@@ -1,0 +1,173 @@
+'use client'
+
+import type { Tables } from '@/types/database'
+
+type Team   = Tables<'teams'>
+type League = Tables<'leagues'>
+
+export type EndDecision =
+  | 'end_regular'
+  | 'end_ot'
+  | 'end_draw'
+  | 'enter_ot'
+  | 'enter_penalties'
+  | 'penalties_home'
+  | 'penalties_away'
+
+export type EndReason =
+  | { kind: 'win_score'; winner: 'home' | 'away'; phase: 'regulation' | 'overtime' }
+  | { kind: 'time_up';   phase:  'regulation' | 'overtime' }
+  | { kind: 'penalties' }
+
+interface Props {
+  reason:     EndReason
+  homeTeam:   Team
+  awayTeam:   Team
+  homeScore:  number
+  awayScore:  number
+  league:     League
+  saving:     boolean
+  onDecision: (d: EndDecision) => void
+}
+
+export function EndMatchModal({
+  reason, homeTeam, awayTeam, homeScore, awayScore, league, saving, onDecision,
+}: Props) {
+  const winner =
+    homeScore > awayScore ? homeTeam :
+    awayScore > homeScore ? awayTeam : null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-5">
+      <div className="w-full max-w-sm rounded-3xl bg-slate-800 p-7 shadow-2xl">
+
+        {/* Live score */}
+        <div className="mb-6 flex items-center justify-center gap-4">
+          <ScoreCol name={homeTeam.name} color={homeTeam.color} score={homeScore} />
+          <span className="text-3xl font-bold text-slate-600">–</span>
+          <ScoreCol name={awayTeam.name} color={awayTeam.color} score={awayScore} />
+        </div>
+
+        {/* Contextual message + actions */}
+        {reason.kind === 'win_score' && (
+          <Section
+            title={`🏆 ${reason.winner === 'home' ? homeTeam.name : awayTeam.name} hit the goal limit!`}
+            titleColor="text-emerald-400"
+          >
+            <Btn onClick={() => onDecision('end_regular')} variant="emerald" disabled={saving}>
+              {saving ? 'Saving…' : 'End Match'}
+            </Btn>
+          </Section>
+        )}
+
+        {reason.kind === 'time_up' && reason.phase === 'regulation' && winner && (
+          <Section
+            title={`⏱ Full Time — ${winner.name} wins!`}
+            titleColor="text-emerald-400"
+          >
+            <Btn onClick={() => onDecision('end_regular')} variant="emerald" disabled={saving}>
+              {saving ? 'Saving…' : 'End Match'}
+            </Btn>
+          </Section>
+        )}
+
+        {reason.kind === 'time_up' && reason.phase === 'regulation' && !winner && (
+          <Section title="⏱ Full Time — It's a draw!" titleColor="text-amber-400">
+            {league.overtime_enabled && (
+              <Btn onClick={() => onDecision('enter_ot')} variant="amber" disabled={saving}>
+                Enter Extra Time
+              </Btn>
+            )}
+            <Btn onClick={() => onDecision('end_draw')} variant="slate" disabled={saving}>
+              {saving ? 'Saving…' : 'End as Draw'}
+            </Btn>
+          </Section>
+        )}
+
+        {reason.kind === 'time_up' && reason.phase === 'overtime' && winner && (
+          <Section
+            title={`⏱ Extra Time Over — ${winner.name} wins!`}
+            titleColor="text-emerald-400"
+          >
+            <Btn onClick={() => onDecision('end_ot')} variant="emerald" disabled={saving}>
+              {saving ? 'Saving…' : 'End Match'}
+            </Btn>
+          </Section>
+        )}
+
+        {reason.kind === 'time_up' && reason.phase === 'overtime' && !winner && (
+          <Section title="⏱ Extra Time Over — Still tied!" titleColor="text-amber-400">
+            {league.penalties_enabled && (
+              <Btn onClick={() => onDecision('enter_penalties')} variant="amber" disabled={saving}>
+                Go to Penalties
+              </Btn>
+            )}
+            <Btn onClick={() => onDecision('end_draw')} variant="slate" disabled={saving}>
+              {saving ? 'Saving…' : 'End as Draw'}
+            </Btn>
+          </Section>
+        )}
+
+        {reason.kind === 'penalties' && (
+          <Section title="🥅 Penalties — Who won?" titleColor="text-amber-400">
+            <Btn onClick={() => onDecision('penalties_home')} variant="sky" disabled={saving}>
+              {saving ? 'Saving…' : homeTeam.name}
+            </Btn>
+            <Btn onClick={() => onDecision('penalties_away')} variant="sky" disabled={saving}>
+              {saving ? 'Saving…' : awayTeam.name}
+            </Btn>
+          </Section>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Internal helpers ──────────────────────────────────────────────────────────
+
+function ScoreCol({ name, color, score }: { name: string; color: string | null; score: number }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      {color && <span className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />}
+      <span className="text-xs text-slate-400">{name}</span>
+      <span className="text-5xl font-black text-white tabular-nums">{score}</span>
+    </div>
+  )
+}
+
+function Section({
+  title, titleColor, children,
+}: { title: string; titleColor: string; children: React.ReactNode }) {
+  return (
+    <>
+      <p className={`mb-5 text-center text-lg font-black leading-snug ${titleColor}`}>{title}</p>
+      <div className="flex flex-col gap-3">{children}</div>
+    </>
+  )
+}
+
+function Btn({
+  children, onClick, variant, disabled,
+}: {
+  children: React.ReactNode
+  onClick:  () => void
+  variant:  'emerald' | 'amber' | 'sky' | 'slate'
+  disabled?: boolean
+}) {
+  const color = {
+    emerald: 'bg-emerald-600 active:bg-emerald-700',
+    amber:   'bg-amber-500 active:bg-amber-600',
+    sky:     'bg-sky-600 active:bg-sky-700',
+    slate:   'bg-slate-600 active:bg-slate-700',
+  }[variant]
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`w-full rounded-2xl py-5 text-lg font-black text-white transition-all active:scale-[0.97] disabled:opacity-50 ${color}`}
+    >
+      {children}
+    </button>
+  )
+}
