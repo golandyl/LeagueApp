@@ -103,6 +103,12 @@ function balanceScore(players: DraftPlayer[]): number {
 
 // Greedily swap same-rating players between teams when the combined balance
 // score of the two affected teams strictly decreases. Repeats until stable.
+//
+// Guard: `after < before` uses strict less-than (not <=).  If two players are
+// identical in every property, swapping them leaves the score unchanged
+// (after === before).  With <= that would set improved=true and restart the
+// loop, swapping them back on the next pass → infinite loop.  Strict < means
+// a swap only fires on genuine improvement, guaranteeing termination.
 function applySwaps(rosters: DraftPlayer[][]): DraftPlayer[][] {
   const r = rosters.map(t => [...t])
   let improved = true
@@ -114,13 +120,16 @@ function applySwaps(rosters: DraftPlayer[][]): DraftPlayer[][] {
         for (let pi = 0; pi < r[i].length; pi++) {
           for (let pj = 0; pj < r[j].length; pj++) {
             const a = r[i][pi], b = r[j][pj]
+            // Skip same object reference — swapping a player with themselves
+            // is a no-op and would confuse the revert logic below.
+            if (a === b) continue
             if (a.rating !== b.rating) continue
 
             const before = balanceScore(r[i]) + balanceScore(r[j])
             r[i][pi] = b; r[j][pj] = a
             const after = balanceScore(r[i]) + balanceScore(r[j])
 
-            if (after < before) { improved = true; break outer }
+            if (after < before) { improved = true; break outer }   // strict <
             r[i][pi] = a; r[j][pj] = b  // revert
           }
         }

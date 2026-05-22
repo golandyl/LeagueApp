@@ -1,7 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_ROUTES = ['/login', '/register', '/']
+// Routes accessible without authentication.
+// /league is served by the (public) route group — standings, rosters, etc.
+const PUBLIC_ROUTES = ['/login', '/register', '/', '/league']
 const MANAGER_ROUTES = ['/manager']
 const PLAYER_ROUTES = ['/player']
 
