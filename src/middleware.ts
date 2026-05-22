@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 // Routes accessible without authentication.
 // /league is served by the (public) route group — standings, rosters, etc.
-const PUBLIC_ROUTES = ['/login', '/register', '/', '/league']
+// /draft is the live draft arena — team leaders join via a public link.
+const PUBLIC_ROUTES = ['/login', '/register', '/', '/league', '/draft']
 const MANAGER_ROUTES = ['/manager']
 const PLAYER_ROUTES = ['/player']
 
