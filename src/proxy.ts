@@ -8,7 +8,7 @@ const PUBLIC_ROUTES = ['/login', '/register', '/', '/league', '/draft']
 const MANAGER_ROUTES = ['/manager']
 const PLAYER_ROUTES = ['/player']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
     const isPlayerRoute = PLAYER_ROUTES.some((r) => pathname.startsWith(r))
 
     if (isManagerRoute && role !== 'manager') {
-      return NextResponse.redirect(new URL('/player/dashboard', request.url))
+      return NextResponse.redirect(new URL('/player-dashboard', request.url))
     }
 
     if (isPlayerRoute && role !== 'player' && role !== 'manager') {
