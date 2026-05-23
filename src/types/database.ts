@@ -25,6 +25,7 @@ export type Database = {
           name: string
           overtime_enabled: boolean
           overtime_length_minutes: number
+          overtime_type: 'GOLDEN_GOAL' | 'CLASSIC'
           penalties_enabled: boolean
           points_draw: number
           points_loss: number
@@ -44,6 +45,7 @@ export type Database = {
           name: string
           overtime_enabled?: boolean
           overtime_length_minutes?: number
+          overtime_type?: 'GOLDEN_GOAL' | 'CLASSIC'
           penalties_enabled?: boolean
           points_draw?: number
           points_loss?: number
@@ -63,6 +65,7 @@ export type Database = {
           name?: string
           overtime_enabled?: boolean
           overtime_length_minutes?: number
+          overtime_type?: 'GOLDEN_GOAL' | 'CLASSIC'
           penalties_enabled?: boolean
           points_draw?: number
           points_loss?: number

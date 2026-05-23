@@ -51,10 +51,18 @@ export function EndMatchModal({
         {/* Contextual message + actions */}
         {reason.kind === 'win_score' && (
           <Section
-            title={`🏆 ${reason.winner === 'home' ? homeTeam.name : awayTeam.name} hit the goal limit!`}
+            title={
+              reason.phase === 'overtime'
+                ? `⚡ Golden Goal! ${reason.winner === 'home' ? homeTeam.name : awayTeam.name} wins!`
+                : `🏆 ${reason.winner === 'home' ? homeTeam.name : awayTeam.name} hit the goal limit!`
+            }
             titleColor="text-emerald-400"
           >
-            <Btn onClick={() => onDecision('end_regular')} variant="emerald" disabled={saving}>
+            <Btn
+              onClick={() => onDecision(reason.phase === 'overtime' ? 'end_ot' : 'end_regular')}
+              variant="emerald"
+              disabled={saving}
+            >
               {saving ? 'Saving…' : 'End Match'}
             </Btn>
           </Section>

@@ -230,7 +230,15 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
       if (winner) {
         pauseTimer()
         setEndReason({ kind: 'win_score', winner, phase: phase as 'regulation' | 'overtime' })
+        return
       }
+    }
+
+    // Golden Goal: first goal in OT ends the match immediately
+    if (phase === 'overtime' && league.overtime_type === 'GOLDEN_GOAL' && nextHome !== nextAway) {
+      const winner = nextHome > nextAway ? 'home' : 'away'
+      pauseTimer()
+      setEndReason({ kind: 'win_score', winner, phase: 'overtime' })
     }
   }
 
@@ -454,6 +462,12 @@ function PreMatch({
           <Row label="Win score" value={`First to ${league.win_score} goals`} />
         )}
         <Row label="Extra time" value={league.overtime_enabled ? `${league.overtime_length_minutes} min` : 'Off'} />
+        {league.overtime_enabled && (
+          <Row
+            label="OT Mode"
+            value={league.overtime_type === 'GOLDEN_GOAL' ? 'Golden Goal' : 'Classic'}
+          />
+        )}
         <Row label="Penalties"  value={league.penalties_enabled ? 'Enabled' : 'Off'} />
       </div>
 
