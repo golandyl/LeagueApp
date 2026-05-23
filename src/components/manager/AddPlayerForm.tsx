@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 
 const POSITIONS = ['GK', 'DEF', 'MID', 'FWD'] as const
@@ -13,6 +14,8 @@ type Stamina  = typeof STAMINAS[number]
 interface Props { leagueId: string }
 
 export function AddPlayerForm({ leagueId }: Props) {
+  const t      = useTranslations('players')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const [open,     setOpen]     = useState(false)
   const [name,     setName]     = useState('')
@@ -44,6 +47,7 @@ export function AddPlayerForm({ leagueId }: Props) {
     }
 
     setName(''); setRating(5); setPosition('MID'); setStamina('Med')
+    setLoading(false)
     setOpen(false)
     router.refresh()
   }
@@ -54,27 +58,27 @@ export function AddPlayerForm({ leagueId }: Props) {
         onClick={() => setOpen(true)}
         className="w-full rounded-2xl border-2 border-dashed border-slate-700 py-4 text-sm font-bold text-slate-400 transition-colors hover:border-slate-500 hover:text-slate-300 active:scale-[0.98]"
       >
-        + Add Player
+        {t('addPlayer')}
       </button>
     )
   }
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl bg-slate-800 p-5 space-y-4">
-      <h3 className="font-black text-white">New Player</h3>
+      <h3 className="font-black text-white">{t('newPlayer')}</h3>
 
       <input
         type="text"
         value={name}
         onChange={e => setName(e.target.value)}
-        placeholder="Full name"
+        placeholder={t('fullName')}
         required
         className="w-full rounded-xl bg-slate-700 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-emerald-500"
       />
 
       <div className="grid grid-cols-3 gap-2">
         <div>
-          <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-400">Rating</p>
+          <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-400">{t('rating')}</p>
           <input
             type="number"
             value={rating}
@@ -85,7 +89,7 @@ export function AddPlayerForm({ leagueId }: Props) {
           />
         </div>
         <div>
-          <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-400">Position</p>
+          <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-400">{t('position')}</p>
           <select
             value={position}
             onChange={e => setPosition(e.target.value as Position)}
@@ -95,7 +99,7 @@ export function AddPlayerForm({ leagueId }: Props) {
           </select>
         </div>
         <div>
-          <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-400">Stamina</p>
+          <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-400">{t('stamina')}</p>
           <select
             value={stamina}
             onChange={e => setStamina(e.target.value as Stamina)}
@@ -114,14 +118,14 @@ export function AddPlayerForm({ leagueId }: Props) {
           onClick={() => { setOpen(false); setError(null) }}
           className="flex-1 rounded-xl bg-slate-700 py-3 text-sm font-bold text-slate-300 active:bg-slate-600"
         >
-          Cancel
+          {tCommon('cancel')}
         </button>
         <button
           type="submit"
           disabled={loading}
           className="flex-1 rounded-xl bg-emerald-500 py-3 text-sm font-black text-white transition-all active:bg-emerald-600 disabled:opacity-60"
         >
-          {loading ? 'Adding…' : 'Add Player'}
+          {loading ? t('adding') : t('add')}
         </button>
       </div>
     </form>

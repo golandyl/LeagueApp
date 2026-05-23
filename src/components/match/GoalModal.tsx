@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import type { Tables } from '@/types/database'
 
 type Team   = Tables<'teams'>
@@ -10,8 +11,8 @@ type Step = 'team' | 'scorer' | 'assist'
 
 export interface GoalSelection {
   scoringTeamId: string
-  scorerId:      string | null   // null = own goal (scorer unknown)
-  assistId:      string | null   // null = solo goal
+  scorerId:      string | null
+  assistId:      string | null
   isOwnGoal:     boolean
 }
 
@@ -25,6 +26,9 @@ interface Props {
 }
 
 export function GoalModal({ homeTeam, awayTeam, homePlayers, awayPlayers, onConfirm, onClose }: Props) {
+  const t       = useTranslations('match')
+  const tCommon = useTranslations('common')
+
   const [step,          setStep]          = useState<Step>('team')
   const [scoringTeamId, setScoringTeamId] = useState<string | null>(null)
   const [scorerId,      setScorerId]      = useState<string | null>(null)
@@ -62,9 +66,9 @@ export function GoalModal({ homeTeam, awayTeam, homePlayers, awayPlayers, onConf
   }
 
   const heading = {
-    team:   '⚽  Which team scored?',
-    scorer: '⚽  Who scored?',
-    assist: '🎯  Who assisted?',
+    team:   `⚽  ${t('whichTeamScored')}`,
+    scorer: `⚽  ${t('whoScored')}`,
+    assist: `🎯  ${t('whoAssisted')}`,
   }[step]
 
   return (
@@ -75,8 +79,11 @@ export function GoalModal({ homeTeam, awayTeam, homePlayers, awayPlayers, onConf
         <div className="mb-6 flex items-start justify-between gap-2">
           <div>
             {step !== 'team' && (
-              <button onClick={goBack} className="mb-1.5 text-sm font-semibold text-sky-400">
-                ← Back
+              <button onClick={goBack} className="mb-1.5 inline-flex items-center gap-1 text-sm font-semibold text-sky-400">
+                <svg className="h-3.5 w-3.5 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+                </svg>
+                {tCommon('back')}
               </button>
             )}
             <h2 className="text-xl font-black text-white">{heading}</h2>
@@ -84,6 +91,7 @@ export function GoalModal({ homeTeam, awayTeam, homePlayers, awayPlayers, onConf
           <button
             onClick={onClose}
             className="shrink-0 rounded-full bg-slate-700 p-2 text-slate-400 hover:text-white"
+            aria-label={tCommon('cancel')}
           >
             ✕
           </button>
@@ -96,7 +104,7 @@ export function GoalModal({ homeTeam, awayTeam, homePlayers, awayPlayers, onConf
               <button
                 key={team.id}
                 onClick={() => pickTeam(team.id)}
-                className="flex items-center gap-4 rounded-2xl border-2 border-slate-600 bg-slate-700 px-5 py-5 text-left transition-all active:scale-[0.97] active:bg-slate-600"
+                className="flex items-center gap-4 rounded-2xl border-2 border-slate-600 bg-slate-700 px-5 py-5 text-start transition-all active:scale-[0.97] active:bg-slate-600"
               >
                 {team.color && (
                   <span
@@ -114,8 +122,8 @@ export function GoalModal({ homeTeam, awayTeam, homePlayers, awayPlayers, onConf
         {step === 'scorer' && (
           <div className="flex flex-col gap-2">
             <PlayerButton
-              label="🙈  Own Goal"
-              sub="Player from the other team"
+              label={`🙈  ${t('ownGoal')}`}
+              sub={t('ownGoalSub')}
               variant="orange"
               onClick={() => pickScorer('own_goal')}
             />
@@ -124,7 +132,7 @@ export function GoalModal({ homeTeam, awayTeam, homePlayers, awayPlayers, onConf
               <PlayerButton key={p.id} label={p.full_name} sub={p.position} onClick={() => pickScorer(p.id)} />
             ))}
             {activePlayers.length === 0 && (
-              <p className="py-4 text-center text-sm text-slate-500">No players on this team</p>
+              <p className="py-4 text-center text-sm text-slate-500">{t('noPlayersOnTeam')}</p>
             )}
           </div>
         )}
@@ -133,8 +141,8 @@ export function GoalModal({ homeTeam, awayTeam, homePlayers, awayPlayers, onConf
         {step === 'assist' && (
           <div className="flex flex-col gap-2">
             <PlayerButton
-              label="👟  Solo Goal"
-              sub="No assist"
+              label={`👟  ${t('soloGoal')}`}
+              sub={t('noAssist')}
               variant="sky"
               onClick={() => pickAssist('solo')}
             />
@@ -159,7 +167,7 @@ function PlayerButton({
   onClick:  () => void
   variant?: 'default' | 'orange' | 'sky'
 }) {
-  const base = 'flex items-center justify-between rounded-xl px-5 py-4 text-left transition-all active:scale-[0.97]'
+  const base = 'flex items-center justify-between rounded-xl px-5 py-4 text-start transition-all active:scale-[0.97]'
   const styles = {
     default: `${base} bg-slate-700 active:bg-slate-600`,
     orange:  `${base} border-2 border-orange-500/30 bg-orange-500/10 active:bg-orange-500/20`,

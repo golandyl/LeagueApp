@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { Tables } from '@/types/database'
 
 type Team   = Tables<'teams'>
@@ -33,9 +34,14 @@ interface Props {
 export function EndMatchModal({
   reason, homeTeam, awayTeam, homeScore, awayScore, league, saving, onDecision,
 }: Props) {
+  const t       = useTranslations('endMatch')
+  const tCommon = useTranslations('common')
+
   const winner =
     homeScore > awayScore ? homeTeam :
     awayScore > homeScore ? awayTeam : null
+
+  const winnerName = winner?.name ?? ''
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-5">
@@ -53,8 +59,8 @@ export function EndMatchModal({
           <Section
             title={
               reason.phase === 'overtime'
-                ? `⚡ Golden Goal! ${reason.winner === 'home' ? homeTeam.name : awayTeam.name} wins!`
-                : `🏆 ${reason.winner === 'home' ? homeTeam.name : awayTeam.name} hit the goal limit!`
+                ? t('goldenGoal', { team: reason.winner === 'home' ? homeTeam.name : awayTeam.name })
+                : t('goalLimit', { team: reason.winner === 'home' ? homeTeam.name : awayTeam.name })
             }
             titleColor="text-emerald-400"
           >
@@ -63,66 +69,66 @@ export function EndMatchModal({
               variant="emerald"
               disabled={saving}
             >
-              {saving ? 'Saving…' : 'End Match'}
+              {saving ? tCommon('saving') : t('endMatch')}
             </Btn>
           </Section>
         )}
 
         {reason.kind === 'time_up' && reason.phase === 'regulation' && winner && (
           <Section
-            title={`⏱ Full Time — ${winner.name} wins!`}
+            title={t('fullTimeWin', { team: winnerName })}
             titleColor="text-emerald-400"
           >
             <Btn onClick={() => onDecision('end_regular')} variant="emerald" disabled={saving}>
-              {saving ? 'Saving…' : 'End Match'}
+              {saving ? tCommon('saving') : t('endMatch')}
             </Btn>
           </Section>
         )}
 
         {reason.kind === 'time_up' && reason.phase === 'regulation' && !winner && (
-          <Section title="⏱ Full Time — It's a draw!" titleColor="text-amber-400">
+          <Section title={t('fullTimeDraw')} titleColor="text-amber-400">
             {league.overtime_enabled && (
               <Btn onClick={() => onDecision('enter_ot')} variant="amber" disabled={saving}>
-                Enter Extra Time
+                {t('enterExtraTime')}
               </Btn>
             )}
             <Btn onClick={() => onDecision('end_draw')} variant="slate" disabled={saving}>
-              {saving ? 'Saving…' : 'End as Draw'}
+              {saving ? tCommon('saving') : t('endAsDraw')}
             </Btn>
           </Section>
         )}
 
         {reason.kind === 'time_up' && reason.phase === 'overtime' && winner && (
           <Section
-            title={`⏱ Extra Time Over — ${winner.name} wins!`}
+            title={t('extraTimeWin', { team: winnerName })}
             titleColor="text-emerald-400"
           >
             <Btn onClick={() => onDecision('end_ot')} variant="emerald" disabled={saving}>
-              {saving ? 'Saving…' : 'End Match'}
+              {saving ? tCommon('saving') : t('endMatch')}
             </Btn>
           </Section>
         )}
 
         {reason.kind === 'time_up' && reason.phase === 'overtime' && !winner && (
-          <Section title="⏱ Extra Time Over — Still tied!" titleColor="text-amber-400">
+          <Section title={t('extraTimeTied')} titleColor="text-amber-400">
             {league.penalties_enabled && (
               <Btn onClick={() => onDecision('enter_penalties')} variant="amber" disabled={saving}>
-                Go to Penalties
+                {t('goToPenalties')}
               </Btn>
             )}
             <Btn onClick={() => onDecision('end_draw')} variant="slate" disabled={saving}>
-              {saving ? 'Saving…' : 'End as Draw'}
+              {saving ? tCommon('saving') : t('endAsDraw')}
             </Btn>
           </Section>
         )}
 
         {reason.kind === 'penalties' && (
-          <Section title="🥅 Penalties — Who won?" titleColor="text-amber-400">
+          <Section title={t('penaltiesWhoWon')} titleColor="text-amber-400">
             <Btn onClick={() => onDecision('penalties_home')} variant="sky" disabled={saving}>
-              {saving ? 'Saving…' : homeTeam.name}
+              {saving ? tCommon('saving') : homeTeam.name}
             </Btn>
             <Btn onClick={() => onDecision('penalties_away')} variant="sky" disabled={saving}>
-              {saving ? 'Saving…' : awayTeam.name}
+              {saving ? tCommon('saving') : awayTeam.name}
             </Btn>
           </Section>
         )}

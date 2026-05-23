@@ -1,19 +1,8 @@
-import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+// Root layout: exists only to satisfy the Next.js convention.
+// The actual <html>/<body> shell — including fonts, lang, and dir — lives in
+// src/app/[locale]/layout.tsx, which Next.js 16 allows as the effective root.
 import './globals.css'
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: 'Sunday League',
-  description: 'Organize your local football league with live scoring, drafts, and standings.',
-}
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
-  )
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
 }

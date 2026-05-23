@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
 
@@ -11,6 +12,10 @@ interface Props {
 }
 
 export function LeagueSettingsModal({ league }: Props) {
+  const t       = useTranslations('settings')
+  const tCreate = useTranslations('createLeague')
+  const tCommon = useTranslations('common')
+
   const [open, setOpen] = useState(false)
 
   // ── Form state ────────────────────────────────────────────────────────────────
@@ -69,7 +74,7 @@ export function LeagueSettingsModal({ league }: Props) {
       {/* ── Trigger ────────────────────────────────────────────────────────── */}
       <button
         onClick={() => setOpen(true)}
-        aria-label="League settings"
+        aria-label={t('title')}
         className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-700 hover:text-white active:scale-95"
       >
         <svg
@@ -100,12 +105,12 @@ export function LeagueSettingsModal({ league }: Props) {
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <div>
-                <h2 className="text-lg font-black text-white">League Settings</h2>
+                <h2 className="text-lg font-black text-white">{t('title')}</h2>
                 <p className="text-xs text-slate-500 mt-0.5">{league.name}</p>
               </div>
               <button
                 onClick={close}
-                aria-label="Close"
+                aria-label={tCommon('cancel')}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-700 hover:text-white"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -121,7 +126,7 @@ export function LeagueSettingsModal({ league }: Props) {
             <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
 
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Match length (min)">
+                <Field label={tCreate('matchLength')}>
                   <input
                     type="number"
                     value={matchMin}
@@ -130,7 +135,7 @@ export function LeagueSettingsModal({ league }: Props) {
                     className={inputCls}
                   />
                 </Field>
-                <Field label="Extra time (min)">
+                <Field label={tCreate('extraTime')}>
                   <input
                     type="number"
                     value={otMin}
@@ -141,7 +146,7 @@ export function LeagueSettingsModal({ league }: Props) {
                 </Field>
               </div>
 
-              <Field label="Overtime Type">
+              <Field label={tCreate('overtimeType')}>
                 <div className="grid grid-cols-2 gap-2">
                   {(['CLASSIC', 'GOLDEN_GOAL'] as const).map(type => (
                     <button
@@ -154,26 +159,26 @@ export function LeagueSettingsModal({ league }: Props) {
                           : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
                       }`}
                     >
-                      {type === 'CLASSIC' ? 'Classic' : 'Golden Goal'}
+                      {type === 'CLASSIC' ? tCreate('overtimeTypeClassic') : tCreate('overtimeTypeGoldenGoal')}
                     </button>
                   ))}
                 </div>
                 <p className="mt-1.5 text-xs text-slate-500">
                   {overtimeType === 'GOLDEN_GOAL'
-                    ? 'First goal in extra time wins immediately.'
-                    : 'Extra time plays to the final whistle.'}
+                    ? tCreate('overtimeTypeGoldenGoalHint')
+                    : tCreate('overtimeTypeClassicHint')}
                 </p>
               </Field>
 
               <Field
-                label="Win Score Limit (optional)"
-                hint="Leave blank for time-based. Set a number for first-to-score."
+                label={tCreate('winScore')}
+                hint={tCreate('winScoreHint')}
               >
                 <input
                   type="number"
                   value={winScore}
                   onChange={e => setWinScore(e.target.value === '' ? '' : Number(e.target.value))}
-                  placeholder="e.g. 7"
+                  placeholder={tCreate('winScorePlaceholder')}
                   min={1}
                   className={inputCls}
                 />
@@ -190,7 +195,11 @@ export function LeagueSettingsModal({ league }: Props) {
                   status === 'saved' ? 'bg-emerald-600' : 'bg-sky-600 hover:bg-sky-500'
                 }`}
               >
-                {status === 'saving' ? 'Saving…' : status === 'saved' ? '✓ Saved' : 'Save Changes'}
+                {status === 'saving'
+                  ? tCommon('saving')
+                  : status === 'saved'
+                  ? `✓ ${tCommon('saved')}`
+                  : tCommon('saveChanges')}
               </button>
 
             </form>
