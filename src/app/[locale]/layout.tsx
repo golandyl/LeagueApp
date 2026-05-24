@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
-import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { TopNavbar } from '@/components/ui/TopNavbar'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
@@ -44,10 +44,11 @@ export default async function LocaleLayout({
       dir={dir}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         <NextIntlClientProvider messages={messages}>
+          {/* Sticky nav — hidden on login/register (handled inside TopNavbar) */}
+          <TopNavbar />
           {children}
-          <LanguageSwitcher />
         </NextIntlClientProvider>
       </body>
     </html>

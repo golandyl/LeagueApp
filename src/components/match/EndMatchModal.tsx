@@ -14,6 +14,8 @@ export type EndDecision =
   | 'enter_penalties'
   | 'penalties_home'
   | 'penalties_away'
+  | 'wc_keep_home'
+  | 'wc_keep_away'
 
 export type EndReason =
   | { kind: 'win_score'; winner: 'home' | 'away'; phase: 'regulation' | 'overtime' }
@@ -21,18 +23,20 @@ export type EndReason =
   | { kind: 'penalties' }
 
 interface Props {
-  reason:     EndReason
-  homeTeam:   Team
-  awayTeam:   Team
-  homeScore:  number
-  awayScore:  number
-  league:     League
-  saving:     boolean
-  onDecision: (d: EndDecision) => void
+  reason:               EndReason
+  homeTeam:             Team
+  awayTeam:             Team
+  homeScore:            number
+  awayScore:            number
+  league:               League
+  saving:               boolean
+  onDecision:           (d: EndDecision) => void
+  winnerContinuesMode?: boolean
 }
 
 export function EndMatchModal({
   reason, homeTeam, awayTeam, homeScore, awayScore, league, saving, onDecision,
+  winnerContinuesMode = false,
 }: Props) {
   const t       = useTranslations('endMatch')
   const tCommon = useTranslations('common')
@@ -86,15 +90,29 @@ export function EndMatchModal({
         )}
 
         {reason.kind === 'time_up' && reason.phase === 'regulation' && !winner && (
-          <Section title={t('fullTimeDraw')} titleColor="text-amber-400">
-            {league.overtime_enabled && (
+          <Section
+            title={winnerContinuesMode ? t('wcWhoStays') : t('fullTimeDraw')}
+            titleColor="text-amber-400"
+          >
+            {!winnerContinuesMode && league.overtime_enabled && (
               <Btn onClick={() => onDecision('enter_ot')} variant="amber" disabled={saving}>
                 {t('enterExtraTime')}
               </Btn>
             )}
-            <Btn onClick={() => onDecision('end_draw')} variant="slate" disabled={saving}>
-              {saving ? tCommon('saving') : t('endAsDraw')}
-            </Btn>
+            {winnerContinuesMode ? (
+              <>
+                <Btn onClick={() => onDecision('wc_keep_home')} variant="sky" disabled={saving}>
+                  {saving ? tCommon('saving') : homeTeam.name}
+                </Btn>
+                <Btn onClick={() => onDecision('wc_keep_away')} variant="sky" disabled={saving}>
+                  {saving ? tCommon('saving') : awayTeam.name}
+                </Btn>
+              </>
+            ) : (
+              <Btn onClick={() => onDecision('end_draw')} variant="slate" disabled={saving}>
+                {saving ? tCommon('saving') : t('endAsDraw')}
+              </Btn>
+            )}
           </Section>
         )}
 
@@ -110,15 +128,29 @@ export function EndMatchModal({
         )}
 
         {reason.kind === 'time_up' && reason.phase === 'overtime' && !winner && (
-          <Section title={t('extraTimeTied')} titleColor="text-amber-400">
-            {league.penalties_enabled && (
+          <Section
+            title={winnerContinuesMode ? t('wcWhoStays') : t('extraTimeTied')}
+            titleColor="text-amber-400"
+          >
+            {!winnerContinuesMode && league.penalties_enabled && (
               <Btn onClick={() => onDecision('enter_penalties')} variant="amber" disabled={saving}>
                 {t('goToPenalties')}
               </Btn>
             )}
-            <Btn onClick={() => onDecision('end_draw')} variant="slate" disabled={saving}>
-              {saving ? tCommon('saving') : t('endAsDraw')}
-            </Btn>
+            {winnerContinuesMode ? (
+              <>
+                <Btn onClick={() => onDecision('wc_keep_home')} variant="sky" disabled={saving}>
+                  {saving ? tCommon('saving') : homeTeam.name}
+                </Btn>
+                <Btn onClick={() => onDecision('wc_keep_away')} variant="sky" disabled={saving}>
+                  {saving ? tCommon('saving') : awayTeam.name}
+                </Btn>
+              </>
+            ) : (
+              <Btn onClick={() => onDecision('end_draw')} variant="slate" disabled={saving}>
+                {saving ? tCommon('saving') : t('endAsDraw')}
+              </Btn>
+            )}
           </Section>
         )}
 

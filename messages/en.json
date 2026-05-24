@@ -5,7 +5,8 @@
     "signOut": "Sign Out",
     "createLeague": "Create League",
     "managerDashboard": "Manager Dashboard",
-    "standings": "Standings"
+    "standings": "Standings",
+    "dashboard": "Dashboard"
   },
   "common": {
     "save": "Save",
@@ -71,12 +72,24 @@
     "current": "Current:",
     "matchCount": "{count, plural, one {# match} other {# matches}}",
     "liveMatchLinks": "Live Match Links",
-    "noMatches": "No matches yet — start a Tournament Day above.",
+    "noMatches": "No matches yet.",
     "viewStandings": "View public standings",
     "vs": "vs",
     "live": "Live",
     "kickOff": "Kick off",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "tabMatchday": "Matchday",
+    "tabTeams": "Teams",
+    "tabRoster": "Roster"
+  },
+  "teams": {
+    "avgRating": "Avg",
+    "noTeams": "No teams yet — start a tournament day.",
+    "shareWhatsApp": "Share to WhatsApp",
+    "swapPlayer": "Swap Player",
+    "swapWith": "Swap with",
+    "swapHint": "Scroll down to pick who to swap with",
+    "noSwapOptions": "No other players available to swap."
   },
   "players": {
     "addPlayer": "+ Add Player",
@@ -99,7 +112,28 @@
     "ghostFillers": "{count, plural, one {# ghost filler added} other {# ghost fillers added}}",
     "needMorePlayers": "Need at least {count} players to start.",
     "generating": "Generating…",
-    "generateMatches": "Generate Matches"
+    "generateMatches": "Generate Matches",
+    "selectPlayers": "Select Tonight's Players",
+    "present": "Present",
+    "absent": "Absent",
+    "checkedIn": "{count, plural, one {# player checked in} other {# players checked in}}",
+    "needMinPlayers": "Select at least {min} players to continue.",
+    "continueToTeams": "Continue",
+    "selectAll": "Select All",
+    "clearAll": "Clear All",
+    "teamSizeEven": "{teams} teams of {size}",
+    "teamSizeMixed": "{bigCount} × {bigSize}, {smallCount} × {smallSize}",
+    "cancelHint": "Close to add or edit players first",
+    "continueToFormat": "Choose Format",
+    "formatStep": "Tournament Format",
+    "roundRobin": "Round Robin",
+    "roundRobinDesc": "Every team plays every other team once.",
+    "winnerContinues": "Winner Continues",
+    "winnerContinuesDesc": "The winner stays on — teams queue up and rotate in.",
+    "cup": "Cup Knockout",
+    "cupDesc": "Bracket-style elimination. Requires exactly 4, 8, or 16 teams.",
+    "cupTeamError": "Cup requires 4, 8, or 16 teams. Go back and adjust the team count.",
+    "cupValidCounts": "Valid: 4, 8, or 16"
   },
   "settings": {
     "title": "League Settings"
@@ -136,7 +170,10 @@
     "ownGoalSub": "Player from the other team",
     "soloGoal": "Solo Goal",
     "noAssist": "No assist",
-    "noPlayersOnTeam": "No players on this team"
+    "noPlayersOnTeam": "No players on this team",
+    "wcNextMatchReady": "Next Match",
+    "wcCreatingNext": "Preparing next match…",
+    "wcStartNext": "Start Next Match →"
   },
   "endMatch": {
     "endMatch": "End Match",
@@ -149,7 +186,8 @@
     "extraTimeWin": "⏱ Extra Time Over — {team} wins!",
     "extraTimeTied": "⏱ Extra Time Over — Still tied!",
     "goToPenalties": "Go to Penalties",
-    "penaltiesWhoWon": "🥅 Penalties — Who won?"
+    "penaltiesWhoWon": "🥅 Penalties — Who won?",
+    "wcWhoStays": "Draw — Who stays on pitch?"
   },
   "standings": {
     "noTournaments": "No tournaments yet.",

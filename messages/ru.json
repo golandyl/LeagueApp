@@ -5,7 +5,8 @@
     "signOut": "Выйти",
     "createLeague": "Создать лигу",
     "managerDashboard": "Панель менеджера",
-    "standings": "Турнирная таблица"
+    "standings": "Турнирная таблица",
+    "dashboard": "Панель"
   },
   "common": {
     "save": "Сохранить",
@@ -76,7 +77,19 @@
     "vs": "vs",
     "live": "Прямой эфир",
     "kickOff": "Начало",
-    "unknown": "Неизвестно"
+    "unknown": "Неизвестно",
+    "tabMatchday": "Игровой день",
+    "tabTeams": "Команды",
+    "tabRoster": "Состав"
+  },
+  "teams": {
+    "avgRating": "Ср.",
+    "noTeams": "Команд пока нет — запустите турнирный день.",
+    "shareWhatsApp": "Поделиться в WhatsApp",
+    "swapPlayer": "Замена игрока",
+    "swapWith": "Поменять с",
+    "swapHint": "Прокрутите вниз, чтобы выбрать игрока для замены",
+    "noSwapOptions": "Нет доступных игроков для замены."
   },
   "players": {
     "addPlayer": "+ Добавить игрока",
@@ -99,7 +112,28 @@
     "ghostFillers": "{count, plural, one {# заполнитель добавлен} few {# заполнителя добавлено} other {# заполнителей добавлено}}",
     "needMorePlayers": "Нужно минимум {count} игроков для начала.",
     "generating": "Генерация…",
-    "generateMatches": "Создать матчи"
+    "generateMatches": "Создать матчи",
+    "selectPlayers": "Выбрать игроков на сегодня",
+    "present": "Присутствует",
+    "absent": "Отсутствует",
+    "checkedIn": "{count, plural, one {# игрок отмечен} few {# игрока отмечено} other {# игроков отмечено}}",
+    "needMinPlayers": "Выберите минимум {min} игроков для продолжения.",
+    "continueToTeams": "Продолжить",
+    "selectAll": "Выбрать всех",
+    "clearAll": "Сбросить",
+    "teamSizeEven": "{teams} команды по {size}",
+    "teamSizeMixed": "{bigCount} × {bigSize}, {smallCount} × {smallSize}",
+    "cancelHint": "Закройте, чтобы сначала добавить или изменить игроков",
+    "continueToFormat": "Выбрать формат",
+    "formatStep": "Формат турнира",
+    "roundRobin": "Круговой турнир",
+    "roundRobinDesc": "Каждая команда играет со всеми остальными по одному разу.",
+    "winnerContinues": "Победитель остаётся",
+    "winnerContinuesDesc": "Победитель остаётся на поле — команды чередуются из очереди.",
+    "cup": "Кубок (плей-офф)",
+    "cupDesc": "Олимпийская система. Требуется ровно 4, 8 или 16 команд.",
+    "cupTeamError": "Кубок требует 4, 8 или 16 команд. Вернитесь и скорректируйте количество команд.",
+    "cupValidCounts": "Допустимо: 4, 8 или 16"
   },
   "settings": {
     "title": "Настройки лиги"
@@ -136,7 +170,10 @@
     "ownGoalSub": "Игрок другой команды",
     "soloGoal": "Соло-гол",
     "noAssist": "Без паса",
-    "noPlayersOnTeam": "В этой команде нет игроков"
+    "noPlayersOnTeam": "В этой команде нет игроков",
+    "wcNextMatchReady": "Следующий матч",
+    "wcCreatingNext": "Готовим следующий матч…",
+    "wcStartNext": "Начать следующий матч →"
   },
   "endMatch": {
     "endMatch": "Завершить матч",
@@ -149,7 +186,8 @@
     "extraTimeWin": "⏱ Овертайм завершён — {team} побеждает!",
     "extraTimeTied": "⏱ Овертайм завершён — Счёт равный!",
     "goToPenalties": "Перейти к пенальти",
-    "penaltiesWhoWon": "🥅 Серия пенальти — Кто победил?"
+    "penaltiesWhoWon": "🥅 Серия пенальти — Кто победил?",
+    "wcWhoStays": "Ничья — Кто остаётся на поле?"
   },
   "standings": {
     "noTournaments": "Турниров пока нет.",

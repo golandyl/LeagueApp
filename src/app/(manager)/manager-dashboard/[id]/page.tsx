@@ -140,7 +140,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
           )}
           <StartTournamentButton
             leagueId={leagueId}
-            playerCount={resolvedPlayers.length}
+            players={resolvedPlayers}
           />
         </section>
 

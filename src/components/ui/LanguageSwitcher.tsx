@@ -44,13 +44,16 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <div ref={ref} className="fixed top-4 end-4 z-50">
+    // `relative` so the dropdown positions relative to this wrapper (not fixed).
+    // z-50 on the dropdown ensures it floats above page content within the
+    // navbar's stacking context while remaining below fixed full-screen modals.
+    <div ref={ref} className="relative">
       {/* Trigger */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label="Switch language"
         aria-expanded={open}
-        className="flex items-center gap-1.5 rounded-full bg-slate-800/90 backdrop-blur-sm border border-slate-700/60 px-3 py-1.5 shadow-lg transition-all hover:bg-slate-700/90 active:scale-95"
+        className="flex items-center gap-1.5 rounded-full border border-slate-700/60 bg-slate-800/90 px-3 py-1.5 shadow-sm backdrop-blur-sm transition-all hover:bg-slate-700/90 active:scale-95"
       >
         <span className="text-base leading-none" aria-hidden="true">{current.flag}</span>
         <span className="text-xs font-bold uppercase tracking-wide text-slate-200">{current.code}</span>
@@ -63,17 +66,17 @@ export function LanguageSwitcher() {
         </svg>
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown — absolute so it overlaps page content below the nav */}
       {open && (
-        <div className="absolute end-0 mt-2 w-44 rounded-2xl bg-slate-800 border border-slate-700/60 shadow-2xl overflow-hidden">
+        <div className="absolute end-0 z-50 mt-2 w-44 overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-800 shadow-2xl">
           {LOCALES.map(l => (
             <button
               key={l.code}
               onClick={() => switchLocale(l.code)}
               className={`flex w-full items-center gap-3 px-4 py-3 text-sm transition-colors ${
                 l.code === locale
-                  ? 'bg-emerald-500/15 text-emerald-300 font-bold'
-                  : 'text-slate-300 hover:bg-slate-700 font-medium'
+                  ? 'bg-emerald-500/15 font-bold text-emerald-300'
+                  : 'font-medium text-slate-300 hover:bg-slate-700'
               }`}
             >
               <span className="text-base leading-none" aria-hidden="true">{l.flag}</span>

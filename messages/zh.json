@@ -5,7 +5,8 @@
     "signOut": "退出登录",
     "createLeague": "创建联赛",
     "managerDashboard": "管理员控制台",
-    "standings": "积分榜"
+    "standings": "积分榜",
+    "dashboard": "控制台"
   },
   "common": {
     "save": "保存",
@@ -76,7 +77,19 @@
     "vs": "对",
     "live": "直播",
     "kickOff": "开球",
-    "unknown": "未知"
+    "unknown": "未知",
+    "tabMatchday": "比赛日",
+    "tabTeams": "球队",
+    "tabRoster": "阵容"
+  },
+  "teams": {
+    "avgRating": "均",
+    "noTeams": "暂无球队 — 请开始一个赛事日。",
+    "shareWhatsApp": "分享至 WhatsApp",
+    "swapPlayer": "交换球员",
+    "swapWith": "与以下球员交换",
+    "swapHint": "向下滚动选择要交换的球员",
+    "noSwapOptions": "没有可交换的球员。"
   },
   "players": {
     "addPlayer": "+ 添加球员",
@@ -99,7 +112,28 @@
     "ghostFillers": "{count, plural, other {已添加 # 个虚拟补位}}",
     "needMorePlayers": "至少需要 {count} 名球员才能开始。",
     "generating": "生成中…",
-    "generateMatches": "生成比赛"
+    "generateMatches": "生成比赛",
+    "selectPlayers": "选择今晚参赛球员",
+    "present": "出席",
+    "absent": "缺席",
+    "checkedIn": "{count, plural, other {{count} 名球员已签到}}",
+    "needMinPlayers": "至少选择 {min} 名球员才能继续。",
+    "continueToTeams": "继续",
+    "selectAll": "全选",
+    "clearAll": "清空",
+    "teamSizeEven": "{teams} 支球队，每队 {size} 人",
+    "teamSizeMixed": "{bigCount} 队 × {bigSize} 人，{smallCount} 队 × {smallSize} 人",
+    "cancelHint": "关闭此窗口以先添加或编辑球员",
+    "continueToFormat": "选择赛制",
+    "formatStep": "赛事格式",
+    "roundRobin": "循环赛",
+    "roundRobinDesc": "每支球队与其他所有球队各对阵一次。",
+    "winnerContinues": "赢者留场",
+    "winnerContinuesDesc": "获胜队留在场上，其他队轮流挑战。",
+    "cup": "淘汰赛（杯赛）",
+    "cupDesc": "单败淘汰制。要求恰好有 4、8 或 16 支球队。",
+    "cupTeamError": "杯赛要求 4、8 或 16 支球队。请返回调整队伍数量。",
+    "cupValidCounts": "有效：4、8 或 16"
   },
   "settings": {
     "title": "联赛设置"
@@ -136,7 +170,10 @@
     "ownGoalSub": "对方球队球员",
     "soloGoal": "单刀球",
     "noAssist": "无助攻",
-    "noPlayersOnTeam": "该队没有球员"
+    "noPlayersOnTeam": "该队没有球员",
+    "wcNextMatchReady": "下一场比赛",
+    "wcCreatingNext": "正在准备下一场比赛…",
+    "wcStartNext": "开始下一场比赛 →"
   },
   "endMatch": {
     "endMatch": "结束比赛",
@@ -149,7 +186,8 @@
     "extraTimeWin": "⏱ 加时赛结束 — {team} 获胜！",
     "extraTimeTied": "⏱ 加时赛结束 — 仍然平局！",
     "goToPenalties": "进行点球大战",
-    "penaltiesWhoWon": "🥅 点球大战 — 谁获胜？"
+    "penaltiesWhoWon": "🥅 点球大战 — 谁获胜？",
+    "wcWhoStays": "平局 — 谁留在场上？"
   },
   "standings": {
     "noTournaments": "暂无赛事。",

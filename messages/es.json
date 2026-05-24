@@ -5,7 +5,8 @@
     "signOut": "Cerrar sesión",
     "createLeague": "Crear liga",
     "managerDashboard": "Panel de gestión",
-    "standings": "Clasificación"
+    "standings": "Clasificación",
+    "dashboard": "Panel"
   },
   "common": {
     "save": "Guardar",
@@ -76,7 +77,19 @@
     "vs": "vs",
     "live": "En vivo",
     "kickOff": "Saque",
-    "unknown": "Desconocido"
+    "unknown": "Desconocido",
+    "tabMatchday": "Jornada",
+    "tabTeams": "Equipos",
+    "tabRoster": "Plantilla"
+  },
+  "teams": {
+    "avgRating": "Med",
+    "noTeams": "Sin equipos aún — inicia un día de torneo.",
+    "shareWhatsApp": "Compartir por WhatsApp",
+    "swapPlayer": "Intercambiar jugador",
+    "swapWith": "Intercambiar con",
+    "swapHint": "Desplázate abajo para elegir con quién intercambiar",
+    "noSwapOptions": "No hay jugadores disponibles para intercambiar."
   },
   "players": {
     "addPlayer": "+ Añadir jugador",
@@ -99,7 +112,28 @@
     "ghostFillers": "{count, plural, one {# relleno fantasma añadido} other {# rellenos fantasma añadidos}}",
     "needMorePlayers": "Se necesitan al menos {count} jugadores para empezar.",
     "generating": "Generando…",
-    "generateMatches": "Generar partidos"
+    "generateMatches": "Generar partidos",
+    "selectPlayers": "Seleccionar jugadores de esta noche",
+    "present": "Presente",
+    "absent": "Ausente",
+    "checkedIn": "{count, plural, one {# jugador registrado} other {# jugadores registrados}}",
+    "needMinPlayers": "Selecciona al menos {min} jugadores para continuar.",
+    "continueToTeams": "Continuar",
+    "selectAll": "Seleccionar todo",
+    "clearAll": "Limpiar",
+    "teamSizeEven": "{teams} equipos de {size}",
+    "teamSizeMixed": "{bigCount} × {bigSize}, {smallCount} × {smallSize}",
+    "cancelHint": "Cierra para añadir o editar jugadores primero",
+    "continueToFormat": "Elegir formato",
+    "formatStep": "Formato del torneo",
+    "roundRobin": "Todos contra todos",
+    "roundRobinDesc": "Cada equipo juega contra todos los demás una vez.",
+    "winnerContinues": "El ganador continúa",
+    "winnerContinuesDesc": "El ganador se queda — los equipos rotan desde la cola.",
+    "cup": "Copa (eliminatoria)",
+    "cupDesc": "Eliminación directa. Requiere exactamente 4, 8 o 16 equipos.",
+    "cupTeamError": "La copa requiere 4, 8 o 16 equipos. Vuelve atrás y ajusta el número de equipos.",
+    "cupValidCounts": "Válido: 4, 8 o 16"
   },
   "settings": {
     "title": "Configuración de la liga"
@@ -136,7 +170,10 @@
     "ownGoalSub": "Jugador del otro equipo",
     "soloGoal": "Gol en solitario",
     "noAssist": "Sin asistencia",
-    "noPlayersOnTeam": "No hay jugadores en este equipo"
+    "noPlayersOnTeam": "No hay jugadores en este equipo",
+    "wcNextMatchReady": "Siguiente partido",
+    "wcCreatingNext": "Preparando el siguiente partido…",
+    "wcStartNext": "Iniciar siguiente partido →"
   },
   "endMatch": {
     "endMatch": "Terminar partido",
@@ -149,7 +186,8 @@
     "extraTimeWin": "⏱ Prórroga terminada — ¡{team} gana!",
     "extraTimeTied": "⏱ Prórroga terminada — ¡Sigue empatado!",
     "goToPenalties": "Ir a penaltis",
-    "penaltiesWhoWon": "🥅 Penaltis — ¿Quién ganó?"
+    "penaltiesWhoWon": "🥅 Penaltis — ¿Quién ganó?",
+    "wcWhoStays": "Empate — ¿Quién se queda en el campo?"
   },
   "standings": {
     "noTournaments": "No hay torneos aún.",

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables, Enums, TablesInsert } from '@/types/database'
 import { LiveTimer }    from '@/components/match/LiveTimer'
@@ -21,44 +22,38 @@ interface RecordedGoal {
   scoringTeamId: string
   scorerId:      string | null
   assistId:      string | null
-  minute:        number    // real football minute, e.g. 83 → displayed as "83'"
+  minute:        number
   isOwnGoal:     boolean
 }
 
 // ── localStorage persistence ──────────────────────────────────────────────────
 
-const MAX_RECOVERY_AGE_MS = 8 * 60 * 60 * 1000   // ignore saves older than 8 h
+const MAX_RECOVERY_AGE_MS = 8 * 60 * 60 * 1000
 
 interface SavedState {
   matchId:        string
   matchStatus:    MatchStatus
   phase:          Phase
   secondsElapsed: number
-  timerRunning:   boolean   // only used to compute drift on recovery
+  timerRunning:   boolean
   homeScore:      number
   awayScore:      number
   goals:          RecordedGoal[]
   endReason:      EndReason | null
-  savedAt:        number    // Date.now() — lets us compute how long we were away
+  savedAt:        number
 }
 
 function storageKey(id: string) { return `match_arena:${id}` }
 
-/**
- * Parses, validates, and drift-corrects a saved match state from localStorage.
- * Adds elapsed drift to secondsElapsed so the clock shows the right value
- * the instant the component mounts, with no visible jump.
- */
 function readSaved(matchId: string): (SavedState & { driftSeconds: number }) | null {
   if (typeof window === 'undefined') return null
   try {
     const raw = localStorage.getItem(storageKey(matchId))
     if (!raw) return null
     const s = JSON.parse(raw) as SavedState
-    if (s.matchId !== matchId)   return null   // stale from another match
-    if (s.matchStatus !== 'live') return null   // pre/ended state isn't worth recovering
+    if (s.matchId !== matchId)    return null
+    if (s.matchStatus !== 'live') return null
     if (Date.now() - s.savedAt > MAX_RECOVERY_AGE_MS) return null
-    // If the timer was running when we left, calculate how much real time passed
     const driftSeconds = s.timerRunning
       ? Math.max(0, Math.floor((Date.now() - s.savedAt) / 1000))
       : 0
@@ -77,95 +72,77 @@ function clearSaved(matchId: string) {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 interface Props {
-  match:       Match
-  league:      League
-  homeTeam:    Team
-  awayTeam:    Team
-  homePlayers: Player[]
-  awayPlayers: Player[]
+  match:            Match
+  league:           League
+  homeTeam:         Team
+  awayTeam:         Team
+  homePlayers:      Player[]
+  awayPlayers:      Player[]
+  tournamentFormat: string
 }
 
-export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awayPlayers }: Props) {
+export function MatchArena({
+  match, league, homeTeam, awayTeam, homePlayers, awayPlayers, tournamentFormat,
+}: Props) {
   const t        = useTranslations('match')
   const supabase = createClient()
 
-  // ── Recovery — one synchronous read before any other useState ────────────────
-  // All downstream useState calls use this snapshot as their initial value,
-  // guaranteeing localStorage is parsed exactly once per mount.
+  const isWinnerContinues = tournamentFormat === 'winner_continues'
+
   const [recovered] = useState(() => readSaved(match.id))
   const wasRecovered = recovered !== null
 
-  // ── Match lifecycle ──────────────────────────────────────────────────────────
   const [matchStatus, setMatchStatus] = useState<MatchStatus>(
     recovered?.matchStatus ?? (match.status === 'completed' ? 'ended' : 'pre'),
   )
   const [phase, setPhase] = useState<Phase>(recovered?.phase ?? 'regulation')
 
-  // ── Timer ─────────────────────────────────────────────────────────────────────
-  // Drift is folded into secondsElapsed on mount so the clock is instantly correct.
-  // Timer always starts paused on recovery — manager confirms state before resuming.
   const [secondsElapsed, setSecondsElapsed] = useState(
     recovered ? recovered.secondsElapsed + recovered.driftSeconds : 0,
   )
   const [timerRunning, setTimerRunning] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Time limit for the current phase (seconds)
   const timeLimit =
     phase === 'regulation'
       ? league.match_length_minutes * 60
       : league.overtime_length_minutes * 60
 
-  // Stoppage time: the phase clock has expired but the manager hasn't blown the
-  // whistle yet. The timer keeps running (count-up continues, turns red).
-  // Goals can still be scored. The "Pause" button is replaced by "Blow Whistle".
   const isStoppageTime =
     matchStatus === 'live' &&
-    phase       !== 'penalties' &&   // no stoppage concept during penalties
+    phase       !== 'penalties' &&
     secondsElapsed >= timeLimit
 
-  // ── Scores + goals ────────────────────────────────────────────────────────────
   const [homeScore, setHomeScore] = useState(recovered?.homeScore ?? match.home_score ?? 0)
   const [awayScore, setAwayScore] = useState(recovered?.awayScore ?? match.away_score ?? 0)
   const [goals,     setGoals]     = useState<RecordedGoal[]>(recovered?.goals ?? [])
-  // finalVC is set locally when a match ends so FinalScreen shows the right label
-  // before the server prop has a chance to update.
-  const [finalVC, setFinalVC] = useState<Enums<'victory_condition'> | null>(
+  const [finalVC,   setFinalVC]   = useState<Enums<'victory_condition'> | null>(
     match.status === 'completed' ? match.victory_condition : null,
   )
 
-  // ── Modal / banner state ──────────────────────────────────────────────────────
   const [showGoalModal,      setShowGoalModal]      = useState(false)
   const [endReason,          setEndReason]          = useState<EndReason | null>(recovered?.endReason ?? null)
   const [saving,             setSaving]             = useState(false)
   const [showRecoveryBanner, setShowRecoveryBanner] = useState(wasRecovered)
 
+  // Winner Continues queue state
+  const [nextMatchId, setNextMatchId] = useState<string | null>(null)
+  const [wcLoading,   setWcLoading]   = useState(false)
+
   useEffect(() => {
     if (!showRecoveryBanner) return
-    const t = setTimeout(() => setShowRecoveryBanner(false), 6000)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setShowRecoveryBanner(false), 6000)
+    return () => clearTimeout(timer)
   }, [showRecoveryBanner])
 
-  // ── Sync loop ─────────────────────────────────────────────────────────────────
-  // Fires on every meaningful state change, including every timer tick while
-  // running (keeping savedAt fresh for accurate drift computation on recovery).
   useEffect(() => {
     if (matchStatus !== 'live') return
     writeSaved({
-      matchId:   match.id,
-      matchStatus,
-      phase,
-      secondsElapsed,
-      timerRunning,
-      homeScore,
-      awayScore,
-      goals,
-      endReason,
-      savedAt:   Date.now(),
+      matchId: match.id, matchStatus, phase, secondsElapsed,
+      timerRunning, homeScore, awayScore, goals, endReason, savedAt: Date.now(),
     })
   }, [matchStatus, phase, secondsElapsed, timerRunning, homeScore, awayScore, goals, endReason, match.id])
 
-  // ── Timer helpers ─────────────────────────────────────────────────────────────
   const stopInterval = useCallback(() => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null }
   }, [])
@@ -185,7 +162,6 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
 
   useEffect(() => () => stopInterval(), [stopInterval])
 
-  // ── Kick off ──────────────────────────────────────────────────────────────────
   async function handleKickOff() {
     await supabase
       .from('matches')
@@ -195,9 +171,6 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
     startTimer()
   }
 
-  // ── Goal minute ───────────────────────────────────────────────────────────────
-  // Math.ceil gives real-football minutes: first second = 1', sixtieth second = 1'.
-  // OT minutes continue counting from where regulation ended (e.g. 60+3 = 63').
   function currentMinute(): number {
     const phaseMinute = Math.max(1, Math.ceil(secondsElapsed / 60))
     return phase === 'overtime'
@@ -205,7 +178,6 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
       : phaseMinute
   }
 
-  // ── Goal recording ────────────────────────────────────────────────────────────
   function handleGoalConfirm(sel: GoalSelection) {
     setShowGoalModal(false)
 
@@ -224,7 +196,6 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
       isOwnGoal:     sel.isOwnGoal,
     }])
 
-    // Win-score threshold fires even during stoppage time
     if (league.win_score !== null) {
       const winner =
         nextHome >= league.win_score ? 'home' :
@@ -236,7 +207,6 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
       }
     }
 
-    // Golden Goal: first goal in OT ends the match immediately
     if (phase === 'overtime' && league.overtime_type === 'GOLDEN_GOAL' && nextHome !== nextAway) {
       const winner = nextHome > nextAway ? 'home' : 'away'
       pauseTimer()
@@ -244,24 +214,75 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
     }
   }
 
-  // ── Blow whistle ──────────────────────────────────────────────────────────────
-  // Only reachable when isStoppageTime === true (button is visible in LiveTimer).
-  // Pauses the clock and hands control to EndMatchModal to resolve the result.
   function handleWhistle() {
     pauseTimer()
     setEndReason({ kind: 'time_up', phase: phase as 'regulation' | 'overtime' })
   }
 
-  // ── End match decisions ───────────────────────────────────────────────────────
+  // ── Winner Continues queue engine ─────────────────────────────────────────────
+  // Queries all teams in the tournament, ranks non-winner teams by their most
+  // recent played_at (NULLS FIRST = hasn't played yet gets priority), then
+  // inserts a new scheduled match: winner vs top-of-queue.
+  async function createNextWCMatch(winnerId: string): Promise<string | null> {
+    const [{ data: allTeams }, { data: completedMatches }] = await Promise.all([
+      supabase
+        .from('teams')
+        .select('id')
+        .eq('tournament_id', match.tournament_id),
+      supabase
+        .from('matches')
+        .select('home_team_id, away_team_id, played_at')
+        .eq('tournament_id', match.tournament_id)
+        .eq('status', 'completed'),
+    ])
+
+    if (!allTeams || allTeams.length < 2) return null
+
+    // Build most-recent played_at per team from completed match history
+    const lastPlayedMap = new Map<string, string | null>()
+    for (const team of allTeams) lastPlayedMap.set(team.id, null)
+    for (const m of completedMatches ?? []) {
+      if (!m.played_at) continue
+      const hPrev = lastPlayedMap.get(m.home_team_id)
+      if (!hPrev || m.played_at > hPrev) lastPlayedMap.set(m.home_team_id, m.played_at)
+      const aPrev = lastPlayedMap.get(m.away_team_id)
+      if (!aPrev || m.played_at > aPrev) lastPlayedMap.set(m.away_team_id, m.played_at)
+    }
+
+    // Sort: null (never played) first, then ascending by last played timestamp
+    const queue = allTeams
+      .filter(t => t.id !== winnerId)
+      .sort((a, b) => {
+        const pa = lastPlayedMap.get(a.id)
+        const pb = lastPlayedMap.get(b.id)
+        if (!pa && !pb) return 0
+        if (!pa) return -1
+        if (!pb) return 1
+        return pa < pb ? -1 : 1
+      })
+
+    const nextOpponent = queue[0]
+    if (!nextOpponent) return null
+
+    const { data: newMatch } = await supabase
+      .from('matches')
+      .insert({
+        league_id:     match.league_id,
+        tournament_id: match.tournament_id,
+        home_team_id:  winnerId,
+        away_team_id:  nextOpponent.id,
+        status:        'scheduled',
+        match_date:    new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+
+    return newMatch?.id ?? null
+  }
+
+  // ── End match decisions ────────────────────────────────────────────────────────
   async function handleEndDecision(decision: EndDecision) {
     if (decision === 'enter_ot') {
-      // Key OT math: carry the stoppage overrun into OT so the total extra time
-      // doesn't exceed the configured OT duration.
-      //
-      // Example: 60-min regulation, 2-min stoppage → secondsElapsed = 3720
-      //   overRunSeconds = 3720 - 3600 = 120  (2 min)
-      //   OT configured  = 5 min = 300 s
-      //   OT timer starts at 02:00, blows at 05:00 → 3 min of actual OT
       const overRunSeconds = Math.max(0, secondsElapsed - league.match_length_minutes * 60)
       setPhase('overtime')
       setSecondsElapsed(overRunSeconds)
@@ -283,20 +304,47 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
     if (decision === 'end_ot') {
       vc = 'OVERTIME'
     } else if (decision === 'penalties_home') {
-      vc = 'PENALTIES'; finalHome = homeScore + 1   // +1 marks the penalty winner
+      vc = 'PENALTIES'; finalHome = homeScore + 1
     } else if (decision === 'penalties_away') {
       vc = 'PENALTIES'; finalAway = awayScore + 1
     }
-    // 'end_regular' and 'end_draw' leave vc as 'REGULAR'
+    // end_regular, end_draw, wc_keep_home, wc_keep_away → vc stays REGULAR
+
+    // Determine Winner Continues winner for queue advancement
+    let wcWinnerId: string | null = null
+    if (isWinnerContinues) {
+      if (decision === 'wc_keep_home' || decision === 'penalties_home') {
+        wcWinnerId = homeTeam.id
+      } else if (decision === 'wc_keep_away' || decision === 'penalties_away') {
+        wcWinnerId = awayTeam.id
+      } else if (finalHome > finalAway) {
+        wcWinnerId = homeTeam.id
+      } else if (finalAway > finalHome) {
+        wcWinnerId = awayTeam.id
+      }
+      // Pure draw that slipped through (shouldn't happen in WC mode since
+      // EndMatchModal replaces "End as Draw" with team buttons)
+    }
 
     setSaving(true)
     try {
       await persistMatch(vc, finalHome, finalAway)
-      clearSaved(match.id)   // DB is now the source of truth
+      clearSaved(match.id)
       setFinalVC(vc)
       setMatchStatus('ended')
     } finally {
       setSaving(false)
+    }
+
+    // After the match is persisted and FinalScreen is showing, build next WC match
+    if (wcWinnerId) {
+      setWcLoading(true)
+      try {
+        const nextId = await createNextWCMatch(wcWinnerId)
+        setNextMatchId(nextId)
+      } finally {
+        setWcLoading(false)
+      }
     }
   }
 
@@ -357,6 +405,8 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
         homePlayers={homePlayers}
         awayPlayers={awayPlayers}
         victoryCondition={finalVC}
+        nextMatchId={nextMatchId}
+        wcLoading={wcLoading}
       />
     )
   }
@@ -395,7 +445,6 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
         onWhistle={handleWhistle}
       />
 
-      {/* Goal button — always visible, tappable even in stoppage time */}
       <button
         onClick={() => setShowGoalModal(true)}
         className="w-full rounded-2xl bg-emerald-600 py-7 text-2xl font-black uppercase tracking-widest text-white transition-all active:scale-[0.97] active:bg-emerald-700"
@@ -434,6 +483,7 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
           league={league}
           saving={saving}
           onDecision={handleEndDecision}
+          winnerContinuesMode={isWinnerContinues}
         />
       )}
     </div>
@@ -488,6 +538,7 @@ function PreMatch({
 function FinalScreen({
   homeTeam, awayTeam, homeScore, awayScore, goals,
   homePlayers, awayPlayers, victoryCondition,
+  nextMatchId, wcLoading,
 }: {
   homeTeam:         Team
   awayTeam:         Team
@@ -497,6 +548,8 @@ function FinalScreen({
   homePlayers:      Player[]
   awayPlayers:      Player[]
   victoryCondition: Enums<'victory_condition'> | null
+  nextMatchId:      string | null
+  wcLoading:        boolean
 }) {
   const t = useTranslations('match')
 
@@ -520,6 +573,25 @@ function FinalScreen({
 
       {vcLabel && (
         <p className="text-center text-sm font-semibold text-amber-400">{vcLabel}</p>
+      )}
+
+      {/* Winner Continues — next match CTA */}
+      {(wcLoading || nextMatchId) && (
+        <div className="rounded-2xl bg-slate-800 p-5">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">
+            {t('wcNextMatchReady')}
+          </p>
+          {wcLoading ? (
+            <p className="text-sm text-slate-500">{t('wcCreatingNext')}</p>
+          ) : nextMatchId ? (
+            <Link
+              href={`/match/${nextMatchId}`}
+              className="block w-full rounded-2xl bg-sky-600 py-5 text-center text-base font-black text-white transition-all active:scale-[0.97] active:bg-sky-700"
+            >
+              {t('wcStartNext')}
+            </Link>
+          ) : null}
+        </div>
       )}
 
       {goals.length > 0 ? (
@@ -564,12 +636,10 @@ function GoalLog({
           return (
             <li key={g.localId} className="flex items-baseline gap-2">
               <span className="text-base leading-none">⚽</span>
-              {/* Minute — broadcast-style amber */}
               <span className="shrink-0 font-black tabular-nums text-amber-400">
                 {g.minute}&apos;
               </span>
               <span className="text-slate-400">—</span>
-              {/* Team colour dot + name */}
               <div className="flex min-w-0 flex-1 items-center gap-1.5">
                 {team.color && (
                   <span
@@ -579,7 +649,6 @@ function GoalLog({
                 )}
                 <span className="truncate text-sm font-semibold text-white">{scorer}</span>
               </div>
-              {/* Assist */}
               {g.assistId && (
                 <span className="shrink-0 text-xs text-slate-400">
                   ▶ {playerName(g.assistId)}

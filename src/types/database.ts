@@ -400,6 +400,7 @@ export type Database = {
           created_at: string
           draft_status: Database["public"]["Enums"]["draft_status"]
           end_date: string | null
+          format: string
           id: string
           league_id: string
           name: string
@@ -412,6 +413,7 @@ export type Database = {
           created_at?: string
           draft_status?: Database["public"]["Enums"]["draft_status"]
           end_date?: string | null
+          format?: string
           id?: string
           league_id: string
           name: string
@@ -424,6 +426,7 @@ export type Database = {
           created_at?: string
           draft_status?: Database["public"]["Enums"]["draft_status"]
           end_date?: string | null
+          format?: string
           id?: string
           league_id?: string
           name?: string

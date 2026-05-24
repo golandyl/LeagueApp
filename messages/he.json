@@ -5,7 +5,8 @@
     "signOut": "התנתקות",
     "createLeague": "יצירת ליגה",
     "managerDashboard": "לוח בקרה",
-    "standings": "טבלת דירוג"
+    "standings": "טבלת דירוג",
+    "dashboard": "לוח בקרה"
   },
   "common": {
     "save": "שמור",
@@ -76,7 +77,19 @@
     "vs": "נגד",
     "live": "שידור חי",
     "kickOff": "פתיחה",
-    "unknown": "לא ידוע"
+    "unknown": "לא ידוע",
+    "tabMatchday": "יום משחק",
+    "tabTeams": "קבוצות",
+    "tabRoster": "הרכב"
+  },
+  "teams": {
+    "avgRating": "ממוצע",
+    "noTeams": "אין קבוצות עדיין — התחל יום טורניר.",
+    "shareWhatsApp": "שתף בוואטסאפ",
+    "swapPlayer": "החלפת שחקן",
+    "swapWith": "החלף עם",
+    "swapHint": "גלול למטה כדי לבחור עם מי להחליף",
+    "noSwapOptions": "אין שחקנים זמינים להחלפה."
   },
   "players": {
     "addPlayer": "+ הוסף שחקן",
@@ -99,7 +112,28 @@
     "ghostFillers": "{count, plural, one {# מילוי רפאים נוסף} other {# מילויי רפאים נוספו}}",
     "needMorePlayers": "דרושים לפחות {count} שחקנים להתחיל.",
     "generating": "יוצר…",
-    "generateMatches": "צור משחקים"
+    "generateMatches": "צור משחקים",
+    "selectPlayers": "בחר שחקנים להערב",
+    "present": "נוכח",
+    "absent": "נעדר",
+    "checkedIn": "{count, plural, one {# שחקן נרשם} other {# שחקנים נרשמו}}",
+    "needMinPlayers": "בחר לפחות {min} שחקנים כדי להמשיך.",
+    "continueToTeams": "המשך",
+    "selectAll": "בחר הכל",
+    "clearAll": "נקה הכל",
+    "teamSizeEven": "{teams} קבוצות של {size}",
+    "teamSizeMixed": "{bigCount} × {bigSize}, {smallCount} × {smallSize}",
+    "cancelHint": "סגור כדי להוסיף או לערוך שחקנים",
+    "continueToFormat": "בחר פורמט",
+    "formatStep": "פורמט הטורניר",
+    "roundRobin": "כולם נגד כולם",
+    "roundRobinDesc": "כל קבוצה משחקת נגד כל שאר הקבוצות פעם אחת.",
+    "winnerContinues": "הזוכה נשאר",
+    "winnerContinuesDesc": "הזוכה נשאר על המגרש — הקבוצות מסתובבות בתור.",
+    "cup": "גביע (נוקאאוט)",
+    "cupDesc": "פורמט הדחה. דורש בדיוק 4, 8 או 16 קבוצות.",
+    "cupTeamError": "גביע דורש 4, 8 או 16 קבוצות. חזור אחורה ושנה את מספר הקבוצות.",
+    "cupValidCounts": "תקני: 4, 8 או 16"
   },
   "settings": {
     "title": "הגדרות ליגה"
@@ -136,7 +170,10 @@
     "ownGoalSub": "שחקן מהקבוצה השנייה",
     "soloGoal": "גול יחיד",
     "noAssist": "ללא בישול",
-    "noPlayersOnTeam": "אין שחקנים בקבוצה זו"
+    "noPlayersOnTeam": "אין שחקנים בקבוצה זו",
+    "wcNextMatchReady": "משחק הבא",
+    "wcCreatingNext": "מכין את המשחק הבא…",
+    "wcStartNext": "התחל משחק הבא →"
   },
   "endMatch": {
     "endMatch": "סיים משחק",
@@ -149,7 +186,8 @@
     "extraTimeWin": "⏱ הארכה הסתיימה — {team} ניצחה!",
     "extraTimeTied": "⏱ הארכה הסתיימה — עדיין שוויון!",
     "goToPenalties": "עבור לפנדלים",
-    "penaltiesWhoWon": "🥅 פנדלים — מי ניצח?"
+    "penaltiesWhoWon": "🥅 פנדלים — מי ניצח?",
+    "wcWhoStays": "תיקו — מי נשאר על המגרש?"
   },
   "standings": {
     "noTournaments": "אין טורנירים עדיין.",
