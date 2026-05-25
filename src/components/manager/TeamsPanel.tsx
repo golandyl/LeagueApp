@@ -17,12 +17,11 @@ interface Props {
   teams:       Team[]
   players:     Player[]
   teamPlayers: TeamPlayerRow[]
+  readOnly?:   boolean
 }
 
 // FWD at top (attacking end), GK at bottom (defending goal)
-const PITCH_ORDER: Position[]  = ['FWD', 'MID', 'DEF', 'GK']
-// Readable share order: GK first
-const SHARE_ORDER: Position[]  = ['GK', 'DEF', 'MID', 'FWD']
+const PITCH_ORDER: Position[] = ['FWD', 'MID', 'DEF', 'GK']
 
 const PIN_COLOR: Record<Position, string> = {
   GK:  '#F59E0B',   // amber
@@ -50,7 +49,7 @@ function groupByPos(roster: Player[]): Record<Position, Player[]> {
 
 // ── Root panel ─────────────────────────────────────────────────────────────────
 
-export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp }: Props) {
+export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp, readOnly = false }: Props) {
   const t       = useTranslations('teams')
   const tCommon = useTranslations('common')
   const supabase = createClient()
@@ -138,11 +137,9 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp 
     const lines: string[] = [`🏆 ${tournament.name}`, '']
     for (const team of teams) {
       const roster = teamRosters.get(team.id) ?? []
-      lines.push(`${team.name}  ⭐ ${calcAvg(roster)}`)
-      const byPos = groupByPos(roster)
-      for (const pos of SHARE_ORDER) {
-        const pp = byPos[pos]
-        if (pp.length > 0) lines.push(`${pos}: ${pp.map(p => p.full_name).join(', ')}`)
+      lines.push(`${team.name}:`)
+      for (const player of roster) {
+        lines.push(`• ${player.full_name}`)
       }
       lines.push('')
     }
@@ -159,14 +156,16 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp 
   return (
     <div className="space-y-4">
 
-      {/* WhatsApp share */}
-      <button
-        onClick={handleShareWhatsApp}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] py-4 text-sm font-black text-white shadow-lg transition-all active:scale-[0.97] active:opacity-90"
-      >
-        <WhatsAppIcon />
-        {t('shareWhatsApp')}
-      </button>
+      {/* WhatsApp share — hidden in read-only mode */}
+      {!readOnly && (
+        <button
+          onClick={handleShareWhatsApp}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] py-4 text-sm font-black text-white shadow-lg transition-all active:scale-[0.97] active:opacity-90"
+        >
+          <WhatsAppIcon />
+          {t('shareWhatsApp')}
+        </button>
+      )}
 
       {swapError && (
         <p className="rounded-xl bg-red-900/40 px-4 py-3 text-sm text-red-300">{swapError}</p>
@@ -179,16 +178,18 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp 
           team={team}
           roster={teamRosters.get(team.id) ?? []}
           selectedPlayerId={swapSource?.playerId ?? null}
-          onPlayerTap={(pid) =>
-            setSwapSource(prev =>
-              prev?.playerId === pid ? null : { playerId: pid, fromTeamId: team.id }
-            )
+          readOnly={readOnly}
+          onPlayerTap={readOnly
+            ? () => {}
+            : (pid) => setSwapSource(prev =>
+                prev?.playerId === pid ? null : { playerId: pid, fromTeamId: team.id }
+              )
           }
         />
       ))}
 
-      {/* Swap bottom sheet */}
-      {swapSource && (
+      {/* Swap bottom sheet — hidden in read-only mode */}
+      {!readOnly && swapSource && (
         <SwapSheet
           sourcePlayer={playerById.get(swapSource.playerId)!}
           options={swapOptions}
@@ -205,12 +206,13 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp 
 // ── Team card ──────────────────────────────────────────────────────────────────
 
 function TeamCard({
-  team, roster, selectedPlayerId, onPlayerTap,
+  team, roster, selectedPlayerId, onPlayerTap, readOnly,
 }: {
   team:             Team
   roster:           Player[]
   selectedPlayerId: string | null
   onPlayerTap:      (playerId: string) => void
+  readOnly?:        boolean
 }) {
   const t     = useTranslations('teams')
   const byPos = groupByPos(roster)
@@ -228,9 +230,13 @@ function TeamCard({
           />
         )}
         <span className="min-w-0 flex-1 truncate font-black text-white">{team.name}</span>
-        <span className="shrink-0 rounded-full bg-emerald-900/60 px-2.5 py-1 text-xs font-black text-emerald-300 ring-1 ring-emerald-700/50">
-          {t('avgRating')} {avg}
-        </span>
+        {/* Prominent rating badge */}
+        <div className="shrink-0 rounded-2xl bg-emerald-900/40 px-3.5 py-2 text-center ring-1 ring-emerald-700/40">
+          <p className="text-2xl font-black tabular-nums leading-none text-emerald-300">{avg}</p>
+          <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-emerald-600/80">
+            {t('avgRating')}
+          </p>
+        </div>
       </div>
 
       {/* Tactics board */}
@@ -255,6 +261,7 @@ function TeamCard({
                     pos={pos}
                     isSelected={selectedPlayerId === player.id}
                     onTap={onPlayerTap}
+                    readOnly={readOnly}
                   />
                 ))}
               </div>
@@ -263,8 +270,8 @@ function TeamCard({
         </div>
       </div>
 
-      {/* Swap hint when a player in this card is selected */}
-      {selectedPlayerId && roster.some(p => p.id === selectedPlayerId) && (
+      {/* Swap hint — hidden in read-only mode */}
+      {!readOnly && selectedPlayerId && roster.some(p => p.id === selectedPlayerId) && (
         <p className="px-4 pb-3 text-center text-xs font-semibold text-amber-400">
           {t('swapHint')}
         </p>
@@ -300,24 +307,18 @@ function PitchMarkings() {
 // ── Player pin ─────────────────────────────────────────────────────────────────
 
 function PlayerPin({
-  player, pos, isSelected, onTap,
+  player, pos, isSelected, onTap, readOnly,
 }: {
   player:     Player
   pos:        Position
   isSelected: boolean
   onTap:      (playerId: string) => void
+  readOnly?:  boolean
 }) {
   const pinColor = PIN_COLOR[pos]
 
-  return (
-    <button
-      onClick={() => onTap(player.id)}
-      className={[
-        'flex flex-col items-center gap-0.5 transition-all active:scale-90',
-        isSelected ? 'scale-110' : '',
-      ].join(' ')}
-      aria-pressed={isSelected}
-    >
+  const inner = (
+    <>
       <div
         className={[
           'flex h-9 w-9 items-center justify-center rounded-full text-[11px] font-black text-white ring-2 transition-all',
@@ -330,6 +331,27 @@ function PlayerPin({
       <span className="max-w-[44px] truncate text-center text-[8px] font-semibold leading-tight text-white/75">
         {player.full_name.split(' ')[0]}
       </span>
+    </>
+  )
+
+  if (readOnly) {
+    return (
+      <div className="flex flex-col items-center gap-0.5">
+        {inner}
+      </div>
+    )
+  }
+
+  return (
+    <button
+      onClick={() => onTap(player.id)}
+      className={[
+        'flex flex-col items-center gap-0.5 transition-all active:scale-90',
+        isSelected ? 'scale-110' : '',
+      ].join(' ')}
+      aria-pressed={isSelected}
+    >
+      {inner}
     </button>
   )
 }

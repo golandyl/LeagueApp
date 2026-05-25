@@ -80,7 +80,19 @@
     "unknown": "Unknown",
     "tabMatchday": "Matchday",
     "tabTeams": "Teams",
-    "tabRoster": "Roster"
+    "tabRoster": "Roster",
+    "tabAdmin": "Admin",
+    "tabHistory": "History",
+    "finishDay": "Finish Tournament Day",
+    "finishDayDesc": "Archive this tournament day? All matches will be saved to history.",
+    "finishDayConfirmBtn": "Archive Day",
+    "finishing": "Archiving…",
+    "archiveTitle": "Past Tournaments",
+    "noHistory": "No past tournaments yet.",
+    "teamsCount": "{count, plural, one {# team} other {# teams}}",
+    "archiveMatchResults": "Match Results",
+    "archiveRosters": "Team Rosters",
+    "archiveLoadError": "Failed to load archive."
   },
   "teams": {
     "avgRating": "Avg",
@@ -133,10 +145,30 @@
     "cup": "Cup Knockout",
     "cupDesc": "Bracket-style elimination. Requires exactly 4, 8, or 16 teams.",
     "cupTeamError": "Cup requires 4, 8, or 16 teams. Go back and adjust the team count.",
-    "cupValidCounts": "Valid: 4, 8, or 16"
+    "cupValidCounts": "Valid: 4, 8, or 16",
+    "balancingLabel": "Team Assignment",
+    "modeBalanced": "By Rating",
+    "modeBalancedDesc": "Teams are balanced using player ratings for fair matchups.",
+    "modeRandom": "Pure Random",
+    "modeRandomDesc": "Players are shuffled randomly, ignoring ratings entirely.",
+    "modeChoosingRink": "Choosing Rink",
+    "modeChoosingRinkDesc": "Captains draft players live using shared links.",
+    "formatHintLiveDraft": "Choose how matches will be scheduled after the draft."
   },
   "settings": {
     "title": "League Settings"
+  },
+  "admin": {
+    "tabAdmin": "Admin",
+    "dangerZone": "Danger Zone",
+    "resetHistory": "Reset Tournament History",
+    "resetHistoryDesc": "Permanently deletes all tournaments, teams, rosters, and matches for this league. Your registered players are kept safe.",
+    "typeToConfirm": "Type the league name to confirm",
+    "confirmDelete": "Confirm Delete",
+    "deleting": "Deleting…",
+    "deleteSuccess": "Tournament history cleared.",
+    "modalTitle": "Confirm Reset",
+    "deleteError": "Something went wrong. Try again."
   },
   "match": {
     "goalScored": "Goal Scored!",
@@ -175,6 +207,20 @@
     "wcCreatingNext": "Preparing next match…",
     "wcStartNext": "Start Next Match →"
   },
+  "editMatch": {
+    "title": "Edit Match Result",
+    "home": "Home",
+    "away": "Away",
+    "resultType": "How it ended",
+    "vcDraw": "Draw",
+    "vcRegular": "Regular Win",
+    "vcOvertime": "After Extra Time",
+    "vcPenalties": "Penalties",
+    "status": "Status",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Abandoned",
+    "editAriaLabel": "Edit result"
+  },
   "endMatch": {
     "endMatch": "End Match",
     "goldenGoal": "⚡ Golden Goal! {team} wins!",
@@ -188,6 +234,39 @@
     "goToPenalties": "Go to Penalties",
     "penaltiesWhoWon": "🥅 Penalties — Who won?",
     "wcWhoStays": "Draw — Who stays on pitch?"
+  },
+  "draft": {
+    "title": "Draft Lobby",
+    "liveDraft": "Live Draft",
+    "liveDraftDesc": "Captains pick their squads live. Share a link with each team captain.",
+    "captainLinks": "Captain Links",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "draftComplete": "Draft Complete!",
+    "yourTurn": "Your pick!",
+    "waitingFor": "Waiting for {team}…",
+    "round": "Round {n}",
+    "pickCount": "Pick {n}/{total}",
+    "reconnecting": "Reconnecting…",
+    "waitingForReady": "Waiting for all captains to mark ready…",
+    "manager": "Manager",
+    "host": "HOST",
+    "ready": "Ready",
+    "joining": "Joining…",
+    "offline": "Offline",
+    "imReady": "I'm Ready",
+    "startDraft": "Start Draft →",
+    "waitingForMore": "Waiting for {count} more…",
+    "spectatorMode": "You are observing this draft.",
+    "poolEmpty": "Player pool is empty",
+    "searchPlayers": "Search players…",
+    "available": "{count} available",
+    "pickBtn": "PICK",
+    "noPicks": "No picks yet",
+    "drafted": "{count} drafted",
+    "pickingBadge": "PICKING",
+    "openDraftRoom": "Open Draft Room →",
+    "draftInProgress": "Draft in progress"
   },
   "standings": {
     "noTournaments": "No tournaments yet.",

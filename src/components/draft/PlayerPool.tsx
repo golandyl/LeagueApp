@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import type { Player } from '@/store/draftArena'
 import type { Enums } from '@/types/database'
 
@@ -24,12 +25,13 @@ const STAMINA_STYLES: Record<Stamina, { bg: string }> = {
 
 interface Props {
   players:     Player[]
-  showRatings: boolean   // false for team leaders — hide ratings on the client
+  showRatings: boolean
   isMyTurn:    boolean
   onPick:      (playerId: string) => void
 }
 
 export function PlayerPool({ players, showRatings, isMyTurn, onPick }: Props) {
+  const t = useTranslations('draft')
   const [posFilter, setPosFilter] = useState<'ALL' | Position>('ALL')
   const [query,     setQuery]     = useState('')
   const [picking,   setPicking]   = useState<string | null>(null)
@@ -51,7 +53,7 @@ export function PlayerPool({ players, showRatings, isMyTurn, onPick }: Props) {
   if (players.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center py-20 text-slate-500">
-        Player pool is empty
+        {t('poolEmpty')}
       </div>
     )
   }
@@ -62,7 +64,7 @@ export function PlayerPool({ players, showRatings, isMyTurn, onPick }: Props) {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <input
           type="search"
-          placeholder="Search players…"
+          placeholder={t('searchPlayers')}
           value={query}
           onChange={e => setQuery(e.target.value)}
           className="flex-1 rounded-lg bg-slate-700 px-3 py-2 text-sm text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-sky-500"
@@ -84,7 +86,7 @@ export function PlayerPool({ players, showRatings, isMyTurn, onPick }: Props) {
         </div>
       </div>
 
-      <p className="text-xs text-slate-500">{visible.length} available</p>
+      <p className="text-xs text-slate-500">{t('available', { count: visible.length })}</p>
 
       {/* Player grid */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
@@ -134,7 +136,7 @@ export function PlayerPool({ players, showRatings, isMyTurn, onPick }: Props) {
                     disabled={!!picking}
                     className="rounded bg-sky-600 px-2 py-0.5 text-[10px] font-bold text-white transition-colors hover:bg-sky-500 disabled:opacity-50"
                   >
-                    {busy ? '…' : 'PICK'}
+                    {busy ? '…' : t('pickBtn')}
                   </button>
                 ) : (
                   <span className="text-[10px] text-slate-600">—</span>

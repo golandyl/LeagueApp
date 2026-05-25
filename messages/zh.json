@@ -80,7 +80,19 @@
     "unknown": "未知",
     "tabMatchday": "比赛日",
     "tabTeams": "球队",
-    "tabRoster": "阵容"
+    "tabRoster": "阵容",
+    "tabAdmin": "管理",
+    "tabHistory": "历史",
+    "finishDay": "结束赛事日",
+    "finishDayDesc": "归档此赛事日？所有比赛将保存至历史记录。",
+    "finishDayConfirmBtn": "归档赛事日",
+    "finishing": "归档中…",
+    "archiveTitle": "历史赛事",
+    "noHistory": "暂无历史赛事。",
+    "teamsCount": "{count, plural, other {# 支球队}}",
+    "archiveMatchResults": "比赛结果",
+    "archiveRosters": "队伍阵容",
+    "archiveLoadError": "加载归档失败。"
   },
   "teams": {
     "avgRating": "均",
@@ -133,10 +145,30 @@
     "cup": "淘汰赛（杯赛）",
     "cupDesc": "单败淘汰制。要求恰好有 4、8 或 16 支球队。",
     "cupTeamError": "杯赛要求 4、8 或 16 支球队。请返回调整队伍数量。",
-    "cupValidCounts": "有效：4、8 或 16"
+    "cupValidCounts": "有效：4、8 或 16",
+    "balancingLabel": "分组方式",
+    "modeBalanced": "按评分",
+    "modeBalancedDesc": "根据球员评分平衡分组，确保公平对战。",
+    "modeRandom": "完全随机",
+    "modeRandomDesc": "球员完全随机分组，不考虑评分。",
+    "modeChoosingRink": "现场选人",
+    "modeChoosingRinkDesc": "队长通过共享链接实时挑选球员。",
+    "formatHintLiveDraft": "选择选秀结束后的赛程安排方式。"
   },
   "settings": {
     "title": "联赛设置"
+  },
+  "admin": {
+    "tabAdmin": "管理",
+    "dangerZone": "危险区域",
+    "resetHistory": "重置赛事历史",
+    "resetHistoryDesc": "永久删除此联赛的所有赛事、球队、阵容和比赛记录。已注册的球员数据将保留。",
+    "typeToConfirm": "输入联赛名称以确认",
+    "confirmDelete": "确认删除",
+    "deleting": "删除中…",
+    "deleteSuccess": "赛事历史已清除。",
+    "modalTitle": "确认重置",
+    "deleteError": "发生错误，请重试。"
   },
   "match": {
     "goalScored": "进球了！",
@@ -175,6 +207,20 @@
     "wcCreatingNext": "正在准备下一场比赛…",
     "wcStartNext": "开始下一场比赛 →"
   },
+  "editMatch": {
+    "title": "编辑比赛结果",
+    "home": "主队",
+    "away": "客队",
+    "resultType": "结束方式",
+    "vcDraw": "平局",
+    "vcRegular": "常规胜利",
+    "vcOvertime": "加时赛后",
+    "vcPenalties": "点球大战",
+    "status": "状态",
+    "statusCompleted": "已完成",
+    "statusCancelled": "已取消",
+    "editAriaLabel": "编辑结果"
+  },
   "endMatch": {
     "endMatch": "结束比赛",
     "goldenGoal": "⚡ 金球！{team} 获胜！",
@@ -188,6 +234,39 @@
     "goToPenalties": "进行点球大战",
     "penaltiesWhoWon": "🥅 点球大战 — 谁获胜？",
     "wcWhoStays": "平局 — 谁留在场上？"
+  },
+  "draft": {
+    "title": "选秀大厅",
+    "liveDraft": "现场选秀",
+    "liveDraftDesc": "队长实时挑选球员。向每位队长分享链接。",
+    "captainLinks": "队长链接",
+    "copyLink": "复制链接",
+    "copied": "已复制！",
+    "draftComplete": "选秀完成！",
+    "yourTurn": "轮到你选！",
+    "waitingFor": "等待 {team}…",
+    "round": "第 {n} 轮",
+    "pickCount": "第 {n}/{total} 签",
+    "reconnecting": "正在重连…",
+    "waitingForReady": "等待所有队长确认就绪…",
+    "manager": "管理员",
+    "host": "主持",
+    "ready": "就绪",
+    "joining": "正在加入…",
+    "offline": "离线",
+    "imReady": "我已就绪",
+    "startDraft": "开始选秀 →",
+    "waitingForMore": "等待 {count} 人就绪…",
+    "spectatorMode": "你正在旁观此次选秀。",
+    "poolEmpty": "球员池已空",
+    "searchPlayers": "搜索球员…",
+    "available": "{count} 名可选",
+    "pickBtn": "选择",
+    "noPicks": "尚无选择",
+    "drafted": "已选 {count} 人",
+    "pickingBadge": "选择中",
+    "openDraftRoom": "进入选秀室 →",
+    "draftInProgress": "选秀进行中"
   },
   "standings": {
     "noTournaments": "暂无赛事。",

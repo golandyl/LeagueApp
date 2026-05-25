@@ -40,6 +40,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
     .from('tournaments')
     .select('*')
     .eq('league_id', leagueId)
+    .neq('status', 'completed')
     .order('created_at', { ascending: false })
     .limit(1)
     .single()
@@ -104,6 +105,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
       {/* ── Tabbed content — client component ── */}
       <DashboardTabs
         leagueId={leagueId}
+        leagueName={league.name}
         players={resolvedPlayers}
         tournament={tournament ?? null}
         matches={matches}

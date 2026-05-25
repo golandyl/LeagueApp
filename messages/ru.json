@@ -80,7 +80,19 @@
     "unknown": "Неизвестно",
     "tabMatchday": "Игровой день",
     "tabTeams": "Команды",
-    "tabRoster": "Состав"
+    "tabRoster": "Состав",
+    "tabAdmin": "Админ",
+    "tabHistory": "История",
+    "finishDay": "Завершить день",
+    "finishDayDesc": "Архивировать этот день? Все матчи сохранятся в истории.",
+    "finishDayConfirmBtn": "Архивировать день",
+    "finishing": "Архивирование…",
+    "archiveTitle": "Прошлые турниры",
+    "noHistory": "Прошлых турниров пока нет.",
+    "teamsCount": "{count, plural, one {# команда} few {# команды} other {# команд}}",
+    "archiveMatchResults": "Результаты матчей",
+    "archiveRosters": "Составы команд",
+    "archiveLoadError": "Не удалось загрузить архив."
   },
   "teams": {
     "avgRating": "Ср.",
@@ -133,10 +145,30 @@
     "cup": "Кубок (плей-офф)",
     "cupDesc": "Олимпийская система. Требуется ровно 4, 8 или 16 команд.",
     "cupTeamError": "Кубок требует 4, 8 или 16 команд. Вернитесь и скорректируйте количество команд.",
-    "cupValidCounts": "Допустимо: 4, 8 или 16"
+    "cupValidCounts": "Допустимо: 4, 8 или 16",
+    "balancingLabel": "Метод распределения",
+    "modeBalanced": "По рейтингу",
+    "modeBalancedDesc": "Команды балансируются по рейтингам игроков для честных матчей.",
+    "modeRandom": "Случайный",
+    "modeRandomDesc": "Игроки распределяются случайно, без учёта рейтинга.",
+    "modeChoosingRink": "Выбор команды",
+    "modeChoosingRinkDesc": "Капитаны выбирают игроков в реальном времени через общие ссылки.",
+    "formatHintLiveDraft": "Выберите, как будут расписаны матчи после драфта."
   },
   "settings": {
     "title": "Настройки лиги"
+  },
+  "admin": {
+    "tabAdmin": "Админ",
+    "dangerZone": "Опасная зона",
+    "resetHistory": "Сбросить историю турниров",
+    "resetHistoryDesc": "Безвозвратно удаляет все турниры, команды, составы и матчи лиги. Зарегистрированные игроки сохраняются.",
+    "typeToConfirm": "Введите название лиги для подтверждения",
+    "confirmDelete": "Подтвердить удаление",
+    "deleting": "Удаление…",
+    "deleteSuccess": "История турниров очищена.",
+    "modalTitle": "Подтвердить сброс",
+    "deleteError": "Что-то пошло не так. Попробуйте снова."
   },
   "match": {
     "goalScored": "Гол!",
@@ -175,6 +207,20 @@
     "wcCreatingNext": "Готовим следующий матч…",
     "wcStartNext": "Начать следующий матч →"
   },
+  "editMatch": {
+    "title": "Редактировать результат матча",
+    "home": "Хозяева",
+    "away": "Гости",
+    "resultType": "Как завершился",
+    "vcDraw": "Ничья",
+    "vcRegular": "Победа в основное время",
+    "vcOvertime": "После дополнительного времени",
+    "vcPenalties": "Серия пенальти",
+    "status": "Статус",
+    "statusCompleted": "Завершён",
+    "statusCancelled": "Отменён",
+    "editAriaLabel": "Редактировать результат"
+  },
   "endMatch": {
     "endMatch": "Завершить матч",
     "goldenGoal": "⚡ Золотой гол! {team} побеждает!",
@@ -188,6 +234,39 @@
     "goToPenalties": "Перейти к пенальти",
     "penaltiesWhoWon": "🥅 Серия пенальти — Кто победил?",
     "wcWhoStays": "Ничья — Кто остаётся на поле?"
+  },
+  "draft": {
+    "title": "Лобби Драфта",
+    "liveDraft": "Прямой Драфт",
+    "liveDraftDesc": "Капитаны выбирают игроков в реальном времени. Поделитесь ссылкой с каждым капитаном.",
+    "captainLinks": "Ссылки Капитанов",
+    "copyLink": "Копировать ссылку",
+    "copied": "Скопировано!",
+    "draftComplete": "Драфт Завершён!",
+    "yourTurn": "Ваш выбор!",
+    "waitingFor": "Ожидание {team}…",
+    "round": "Раунд {n}",
+    "pickCount": "Выбор {n}/{total}",
+    "reconnecting": "Переподключение…",
+    "waitingForReady": "Ожидание подтверждения всех капитанов…",
+    "manager": "Менеджер",
+    "host": "ХОСТ",
+    "ready": "Готов",
+    "joining": "Подключение…",
+    "offline": "Не в сети",
+    "imReady": "Я Готов",
+    "startDraft": "Начать Драфт →",
+    "waitingForMore": "Ожидание ещё {count}…",
+    "spectatorMode": "Вы наблюдаете за этим драфтом.",
+    "poolEmpty": "Пул игроков пуст",
+    "searchPlayers": "Поиск игроков…",
+    "available": "{count} доступно",
+    "pickBtn": "ВЫБРАТЬ",
+    "noPicks": "Нет выборов пока",
+    "drafted": "{count} выбрано",
+    "pickingBadge": "ВЫБИРАЕТ",
+    "openDraftRoom": "Открыть Зал Драфта →",
+    "draftInProgress": "Драфт идёт"
   },
   "standings": {
     "noTournaments": "Турниров пока нет.",

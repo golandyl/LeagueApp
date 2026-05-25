@@ -1,12 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { PlayerList }          from './PlayerList'
-import { AddPlayerForm }       from './AddPlayerForm'
-import { StartTournamentButton } from './StartTournamentButton'
-import { TeamsPanel }          from './TeamsPanel'
+import { PlayerList }             from './PlayerList'
+import { AddPlayerForm }          from './AddPlayerForm'
+import { StartTournamentButton }  from './StartTournamentButton'
+import { FinishTournamentButton } from './FinishTournamentButton'
+import { TeamsPanel }             from './TeamsPanel'
+import { AdminPanel }             from './AdminPanel'
+import { HistoryPanel }           from './HistoryPanel'
+import { EditMatchModal }         from '@/components/match/EditMatchModal'
 import type { Tables } from '@/types/database'
 
 type Player     = Tables<'players'>
@@ -14,10 +18,11 @@ type Tournament = Tables<'tournaments'>
 type Match      = Tables<'matches'>
 type Team       = Tables<'teams'>
 
-type TabId = 'matchday' | 'teams' | 'roster'
+type TabId = 'matchday' | 'teams' | 'roster' | 'history' | 'admin'
 
 export interface DashboardTabsProps {
   leagueId:    string
+  leagueName:  string
   players:     Player[]
   tournament:  Tournament | null
   matches:     Match[]
@@ -28,17 +33,35 @@ export interface DashboardTabsProps {
 
 export function DashboardTabs({
   leagueId,
+  leagueName,
   players,
   tournament,
-  matches,
+  matches: initialMatches,
   teams,
   teamPlayers,
 }: DashboardTabsProps) {
-  const t        = useTranslations('dashboard')
-  const [active, setActive] = useState<TabId>('matchday')
+  const t      = useTranslations('dashboard')
+  const tAdmin = useTranslations('admin')
 
-  const hasLive  = matches.some(m => m.status === 'live')
-  const hasTeams = tournament !== null && teams.length > 0
+  const [active,            setActive]            = useState<TabId>('matchday')
+  const [liveMatches,       setLiveMatches]       = useState<Match[]>(initialMatches)
+  const [activeTournament,  setActiveTournament]  = useState<Tournament | null>(tournament)
+
+  function handleMatchUpdate(updated: Match) {
+    setLiveMatches(prev => prev.map(m => m.id === updated.id ? updated : m))
+  }
+
+  function handleReset() {
+    setLiveMatches([])
+  }
+
+  function handleTournamentFinished() {
+    setActiveTournament(null)
+    setLiveMatches([])
+  }
+
+  const hasLive  = liveMatches.some(m => m.status === 'live')
+  const hasTeams = activeTournament !== null && teams.length > 0
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -134,19 +157,51 @@ export function DashboardTabs({
             </span>
           )}
         </button>
+
+        {/* ── History tab ── */}
+        <button
+          role="tab"
+          aria-selected={active === 'history'}
+          aria-controls="panel-history"
+          onClick={() => setActive('history')}
+          className={[
+            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+            active === 'history'
+              ? '-mb-px border-b-2 border-emerald-500 text-white'
+              : 'text-slate-500 hover:text-slate-300',
+          ].join(' ')}
+        >
+          {t('tabHistory')}
+        </button>
+
+        {/* ── Admin tab — pushed to the end with ms-auto ── */}
+        <button
+          role="tab"
+          aria-selected={active === 'admin'}
+          aria-controls="panel-admin"
+          onClick={() => setActive('admin')}
+          className={[
+            'ms-auto flex items-center gap-1.5 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+            active === 'admin'
+              ? '-mb-px border-b-2 border-rose-500 text-rose-300'
+              : 'text-slate-600 hover:text-slate-400',
+          ].join(' ')}
+        >
+          {tAdmin('tabAdmin')}
+        </button>
       </div>
 
       {/* ── Tab panels ────────────────────────────────────────────────────── */}
 
-      {active === 'teams' && tournament && (
+      {active === 'teams' && activeTournament && (
         <div
           id="panel-teams"
           role="tabpanel"
           className="px-4 py-6"
         >
           <TeamsPanel
-            key={tournament.id}
-            tournament={tournament}
+            key={activeTournament.id}
+            tournament={activeTournament}
             teams={teams}
             players={players}
             teamPlayers={teamPlayers}
@@ -163,9 +218,11 @@ export function DashboardTabs({
           <MatchdayPanel
             leagueId={leagueId}
             players={players}
-            tournament={tournament}
-            matches={matches}
+            tournament={activeTournament}
+            matches={liveMatches}
             teams={teams}
+            onMatchUpdate={handleMatchUpdate}
+            onTournamentFinished={handleTournamentFinished}
           />
         </div>
       )}
@@ -179,6 +236,26 @@ export function DashboardTabs({
           <RosterPanel leagueId={leagueId} players={players} />
         </div>
       )}
+
+      {active === 'history' && (
+        <div
+          id="panel-history"
+          role="tabpanel"
+          className="px-4 py-6"
+        >
+          <HistoryPanel leagueId={leagueId} players={players} />
+        </div>
+      )}
+
+      {active === 'admin' && (
+        <div
+          id="panel-admin"
+          role="tabpanel"
+          className="px-4 py-6"
+        >
+          <AdminPanel leagueId={leagueId} leagueName={leagueName} onReset={handleReset} />
+        </div>
+      )}
     </div>
   )
 }
@@ -186,11 +263,13 @@ export function DashboardTabs({
 // ── Matchday panel ─────────────────────────────────────────────────────────────
 
 interface MatchdayPanelProps {
-  leagueId:   string
-  players:    Player[]
-  tournament: Tournament | null
-  matches:    Match[]
-  teams:      Team[]
+  leagueId:               string
+  players:                Player[]
+  tournament:             Tournament | null
+  matches:                Match[]
+  teams:                  Team[]
+  onMatchUpdate:          (updated: Match) => void
+  onTournamentFinished:   () => void
 }
 
 function MatchdayPanel({
@@ -199,8 +278,15 @@ function MatchdayPanel({
   tournament,
   matches,
   teams,
+  onMatchUpdate,
+  onTournamentFinished,
 }: MatchdayPanelProps) {
-  const t = useTranslations('dashboard')
+  const t      = useTranslations('dashboard')
+  const tDraft = useTranslations('draft')
+  const tEdit  = useTranslations('editMatch')
+  const locale = useLocale()
+
+  const [editingMatch, setEditingMatch] = useState<Match | null>(null)
 
   // Reconstruct lookup map from the serialised array
   const teamsMap = new Map(teams.map(team => [team.id, team]))
@@ -222,7 +308,36 @@ function MatchdayPanel({
         )}
 
         <StartTournamentButton leagueId={leagueId} players={players} />
+
+        {tournament && (
+          <FinishTournamentButton
+            tournamentId={tournament.id}
+            onFinished={onTournamentFinished}
+          />
+        )}
       </section>
+
+      {/* Draft room card — shown when a live draft is still in progress */}
+      {tournament && tournament.draft_status !== 'completed' && (
+        <section className="space-y-3">
+          <PanelHeader>{tDraft('draftInProgress')}</PanelHeader>
+          <a
+            href={`/${locale}/draft/${tournament.id}`}
+            className="flex items-center justify-between gap-3 rounded-2xl bg-sky-900/40 px-5 py-5 ring-1 ring-sky-700/60 transition-all hover:bg-sky-900/60 active:scale-[0.98]"
+          >
+            <div className="flex items-center gap-3">
+              <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-sky-400" aria-hidden="true" />
+              <div>
+                <p className="font-black text-white">{tDraft('title')}</p>
+                <p className="mt-0.5 text-xs text-sky-300">{tournament.name}</p>
+              </div>
+            </div>
+            <span className="shrink-0 text-sm font-bold text-sky-300">
+              {tDraft('openDraftRoom')}
+            </span>
+          </a>
+        </section>
+      )}
 
       {/* Live match links — only rendered when a tournament day exists */}
       {(tournament || matches.length > 0) && (
@@ -236,12 +351,12 @@ function MatchdayPanel({
               {matches.map(m => {
                 const home = teamsMap.get(m.home_team_id)
                 const away = teamsMap.get(m.away_team_id)
+                const canEdit = m.status === 'completed' || m.status === 'cancelled'
                 return (
-                  <Link
+                  <div
                     key={m.id}
-                    href={`/match/${m.id}`}
                     className={[
-                      'flex items-center gap-3 rounded-2xl px-4 py-4 transition-all active:scale-[0.98]',
+                      'flex items-center rounded-2xl transition-all',
                       m.status === 'live'
                         ? 'bg-emerald-900/30 ring-1 ring-emerald-700/60'
                         : m.status === 'completed'
@@ -249,19 +364,49 @@ function MatchdayPanel({
                         : 'bg-slate-800',
                     ].join(' ')}
                   >
-                    <div className="flex min-w-0 flex-1 items-center gap-2">
-                      <TeamChip team={home} unknownLabel={t('unknown')} />
-                      <span className="shrink-0 text-xs font-bold text-slate-500">
-                        {t('vs')}
-                      </span>
-                      <TeamChip team={away} unknownLabel={t('unknown')} />
-                    </div>
-                    <MatchBadge
-                      match={m}
-                      liveLabel={t('live')}
-                      kickOffLabel={t('kickOff')}
-                    />
-                  </Link>
+                    {/* Main row — navigates to match arena */}
+                    <Link
+                      href={`/match/${m.id}`}
+                      className="flex min-w-0 flex-1 items-center gap-3 px-4 py-4 active:scale-[0.98]"
+                    >
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                        <TeamChip team={home} unknownLabel={t('unknown')} />
+                        <span className="shrink-0 text-xs font-bold text-slate-500">
+                          {t('vs')}
+                        </span>
+                        <TeamChip team={away} unknownLabel={t('unknown')} />
+                      </div>
+                      <MatchBadge
+                        match={m}
+                        liveLabel={t('live')}
+                        kickOffLabel={t('kickOff')}
+                      />
+                    </Link>
+
+                    {/* Pencil edit button — only for finished matches */}
+                    {canEdit && (
+                      <button
+                        onClick={() => setEditingMatch(m)}
+                        aria-label={tEdit('editAriaLabel')}
+                        className="shrink-0 rounded-xl p-3 me-1 text-slate-600 transition-colors hover:bg-slate-700 hover:text-slate-300"
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 )
               })}
             </div>
@@ -288,6 +433,19 @@ function MatchdayPanel({
           </svg>
         </Link>
       </div>
+
+      {/* Edit match modal */}
+      {editingMatch && (
+        <EditMatchModal
+          match={editingMatch}
+          homeTeam={teamsMap.get(editingMatch.home_team_id)}
+          awayTeam={teamsMap.get(editingMatch.away_team_id)}
+          onSave={updated => {
+            onMatchUpdate(updated)
+          }}
+          onClose={() => setEditingMatch(null)}
+        />
+      )}
     </div>
   )
 }

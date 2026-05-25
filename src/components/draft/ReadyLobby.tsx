@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { Team, PresenceUser } from '@/store/draftArena'
 
 interface Props {
@@ -12,7 +13,8 @@ interface Props {
 }
 
 export function ReadyLobby({ teams, presence, isManager, myTeamId, onReady, onStart }: Props) {
-  // Flatten presence values to get all connected users
+  const t = useTranslations('draft')
+
   const allUsers = Object.values(presence).flat()
 
   function isTeamOnline(teamId: string) {
@@ -25,18 +27,15 @@ export function ReadyLobby({ teams, presence, isManager, myTeamId, onReady, onSt
     return allUsers.some(u => u.isManager)
   }
 
-  const allReady = teams.length > 0 && teams.every(t => isTeamReady(t.id))
-
-  // Whether the current leader has already marked themselves ready
-  const myReady = myTeamId ? isTeamReady(myTeamId) : false
+  const allReady  = teams.length > 0 && teams.every(t => isTeamReady(t.id))
+  const myReady   = myTeamId ? isTeamReady(myTeamId) : false
+  const notReady  = teams.filter(team => !isTeamReady(team.id)).length
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-12">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-white">Draft Lobby</h2>
-        <p className="mt-1 text-sm text-slate-400">
-          Waiting for all team leaders to confirm ready…
-        </p>
+        <h2 className="text-2xl font-bold text-white">{t('title')}</h2>
+        <p className="mt-1 text-sm text-slate-400">{t('waitingForReady')}</p>
       </div>
 
       {/* Participant list */}
@@ -45,9 +44,9 @@ export function ReadyLobby({ teams, presence, isManager, myTeamId, onReady, onSt
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <span className={`h-2 w-2 rounded-full ${isManagerOnline() ? 'bg-green-400' : 'bg-slate-600'}`} />
-            <span className="text-sm text-slate-300">Manager</span>
+            <span className="text-sm text-slate-300">{t('manager')}</span>
           </div>
-          <span className="text-xs font-semibold text-amber-400">HOST</span>
+          <span className="text-xs font-semibold text-amber-400">{t('host')}</span>
         </div>
 
         {/* Team rows */}
@@ -67,11 +66,11 @@ export function ReadyLobby({ teams, presence, isManager, myTeamId, onReady, onSt
                 <span className="truncate text-sm text-slate-300">{team.name}</span>
               </div>
               {ready ? (
-                <span className="text-xs font-bold text-emerald-400">✓ Ready</span>
+                <span className="text-xs font-bold text-emerald-400">✓ {t('ready')}</span>
               ) : online ? (
-                <span className="text-xs text-slate-500">Joining…</span>
+                <span className="text-xs text-slate-500">{t('joining')}</span>
               ) : (
-                <span className="text-xs text-slate-600">Offline</span>
+                <span className="text-xs text-slate-600">{t('offline')}</span>
               )}
             </div>
           )
@@ -80,30 +79,28 @@ export function ReadyLobby({ teams, presence, isManager, myTeamId, onReady, onSt
 
       {/* Actions */}
       <div className="flex flex-col items-center gap-3">
-        {/* Leader: mark ready */}
         {!isManager && myTeamId && (
           <button
             onClick={onReady}
             disabled={myReady}
             className="rounded-xl bg-sky-600 px-8 py-3 text-sm font-bold text-white transition-colors hover:bg-sky-500 disabled:bg-emerald-700 disabled:cursor-default"
           >
-            {myReady ? '✓ Ready' : "I'm Ready"}
+            {myReady ? `✓ ${t('ready')}` : t('imReady')}
           </button>
         )}
 
-        {/* Manager: start */}
         {isManager && (
           <button
             onClick={onStart}
             disabled={!allReady}
             className="rounded-xl bg-emerald-600 px-8 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {allReady ? 'Start Draft →' : `Waiting for ${teams.filter(t => !isTeamReady(t.id)).length} more…`}
+            {allReady ? t('startDraft') : t('waitingForMore', { count: notReady })}
           </button>
         )}
 
         {!isManager && !myTeamId && (
-          <p className="text-sm text-slate-500">You are observing this draft.</p>
+          <p className="text-sm text-slate-500">{t('spectatorMode')}</p>
         )}
       </div>
     </div>

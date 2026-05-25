@@ -80,7 +80,19 @@
     "unknown": "לא ידוע",
     "tabMatchday": "יום משחק",
     "tabTeams": "קבוצות",
-    "tabRoster": "הרכב"
+    "tabRoster": "הרכב",
+    "tabAdmin": "ניהול",
+    "tabHistory": "היסטוריה",
+    "finishDay": "סיים יום טורניר",
+    "finishDayDesc": "לארכב את יום הטורניר הזה? כל המשחקים יישמרו בהיסטוריה.",
+    "finishDayConfirmBtn": "ארכב יום",
+    "finishing": "מארכב…",
+    "archiveTitle": "טורנירים קודמים",
+    "noHistory": "אין טורנירים קודמים עדיין.",
+    "teamsCount": "{count, plural, one {# קבוצה} other {# קבוצות}}",
+    "archiveMatchResults": "תוצאות משחקים",
+    "archiveRosters": "הרכבי קבוצות",
+    "archiveLoadError": "שגיאה בטעינת הארכיב."
   },
   "teams": {
     "avgRating": "ממוצע",
@@ -133,10 +145,30 @@
     "cup": "גביע (נוקאאוט)",
     "cupDesc": "פורמט הדחה. דורש בדיוק 4, 8 או 16 קבוצות.",
     "cupTeamError": "גביע דורש 4, 8 או 16 קבוצות. חזור אחורה ושנה את מספר הקבוצות.",
-    "cupValidCounts": "תקני: 4, 8 או 16"
+    "cupValidCounts": "תקני: 4, 8 או 16",
+    "balancingLabel": "שיטת חלוקה",
+    "modeBalanced": "לפי דירוג",
+    "modeBalancedDesc": "הקבוצות מאוזנות על פי דירוגי השחקנים.",
+    "modeRandom": "אקראי לחלוטין",
+    "modeRandomDesc": "השחקנים מחולקים באקראי, ללא התחשבות בדירוג.",
+    "modeChoosingRink": "בחירות",
+    "modeChoosingRinkDesc": "הקפטנים בוחרים שחקנים בזמן אמת עם קישורים משותפים.",
+    "formatHintLiveDraft": "בחר כיצד המשחקים יתוזמנו לאחר הגיוס."
   },
   "settings": {
     "title": "הגדרות ליגה"
+  },
+  "admin": {
+    "tabAdmin": "ניהול",
+    "dangerZone": "אזור מסוכן",
+    "resetHistory": "איפוס היסטוריית הטורניר",
+    "resetHistoryDesc": "מוחק לצמיתות את כל הטורנירים, הקבוצות, ההרכבים והמשחקים בליגה זו. השחקנים הרשומים שמורים.",
+    "typeToConfirm": "הקלד את שם הליגה לאישור",
+    "confirmDelete": "אישור מחיקה",
+    "deleting": "מוחק…",
+    "deleteSuccess": "היסטוריית הטורניר נמחקה.",
+    "modalTitle": "אישור איפוס",
+    "deleteError": "אירעה שגיאה. נסה שוב."
   },
   "match": {
     "goalScored": "גוֹל!",
@@ -175,6 +207,20 @@
     "wcCreatingNext": "מכין את המשחק הבא…",
     "wcStartNext": "התחל משחק הבא →"
   },
+  "editMatch": {
+    "title": "עריכת תוצאת משחק",
+    "home": "בית",
+    "away": "חוץ",
+    "resultType": "כיצד הסתיים",
+    "vcDraw": "תיקו",
+    "vcRegular": "ניצחון רגיל",
+    "vcOvertime": "לאחר הארכה",
+    "vcPenalties": "פנדלים",
+    "status": "סטטוס",
+    "statusCompleted": "הסתיים",
+    "statusCancelled": "בוטל",
+    "editAriaLabel": "ערוך תוצאה"
+  },
   "endMatch": {
     "endMatch": "סיים משחק",
     "goldenGoal": "⚡ גול זהב! {team} ניצחה!",
@@ -188,6 +234,39 @@
     "goToPenalties": "עבור לפנדלים",
     "penaltiesWhoWon": "🥅 פנדלים — מי ניצח?",
     "wcWhoStays": "תיקו — מי נשאר על המגרש?"
+  },
+  "draft": {
+    "title": "לובי גיוס",
+    "liveDraft": "גיוס חי",
+    "liveDraftDesc": "הקפטנים בוחרים שחקנים בזמן אמת. שתף קישור עם כל קפטן.",
+    "captainLinks": "קישורי קפטנים",
+    "copyLink": "העתק קישור",
+    "copied": "הועתק!",
+    "draftComplete": "הגיוס הסתיים!",
+    "yourTurn": "בחירתך!",
+    "waitingFor": "מחכה ל-{team}…",
+    "round": "סיבוב {n}",
+    "pickCount": "בחירה {n}/{total}",
+    "reconnecting": "מתחבר מחדש…",
+    "waitingForReady": "ממתין לאישור כל הקפטנים…",
+    "manager": "מנהל",
+    "host": "מארח",
+    "ready": "מוכן",
+    "joining": "מצטרף…",
+    "offline": "לא מחובר",
+    "imReady": "אני מוכן",
+    "startDraft": "התחל גיוס ←",
+    "waitingForMore": "ממתין ל-{count} נוספים…",
+    "spectatorMode": "אתה צופה בגיוס הזה.",
+    "poolEmpty": "מאגר השחקנים ריק",
+    "searchPlayers": "חיפוש שחקנים…",
+    "available": "{count} זמינים",
+    "pickBtn": "בחר",
+    "noPicks": "אין בחירות עדיין",
+    "drafted": "{count} גויסו",
+    "pickingBadge": "בוחר",
+    "openDraftRoom": "פתח חדר גיוס ←",
+    "draftInProgress": "גיוס בתהליך"
   },
   "standings": {
     "noTournaments": "אין טורנירים עדיין.",

@@ -80,7 +80,19 @@
     "unknown": "غير معروف",
     "tabMatchday": "يوم المباريات",
     "tabTeams": "الفرق",
-    "tabRoster": "التشكيلة"
+    "tabRoster": "التشكيلة",
+    "tabAdmin": "الإدارة",
+    "tabHistory": "السجل",
+    "finishDay": "إنهاء يوم البطولة",
+    "finishDayDesc": "أرشفة يوم البطولة هذا؟ ستُحفظ جميع المباريات في السجل.",
+    "finishDayConfirmBtn": "أرشفة اليوم",
+    "finishing": "جارٍ الأرشفة…",
+    "archiveTitle": "البطولات السابقة",
+    "noHistory": "لا توجد بطولات سابقة بعد.",
+    "teamsCount": "{count, plural, zero {# فرق} one {# فريق} two {# فريقان} few {# فرق} many {# فريق} other {# فرق}}",
+    "archiveMatchResults": "نتائج المباريات",
+    "archiveRosters": "تشكيلات الفرق",
+    "archiveLoadError": "فشل تحميل الأرشيف."
   },
   "teams": {
     "avgRating": "متوسط",
@@ -133,10 +145,30 @@
     "cup": "كأس (خروج المغلوب)",
     "cupDesc": "تنسيق إقصائي. يتطلب بالضبط 4 أو 8 أو 16 فريقاً.",
     "cupTeamError": "الكأس يتطلب 4 أو 8 أو 16 فريقاً. ارجع وعدّل عدد الفرق.",
-    "cupValidCounts": "صالح: 4 أو 8 أو 16"
+    "cupValidCounts": "صالح: 4 أو 8 أو 16",
+    "balancingLabel": "طريقة التوزيع",
+    "modeBalanced": "حسب التقييم",
+    "modeBalancedDesc": "يتم توزيع الفرق بناءً على تقييمات اللاعبين لمباريات متكافئة.",
+    "modeRandom": "عشوائي كامل",
+    "modeRandomDesc": "يتم توزيع اللاعبين عشوائياً، بصرف النظر عن التقييمات.",
+    "modeChoosingRink": "اختيار الملعب",
+    "modeChoosingRinkDesc": "يختار الكباتن اللاعبين مباشرةً عبر روابط مشتركة.",
+    "formatHintLiveDraft": "اختر كيفية جدولة المباريات بعد الاختيار."
   },
   "settings": {
     "title": "إعدادات الدوري"
+  },
+  "admin": {
+    "tabAdmin": "الإدارة",
+    "dangerZone": "منطقة الخطر",
+    "resetHistory": "إعادة تعيين سجل البطولات",
+    "resetHistoryDesc": "يحذف نهائياً جميع البطولات والفرق والتشكيلات والمباريات في هذا الدوري. يظل اللاعبون المسجلون في أمان.",
+    "typeToConfirm": "اكتب اسم الدوري للتأكيد",
+    "confirmDelete": "تأكيد الحذف",
+    "deleting": "جارٍ الحذف…",
+    "deleteSuccess": "تم مسح سجل البطولات.",
+    "modalTitle": "تأكيد الإعادة",
+    "deleteError": "حدث خطأ. حاول مرة أخرى."
   },
   "match": {
     "goalScored": "هدف!",
@@ -175,6 +207,20 @@
     "wcCreatingNext": "جارٍ تجهيز المباراة التالية…",
     "wcStartNext": "ابدأ المباراة التالية →"
   },
+  "editMatch": {
+    "title": "تعديل نتيجة المباراة",
+    "home": "المضيف",
+    "away": "الضيف",
+    "resultType": "كيف انتهت",
+    "vcDraw": "تعادل",
+    "vcRegular": "فوز عادي",
+    "vcOvertime": "بعد الوقت الإضافي",
+    "vcPenalties": "ركلات الترجيح",
+    "status": "الحالة",
+    "statusCompleted": "مكتملة",
+    "statusCancelled": "ملغاة",
+    "editAriaLabel": "تعديل النتيجة"
+  },
   "endMatch": {
     "endMatch": "إنهاء المباراة",
     "goldenGoal": "⚡ الهدف الذهبي! {team} تفوز!",
@@ -188,6 +234,39 @@
     "goToPenalties": "الذهاب لركلات الترجيح",
     "penaltiesWhoWon": "🥅 ركلات الترجيح — من فاز؟",
     "wcWhoStays": "تعادل — من يبقى في الملعب؟"
+  },
+  "draft": {
+    "title": "صالة الاختيار",
+    "liveDraft": "اختيار مباشر",
+    "liveDraftDesc": "يختار الكباتن اللاعبين مباشرة. شارك رابطاً مع كل كابتن.",
+    "captainLinks": "روابط الكباتن",
+    "copyLink": "نسخ الرابط",
+    "copied": "تم النسخ!",
+    "draftComplete": "اكتمل الاختيار!",
+    "yourTurn": "دورك!",
+    "waitingFor": "في انتظار {team}…",
+    "round": "الجولة {n}",
+    "pickCount": "الاختيار {n}/{total}",
+    "reconnecting": "إعادة الاتصال…",
+    "waitingForReady": "في انتظار تأكيد جميع الكباتن…",
+    "manager": "المدير",
+    "host": "المضيف",
+    "ready": "مستعد",
+    "joining": "جارٍ الانضمام…",
+    "offline": "غير متصل",
+    "imReady": "أنا مستعد",
+    "startDraft": "ابدأ الاختيار →",
+    "waitingForMore": "في انتظار {count} آخرين…",
+    "spectatorMode": "أنت تراقب هذا الاختيار.",
+    "poolEmpty": "مجموعة اللاعبين فارغة",
+    "searchPlayers": "ابحث عن لاعبين…",
+    "available": "{count} متاح",
+    "pickBtn": "اختر",
+    "noPicks": "لا اختيارات بعد",
+    "drafted": "تم اختيار {count}",
+    "pickingBadge": "يختار",
+    "openDraftRoom": "فتح غرفة الاختيار →",
+    "draftInProgress": "الاختيار جارٍ"
   },
   "standings": {
     "noTournaments": "لا توجد بطولات بعد.",

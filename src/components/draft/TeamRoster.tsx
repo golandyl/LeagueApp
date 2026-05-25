@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { Team, Player } from '@/store/draftArena'
 
 const POSITION_LABEL: Record<string, string> = {
@@ -9,10 +10,12 @@ const POSITION_LABEL: Record<string, string> = {
 interface Props {
   team:      Team
   players:   Player[]
-  isCurrent: boolean   // true when it's this team's turn to pick
+  isCurrent: boolean
 }
 
 export function TeamRoster({ team, players, isCurrent }: Props) {
+  const t = useTranslations('draft')
+
   return (
     <div
       className={`rounded-xl border p-3 transition-colors ${
@@ -34,14 +37,14 @@ export function TeamRoster({ team, players, isCurrent }: Props) {
         </div>
         {isCurrent && (
           <span className="shrink-0 rounded bg-sky-600 px-2 py-0.5 text-[10px] font-bold text-white animate-pulse">
-            PICKING
+            {t('pickingBadge')}
           </span>
         )}
       </div>
 
       {/* Player list */}
       {players.length === 0 ? (
-        <p className="text-xs text-slate-600 italic">No picks yet</p>
+        <p className="text-xs text-slate-600 italic">{t('noPicks')}</p>
       ) : (
         <ul className="space-y-1">
           {players.map(p => (
@@ -58,7 +61,7 @@ export function TeamRoster({ team, players, isCurrent }: Props) {
       )}
 
       <p className="mt-2 text-right text-[10px] text-slate-600">
-        {players.length} drafted
+        {t('drafted', { count: players.length })}
       </p>
     </div>
   )

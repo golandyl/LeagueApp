@@ -80,7 +80,19 @@
     "unknown": "Desconocido",
     "tabMatchday": "Jornada",
     "tabTeams": "Equipos",
-    "tabRoster": "Plantilla"
+    "tabRoster": "Plantilla",
+    "tabAdmin": "Admin",
+    "tabHistory": "Historial",
+    "finishDay": "Finalizar jornada",
+    "finishDayDesc": "¿Archivar esta jornada? Todos los partidos quedarán guardados en el historial.",
+    "finishDayConfirmBtn": "Archivar jornada",
+    "finishing": "Archivando…",
+    "archiveTitle": "Torneos anteriores",
+    "noHistory": "Sin torneos anteriores aún.",
+    "teamsCount": "{count, plural, one {# equipo} other {# equipos}}",
+    "archiveMatchResults": "Resultados",
+    "archiveRosters": "Plantillas",
+    "archiveLoadError": "Error al cargar el historial."
   },
   "teams": {
     "avgRating": "Med",
@@ -133,10 +145,30 @@
     "cup": "Copa (eliminatoria)",
     "cupDesc": "Eliminación directa. Requiere exactamente 4, 8 o 16 equipos.",
     "cupTeamError": "La copa requiere 4, 8 o 16 equipos. Vuelve atrás y ajusta el número de equipos.",
-    "cupValidCounts": "Válido: 4, 8 o 16"
+    "cupValidCounts": "Válido: 4, 8 o 16",
+    "balancingLabel": "Método de asignación",
+    "modeBalanced": "Por puntuación",
+    "modeBalancedDesc": "Los equipos se equilibran según la puntuación de los jugadores.",
+    "modeRandom": "Aleatorio puro",
+    "modeRandomDesc": "Los jugadores se reparten al azar, ignorando las puntuaciones.",
+    "modeChoosingRink": "Elección en campo",
+    "modeChoosingRinkDesc": "Los capitanes eligen jugadores en vivo con enlaces compartidos.",
+    "formatHintLiveDraft": "Elige cómo se programarán los partidos tras el draft."
   },
   "settings": {
     "title": "Configuración de la liga"
+  },
+  "admin": {
+    "tabAdmin": "Admin",
+    "dangerZone": "Zona de peligro",
+    "resetHistory": "Reiniciar historial de torneos",
+    "resetHistoryDesc": "Elimina permanentemente todos los torneos, equipos, plantillas y partidos de esta liga. Tus jugadores registrados permanecen seguros.",
+    "typeToConfirm": "Escribe el nombre de la liga para confirmar",
+    "confirmDelete": "Confirmar eliminación",
+    "deleting": "Eliminando…",
+    "deleteSuccess": "Historial de torneos eliminado.",
+    "modalTitle": "Confirmar reinicio",
+    "deleteError": "Algo salió mal. Inténtalo de nuevo."
   },
   "match": {
     "goalScored": "¡Gol marcado!",
@@ -175,6 +207,20 @@
     "wcCreatingNext": "Preparando el siguiente partido…",
     "wcStartNext": "Iniciar siguiente partido →"
   },
+  "editMatch": {
+    "title": "Editar resultado del partido",
+    "home": "Local",
+    "away": "Visitante",
+    "resultType": "Cómo terminó",
+    "vcDraw": "Empate",
+    "vcRegular": "Victoria regular",
+    "vcOvertime": "Tras la prórroga",
+    "vcPenalties": "Penaltis",
+    "status": "Estado",
+    "statusCompleted": "Completado",
+    "statusCancelled": "Abandonado",
+    "editAriaLabel": "Editar resultado"
+  },
   "endMatch": {
     "endMatch": "Terminar partido",
     "goldenGoal": "⚡ ¡Gol de oro! ¡{team} gana!",
@@ -188,6 +234,39 @@
     "goToPenalties": "Ir a penaltis",
     "penaltiesWhoWon": "🥅 Penaltis — ¿Quién ganó?",
     "wcWhoStays": "Empate — ¿Quién se queda en el campo?"
+  },
+  "draft": {
+    "title": "Sala de Draft",
+    "liveDraft": "Draft en Vivo",
+    "liveDraftDesc": "Los capitanes eligen sus plantillas en tiempo real. Comparte un enlace con cada capitán.",
+    "captainLinks": "Enlaces de Capitanes",
+    "copyLink": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "draftComplete": "¡Draft Completo!",
+    "yourTurn": "¡Tu turno!",
+    "waitingFor": "Esperando a {team}…",
+    "round": "Ronda {n}",
+    "pickCount": "Elección {n}/{total}",
+    "reconnecting": "Reconectando…",
+    "waitingForReady": "Esperando que todos los capitanes confirmen…",
+    "manager": "Mánager",
+    "host": "ANFITRIÓN",
+    "ready": "Listo",
+    "joining": "Uniéndose…",
+    "offline": "Sin conexión",
+    "imReady": "Estoy Listo",
+    "startDraft": "Iniciar Draft →",
+    "waitingForMore": "Esperando {count} más…",
+    "spectatorMode": "Estás observando este draft.",
+    "poolEmpty": "El grupo de jugadores está vacío",
+    "searchPlayers": "Buscar jugadores…",
+    "available": "{count} disponibles",
+    "pickBtn": "ELEGIR",
+    "noPicks": "Sin elecciones aún",
+    "drafted": "{count} elegidos",
+    "pickingBadge": "ELIGIENDO",
+    "openDraftRoom": "Abrir Sala de Draft →",
+    "draftInProgress": "Draft en progreso"
   },
   "standings": {
     "noTournaments": "No hay torneos aún.",
