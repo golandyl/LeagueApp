@@ -92,7 +92,9 @@
     "teamsCount": "{count, plural, zero {# فرق} one {# فريق} two {# فريقان} few {# فرق} many {# فريق} other {# فرق}}",
     "archiveMatchResults": "نتائج المباريات",
     "archiveRosters": "تشكيلات الفرق",
-    "archiveLoadError": "فشل تحميل الأرشيف."
+    "archiveLoadError": "فشل تحميل الأرشيف.",
+    "liveGameInProgress": "يُسجَّل مباراة مباشرة حالياً",
+    "viewLiveMatch": "مشاهدة المباراة المباشرة"
   },
   "teams": {
     "avgRating": "متوسط",

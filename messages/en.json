@@ -92,7 +92,9 @@
     "teamsCount": "{count, plural, one {# team} other {# teams}}",
     "archiveMatchResults": "Match Results",
     "archiveRosters": "Team Rosters",
-    "archiveLoadError": "Failed to load archive."
+    "archiveLoadError": "Failed to load archive.",
+    "liveGameInProgress": "A live game is currently being scored",
+    "viewLiveMatch": "View Live Match"
   },
   "teams": {
     "avgRating": "Avg",

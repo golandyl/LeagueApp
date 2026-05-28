@@ -92,7 +92,9 @@
     "teamsCount": "{count, plural, one {# команда} few {# команды} other {# команд}}",
     "archiveMatchResults": "Результаты матчей",
     "archiveRosters": "Составы команд",
-    "archiveLoadError": "Не удалось загрузить архив."
+    "archiveLoadError": "Не удалось загрузить архив.",
+    "liveGameInProgress": "Идёт запись результатов живого матча",
+    "viewLiveMatch": "Смотреть живой матч"
   },
   "teams": {
     "avgRating": "Ср.",

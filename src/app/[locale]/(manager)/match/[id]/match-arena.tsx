@@ -186,36 +186,46 @@ export function MatchArena({
     const nextHome = isHome ? homeScore + 1 : homeScore
     const nextAway = isHome ? awayScore     : awayScore + 1
 
-    setHomeScore(nextHome)
-    setAwayScore(nextAway)
-    setGoals(prev => [...prev, {
+    const newGoal: RecordedGoal = {
       localId:       crypto.randomUUID(),
       scoringTeamId: sel.scoringTeamId,
       scorerId:      sel.scorerId,
       assistId:      sel.assistId,
       minute:        currentMinute(),
       isOwnGoal:     sel.isOwnGoal,
-    }])
+    }
+    setHomeScore(nextHome)
+    setAwayScore(nextAway)
+    setGoals(prev => [...prev, newGoal])
 
-    // Auto-end checks only apply when the manager is present to confirm the result.
-    // Anonymous scorekeepers can record goals freely; the manager ends the match.
-    if (isManager) {
-      if (league.win_score !== null) {
-        const winner =
-          nextHome >= league.win_score ? 'home' :
-          nextAway >= league.win_score ? 'away' : null
-        if (winner) {
-          pauseTimer()
-          setEndReason({ kind: 'win_score', winner, phase: phase as 'regulation' | 'overtime' })
-          return
-        }
-      }
+    // Threshold detection is universal — tournament rules apply regardless of who scored.
+    let thresholdWinner: 'home' | 'away' | null = null
+    let thresholdPhase: 'regulation' | 'overtime' = phase as 'regulation' | 'overtime'
 
-      if (phase === 'overtime' && league.overtime_type === 'GOLDEN_GOAL' && nextHome !== nextAway) {
-        const winner = nextHome > nextAway ? 'home' : 'away'
-        pauseTimer()
-        setEndReason({ kind: 'win_score', winner, phase: 'overtime' })
+    if (league.win_score !== null) {
+      thresholdWinner =
+        nextHome >= league.win_score ? 'home' :
+        nextAway >= league.win_score ? 'away' : null
+    }
+    if (!thresholdWinner && phase === 'overtime' && league.overtime_type === 'GOLDEN_GOAL' && nextHome !== nextAway) {
+      thresholdWinner = nextHome > nextAway ? 'home' : 'away'
+      thresholdPhase  = 'overtime'
+    }
+
+    if (thresholdWinner) {
+      pauseTimer()
+      if (isManager) {
+        // Manager sees a confirmation modal where they can choose OT, penalties, etc.
+        setEndReason({ kind: 'win_score', winner: thresholdWinner, phase: thresholdPhase })
+        return
       }
+      // Anon: derive the decision and auto-finalize immediately without a modal.
+      // Scores and goals are passed explicitly — React state hasn't committed yet.
+      const decision: EndDecision =
+        thresholdPhase === 'overtime'  ? 'end_ot' :
+        isWinnerContinues              ? (thresholdWinner === 'home' ? 'wc_keep_home' : 'wc_keep_away') :
+                                         'end_regular'
+      handleEndDecision(decision, { home: nextHome, away: nextAway }, [...goals, newGoal])
     }
   }
 
@@ -286,7 +296,11 @@ export function MatchArena({
   }
 
   // ── End match decisions ────────────────────────────────────────────────────────
-  async function handleEndDecision(decision: EndDecision) {
+  async function handleEndDecision(
+    decision:        EndDecision,
+    overrideScores?: { home: number; away: number },
+    overrideGoals?:  RecordedGoal[],
+  ) {
     if (decision === 'enter_ot') {
       const overRunSeconds = Math.max(0, secondsElapsed - league.match_length_minutes * 60)
       setPhase('overtime')
@@ -303,8 +317,8 @@ export function MatchArena({
     }
 
     let vc: Enums<'victory_condition'> = 'REGULAR'
-    let finalHome = homeScore
-    let finalAway = awayScore
+    let finalHome = overrideScores?.home ?? homeScore
+    let finalAway = overrideScores?.away ?? awayScore
 
     if (decision === 'end_ot') {
       vc = 'OVERTIME'
@@ -333,7 +347,7 @@ export function MatchArena({
 
     setSaving(true)
     try {
-      await persistMatch(vc, finalHome, finalAway)
+      await persistMatch(vc, finalHome, finalAway, overrideGoals)
       clearSaved(match.id)
       setFinalVC(vc)
       setMatchStatus('ended')
@@ -355,8 +369,9 @@ export function MatchArena({
 
   async function persistMatch(
     victoryCondition: Enums<'victory_condition'>,
-    finalHome: number,
-    finalAway: number,
+    finalHome:        number,
+    finalAway:        number,
+    effectiveGoals:   RecordedGoal[] = goals,
   ) {
     await supabase.from('matches').update({
       status:            'completed',
@@ -365,7 +380,7 @@ export function MatchArena({
       victory_condition: victoryCondition,
     }).eq('id', match.id)
 
-    const events: TablesInsert<'match_events'>[] = goals.flatMap(goal => {
+    const events: TablesInsert<'match_events'>[] = effectiveGoals.flatMap(goal => {
       const rows: TablesInsert<'match_events'>[] = [{
         match_id:    match.id,
         event_type:  'goal',

@@ -92,7 +92,9 @@
     "teamsCount": "{count, plural, other {# 支球队}}",
     "archiveMatchResults": "比赛结果",
     "archiveRosters": "队伍阵容",
-    "archiveLoadError": "加载归档失败。"
+    "archiveLoadError": "加载归档失败。",
+    "liveGameInProgress": "当前有一场实时比赛正在计分",
+    "viewLiveMatch": "查看实时比赛"
   },
   "teams": {
     "avgRating": "均",

@@ -92,7 +92,9 @@
     "teamsCount": "{count, plural, one {# equipo} other {# equipos}}",
     "archiveMatchResults": "Resultados",
     "archiveRosters": "Plantillas",
-    "archiveLoadError": "Error al cargar el historial."
+    "archiveLoadError": "Error al cargar el historial.",
+    "liveGameInProgress": "Hay un partido en vivo siendo anotado",
+    "viewLiveMatch": "Ver partido en vivo"
   },
   "teams": {
     "avgRating": "Med",

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { PlayerList }             from './PlayerList'
 import { AddPlayerForm }          from './AddPlayerForm'
 import { StartTournamentButton }  from './StartTournamentButton'
@@ -54,6 +55,51 @@ export function DashboardTabs({
   // a freshly-created tournament would never appear on the dashboard.
   useEffect(() => { setActiveTournament(tournament) }, [tournament?.id])
   useEffect(() => { setLiveMatches(initialMatches)  }, [initialMatches])
+
+  // Realtime subscription — keeps the dashboard in sync when an anonymous
+  // scorekeeper updates match scores or status from their device.
+  const supabase = useMemo(() => createClient(), [])
+  useEffect(() => {
+    const channel = supabase
+      .channel(`dashboard:${leagueId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'matches', filter: `league_id=eq.${leagueId}` },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setLiveMatches(prev =>
+              prev.some(m => m.id === (payload.new as Match).id)
+                ? prev
+                : [...prev, payload.new as Match],
+            )
+          } else if (payload.eventType === 'UPDATE') {
+            setLiveMatches(prev =>
+              prev.map(m => m.id === (payload.new as Match).id ? payload.new as Match : m),
+            )
+          } else if (payload.eventType === 'DELETE') {
+            setLiveMatches(prev =>
+              prev.filter(m => m.id !== (payload.old as Match).id),
+            )
+          }
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'tournaments', filter: `league_id=eq.${leagueId}` },
+        (payload) => {
+          if (payload.eventType === 'UPDATE') {
+            setActiveTournament(prev =>
+              prev?.id === (payload.new as Tournament).id ? payload.new as Tournament : prev,
+            )
+          } else if (payload.eventType === 'INSERT') {
+            setActiveTournament(prev => prev ?? (payload.new as Tournament))
+          }
+        },
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [leagueId, supabase])
 
   function handleMatchUpdate(updated: Match) {
     setLiveMatches(prev => prev.map(m => m.id === updated.id ? updated : m))
@@ -311,7 +357,8 @@ function MatchdayPanel({
   const [editingMatch, setEditingMatch] = useState<Match | null>(null)
 
   // Reconstruct lookup map from the serialised array
-  const teamsMap = new Map(teams.map(team => [team.id, team]))
+  const teamsMap        = new Map(teams.map(team => [team.id, team]))
+  const activeLiveMatch = tournament ? (matches.find(m => m.status === 'live') ?? null) : null
 
   return (
     <div className="space-y-8">
@@ -321,22 +368,40 @@ function MatchdayPanel({
         <section className="space-y-3">
           <PanelHeader>{t('tournamentControl')}</PanelHeader>
 
-          {tournament && (
-            <p className="text-xs text-slate-500">
-              {t('current')}{' '}
-              <span className="font-semibold text-slate-300">{tournament.name}</span>
-              {' · '}
-              {t('matchCount', { count: matches.length })}
-            </p>
-          )}
+          {activeLiveMatch ? (
+            /* Live guard: hide create/finish controls while a player is actively scoring */
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-emerald-900/30 px-5 py-5 ring-1 ring-emerald-700/60">
+              <div className="flex items-center gap-3">
+                <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" aria-hidden="true" />
+                <p className="text-sm font-semibold text-emerald-300">{t('liveGameInProgress')}</p>
+              </div>
+              <Link
+                href={`/match/${activeLiveMatch.id}`}
+                className="shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white transition-all active:scale-95 active:bg-emerald-700"
+              >
+                {t('viewLiveMatch')}
+              </Link>
+            </div>
+          ) : (
+            <>
+              {tournament && (
+                <p className="text-xs text-slate-500">
+                  {t('current')}{' '}
+                  <span className="font-semibold text-slate-300">{tournament.name}</span>
+                  {' · '}
+                  {t('matchCount', { count: matches.length })}
+                </p>
+              )}
 
-          <StartTournamentButton leagueId={leagueId} players={players} onCreated={onTournamentCreated} />
+              <StartTournamentButton leagueId={leagueId} players={players} onCreated={onTournamentCreated} />
 
-          {tournament && (
-            <FinishTournamentButton
-              tournamentId={tournament.id}
-              onFinished={onTournamentFinished}
-            />
+              {tournament && (
+                <FinishTournamentButton
+                  tournamentId={tournament.id}
+                  onFinished={onTournamentFinished}
+                />
+              )}
+            </>
           )}
         </section>
       )}

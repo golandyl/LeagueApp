@@ -92,7 +92,9 @@
     "teamsCount": "{count, plural, one {# קבוצה} other {# קבוצות}}",
     "archiveMatchResults": "תוצאות משחקים",
     "archiveRosters": "הרכבי קבוצות",
-    "archiveLoadError": "שגיאה בטעינת הארכיב."
+    "archiveLoadError": "שגיאה בטעינת הארכיב.",
+    "liveGameInProgress": "משחק חי מתנהל כעת",
+    "viewLiveMatch": "צפה במשחק החי"
   },
   "teams": {
     "avgRating": "ממוצע",
