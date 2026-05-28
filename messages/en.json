@@ -272,6 +272,19 @@
     "openDraftRoom": "Open Draft Room →",
     "draftInProgress": "Draft in progress"
   },
+  "signup": {
+    "title": "Sign Up for Matchday",
+    "namePlaceholder": "Your name",
+    "signUpButton": "Sign Up",
+    "signingUp": "Signing up…",
+    "alreadySignedUp": "You're signed up! ✓",
+    "attending": "Attending ({count}/{max})",
+    "waitingList": "Waiting List ({count})",
+    "waitingBadge": "Waiting",
+    "removeAriaLabel": "Remove",
+    "emptyHint": "No sign-ups yet — share this link!",
+    "full": "Full — you'll be added to the waiting list"
+  },
   "standings": {
     "noTournaments": "No tournaments yet.",
     "individualAwards": "Individual Awards",

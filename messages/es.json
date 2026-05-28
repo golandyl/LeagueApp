@@ -272,6 +272,19 @@
     "openDraftRoom": "Abrir Sala de Draft →",
     "draftInProgress": "Draft en progreso"
   },
+  "signup": {
+    "title": "Apuntarse al Día de Partido",
+    "namePlaceholder": "Tu nombre",
+    "signUpButton": "Apuntarse",
+    "signingUp": "Apuntando…",
+    "alreadySignedUp": "¡Estás apuntado! ✓",
+    "attending": "Asistentes ({count}/{max})",
+    "waitingList": "Lista de espera ({count})",
+    "waitingBadge": "En espera",
+    "removeAriaLabel": "Eliminar",
+    "emptyHint": "Nadie apuntado aún — ¡comparte el enlace!",
+    "full": "Completo — serás añadido a la lista de espera"
+  },
   "standings": {
     "noTournaments": "No hay torneos aún.",
     "individualAwards": "Premios individuales",

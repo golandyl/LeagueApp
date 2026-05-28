@@ -12,6 +12,7 @@ import { TeamsPanel }             from './TeamsPanel'
 import { AdminPanel }             from './AdminPanel'
 import { HistoryPanel }           from './HistoryPanel'
 import { EditMatchModal }         from '@/components/match/EditMatchModal'
+import { TournamentSignup }       from './TournamentSignup'
 import type { Tables } from '@/types/database'
 
 type Player     = Tables<'players'>
@@ -362,6 +363,13 @@ function MatchdayPanel({
 
   return (
     <div className="space-y-8">
+
+      {/* Public signup section — visible to everyone, including anonymous players */}
+      <TournamentSignup
+        leagueId={leagueId}
+        tournament={tournament ? { id: tournament.id, max_capacity: tournament.max_capacity } : null}
+        isManager={isManager}
+      />
 
       {/* Tournament control — only visible to the manager */}
       {isManager && (

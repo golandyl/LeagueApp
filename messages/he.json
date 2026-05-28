@@ -272,6 +272,19 @@
     "openDraftRoom": "פתח חדר גיוס ←",
     "draftInProgress": "גיוס בתהליך"
   },
+  "signup": {
+    "title": "הרשם ליום משחק",
+    "namePlaceholder": "השם שלך",
+    "signUpButton": "הירשם",
+    "signingUp": "נרשם…",
+    "alreadySignedUp": "אתה רשום! ✓",
+    "attending": "משתתפים ({count}/{max})",
+    "waitingList": "רשימת המתנה ({count})",
+    "waitingBadge": "ממתין",
+    "removeAriaLabel": "הסר",
+    "emptyHint": "אין נרשמים עדיין — שתף את הקישור!",
+    "full": "מלא — תתווסף לרשימת ההמתנה"
+  },
   "standings": {
     "noTournaments": "אין טורנירים עדיין.",
     "individualAwards": "פרסים אישיים",

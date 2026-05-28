@@ -272,6 +272,19 @@
     "openDraftRoom": "Открыть Зал Драфта →",
     "draftInProgress": "Драфт идёт"
   },
+  "signup": {
+    "title": "Запись на игровой день",
+    "namePlaceholder": "Ваше имя",
+    "signUpButton": "Записаться",
+    "signingUp": "Записываем…",
+    "alreadySignedUp": "Вы записаны! ✓",
+    "attending": "Участники ({count}/{max})",
+    "waitingList": "Лист ожидания ({count})",
+    "waitingBadge": "Ожидание",
+    "removeAriaLabel": "Удалить",
+    "emptyHint": "Пока никто не записался — поделитесь ссылкой!",
+    "full": "Мест нет — вы будете в листе ожидания"
+  },
   "standings": {
     "noTournaments": "Турниров пока нет.",
     "individualAwards": "Индивидуальные награды",

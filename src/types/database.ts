@@ -353,6 +353,48 @@ export type Database = {
           },
         ]
       }
+      tournament_signups: {
+        Row: {
+          id:            string
+          league_id:     string
+          tournament_id: string | null
+          player_name:   string
+          status:        'active' | 'waiting'
+          created_at:    string
+        }
+        Insert: {
+          id?:            string
+          league_id:      string
+          tournament_id?: string | null
+          player_name:    string
+          status?:        'active' | 'waiting'
+          created_at?:    string
+        }
+        Update: {
+          id?:            string
+          league_id?:     string
+          tournament_id?: string | null
+          player_name?:   string
+          status?:        'active' | 'waiting'
+          created_at?:    string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_signups_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_signups_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teams: {
         Row: {
           color: string | null
@@ -397,43 +439,46 @@ export type Database = {
       }
       tournaments: {
         Row: {
-          created_at: string
-          draft_status: Database["public"]["Enums"]["draft_status"]
-          end_date: string | null
-          format: string
-          id: string
-          league_id: string
-          name: string
-          season: string
-          start_date: string | null
-          status: Database["public"]["Enums"]["tournament_status"]
-          updated_at: string
+          created_at:    string
+          draft_status:  Database["public"]["Enums"]["draft_status"]
+          end_date:      string | null
+          format:        string
+          id:            string
+          league_id:     string
+          max_capacity:  number
+          name:          string
+          season:        string
+          start_date:    string | null
+          status:        Database["public"]["Enums"]["tournament_status"]
+          updated_at:    string
         }
         Insert: {
-          created_at?: string
+          created_at?:   string
           draft_status?: Database["public"]["Enums"]["draft_status"]
-          end_date?: string | null
-          format?: string
-          id?: string
-          league_id: string
-          name: string
-          season: string
-          start_date?: string | null
-          status?: Database["public"]["Enums"]["tournament_status"]
-          updated_at?: string
+          end_date?:     string | null
+          format?:       string
+          id?:           string
+          league_id:     string
+          max_capacity?: number
+          name:          string
+          season:        string
+          start_date?:   string | null
+          status?:       Database["public"]["Enums"]["tournament_status"]
+          updated_at?:   string
         }
         Update: {
-          created_at?: string
+          created_at?:   string
           draft_status?: Database["public"]["Enums"]["draft_status"]
-          end_date?: string | null
-          format?: string
-          id?: string
-          league_id?: string
-          name?: string
-          season?: string
-          start_date?: string | null
-          status?: Database["public"]["Enums"]["tournament_status"]
-          updated_at?: string
+          end_date?:     string | null
+          format?:       string
+          id?:           string
+          league_id?:    string
+          max_capacity?: number
+          name?:         string
+          season?:       string
+          start_date?:   string | null
+          status?:       Database["public"]["Enums"]["tournament_status"]
+          updated_at?:   string
         }
         Relationships: [
           {

@@ -272,6 +272,19 @@
     "openDraftRoom": "فتح غرفة الاختيار →",
     "draftInProgress": "الاختيار جارٍ"
   },
+  "signup": {
+    "title": "سجّل في يوم المباريات",
+    "namePlaceholder": "اسمك",
+    "signUpButton": "سجّل",
+    "signingUp": "جارٍ التسجيل…",
+    "alreadySignedUp": "أنت مسجّل! ✓",
+    "attending": "المشاركون ({count}/{max})",
+    "waitingList": "قائمة الانتظار ({count})",
+    "waitingBadge": "انتظار",
+    "removeAriaLabel": "إزالة",
+    "emptyHint": "لا مسجّلين بعد — شارك الرابط!",
+    "full": "الظرفية ممتلئة — ستُضاف إلى قائمة الانتظار"
+  },
   "standings": {
     "noTournaments": "لا توجد بطولات بعد.",
     "individualAwards": "الجوائز الفردية",

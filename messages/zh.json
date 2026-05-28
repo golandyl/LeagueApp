@@ -272,6 +272,19 @@
     "openDraftRoom": "进入选秀室 →",
     "draftInProgress": "选秀进行中"
   },
+  "signup": {
+    "title": "报名参加比赛日",
+    "namePlaceholder": "你的名字",
+    "signUpButton": "报名",
+    "signingUp": "报名中…",
+    "alreadySignedUp": "你已报名！✓",
+    "attending": "参与者（{count}/{max}）",
+    "waitingList": "候补名单（{count}）",
+    "waitingBadge": "候补",
+    "removeAriaLabel": "移除",
+    "emptyHint": "暂无报名 — 快分享链接吧！",
+    "full": "已满 — 你将被加入候补名单"
+  },
   "standings": {
     "noTournaments": "暂无赛事。",
     "individualAwards": "个人奖项",

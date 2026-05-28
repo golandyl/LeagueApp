@@ -67,7 +67,8 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
-  function handleOpen() {
+  async function handleOpen() {
+    // Open immediately with all players selected (fast default)
     setPresent(new Set(players.map(p => p.id)))
     setNumTeams(2)
     setFormat('round_robin')
@@ -78,6 +79,27 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
     setStep('attendance')
     setError(null)
     setOpen(true)
+
+    // Then quietly pre-check only the players who signed up.
+    // Falls back to all-selected if the fetch fails or returns nothing.
+    try {
+      const supabase = createClient()
+      const { data: signups } = await supabase
+        .from('tournament_signups')
+        .select('player_name')
+        .eq('league_id', leagueId)
+        .eq('status', 'active')
+
+      if (signups && signups.length > 0) {
+        const signupNames = new Set(signups.map(s => s.player_name.toLowerCase().trim()))
+        const matched     = players.filter(p => signupNames.has(p.full_name.toLowerCase().trim()))
+        if (matched.length > 0) {
+          setPresent(new Set(matched.map(p => p.id)))
+        }
+      }
+    } catch {
+      // Silently ignore — wizard still works with the all-selected default
+    }
   }
 
   function handleClose() {
