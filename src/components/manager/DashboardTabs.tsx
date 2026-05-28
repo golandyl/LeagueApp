@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { PlayerList }             from './PlayerList'
@@ -29,6 +29,7 @@ export interface DashboardTabsProps {
   // Plain arrays — Maps aren't serialisable across the RSC boundary
   teams:       Team[]
   teamPlayers: { player_id: string; team_id: string }[]
+  isManager:   boolean
 }
 
 export function DashboardTabs({
@@ -39,6 +40,7 @@ export function DashboardTabs({
   matches: initialMatches,
   teams,
   teamPlayers,
+  isManager,
 }: DashboardTabsProps) {
   const t      = useTranslations('dashboard')
   const tAdmin = useTranslations('admin')
@@ -46,6 +48,12 @@ export function DashboardTabs({
   const [active,            setActive]            = useState<TabId>('matchday')
   const [liveMatches,       setLiveMatches]       = useState<Match[]>(initialMatches)
   const [activeTournament,  setActiveTournament]  = useState<Tournament | null>(tournament)
+
+  // Sync RSC prop updates into state after router.refresh().
+  // useState only uses the initializer once, so without these effects
+  // a freshly-created tournament would never appear on the dashboard.
+  useEffect(() => { setActiveTournament(tournament) }, [tournament?.id])
+  useEffect(() => { setLiveMatches(initialMatches)  }, [initialMatches])
 
   function handleMatchUpdate(updated: Match) {
     setLiveMatches(prev => prev.map(m => m.id === updated.id ? updated : m))
@@ -58,6 +66,11 @@ export function DashboardTabs({
   function handleTournamentFinished() {
     setActiveTournament(null)
     setLiveMatches([])
+  }
+
+  function handleTournamentCreated(t: Tournament, matches: Match[]) {
+    setActiveTournament(t)
+    setLiveMatches(matches)
   }
 
   const hasLive  = liveMatches.some(m => m.status === 'live')
@@ -174,21 +187,23 @@ export function DashboardTabs({
           {t('tabHistory')}
         </button>
 
-        {/* ── Admin tab — pushed to the end with ms-auto ── */}
-        <button
-          role="tab"
-          aria-selected={active === 'admin'}
-          aria-controls="panel-admin"
-          onClick={() => setActive('admin')}
-          className={[
-            'ms-auto flex items-center gap-1.5 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-            active === 'admin'
-              ? '-mb-px border-b-2 border-rose-500 text-rose-300'
-              : 'text-slate-600 hover:text-slate-400',
-          ].join(' ')}
-        >
-          {tAdmin('tabAdmin')}
-        </button>
+        {/* ── Admin tab — manager-only, pushed to the end with ms-auto ── */}
+        {isManager && (
+          <button
+            role="tab"
+            aria-selected={active === 'admin'}
+            aria-controls="panel-admin"
+            onClick={() => setActive('admin')}
+            className={[
+              'ms-auto flex items-center gap-1.5 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+              active === 'admin'
+                ? '-mb-px border-b-2 border-rose-500 text-rose-300'
+                : 'text-slate-600 hover:text-slate-400',
+            ].join(' ')}
+          >
+            {tAdmin('tabAdmin')}
+          </button>
+        )}
       </div>
 
       {/* ── Tab panels ────────────────────────────────────────────────────── */}
@@ -205,6 +220,7 @@ export function DashboardTabs({
             teams={teams}
             players={players}
             teamPlayers={teamPlayers}
+            readOnly={!isManager}
           />
         </div>
       )}
@@ -221,8 +237,10 @@ export function DashboardTabs({
             tournament={activeTournament}
             matches={liveMatches}
             teams={teams}
+            isManager={isManager}
             onMatchUpdate={handleMatchUpdate}
             onTournamentFinished={handleTournamentFinished}
+            onTournamentCreated={handleTournamentCreated}
           />
         </div>
       )}
@@ -233,7 +251,7 @@ export function DashboardTabs({
           role="tabpanel"
           className="px-4 py-6"
         >
-          <RosterPanel leagueId={leagueId} players={players} />
+          <RosterPanel leagueId={leagueId} players={players} isManager={isManager} />
         </div>
       )}
 
@@ -268,8 +286,10 @@ interface MatchdayPanelProps {
   tournament:             Tournament | null
   matches:                Match[]
   teams:                  Team[]
+  isManager:              boolean
   onMatchUpdate:          (updated: Match) => void
   onTournamentFinished:   () => void
+  onTournamentCreated:    (tournament: Tournament, matches: Match[]) => void
 }
 
 function MatchdayPanel({
@@ -278,8 +298,10 @@ function MatchdayPanel({
   tournament,
   matches,
   teams,
+  isManager,
   onMatchUpdate,
   onTournamentFinished,
+  onTournamentCreated,
 }: MatchdayPanelProps) {
   const t      = useTranslations('dashboard')
   const tDraft = useTranslations('draft')
@@ -294,28 +316,30 @@ function MatchdayPanel({
   return (
     <div className="space-y-8">
 
-      {/* Tournament control — always first and immediately visible */}
-      <section className="space-y-3">
-        <PanelHeader>{t('tournamentControl')}</PanelHeader>
+      {/* Tournament control — only visible to the manager */}
+      {isManager && (
+        <section className="space-y-3">
+          <PanelHeader>{t('tournamentControl')}</PanelHeader>
 
-        {tournament && (
-          <p className="text-xs text-slate-500">
-            {t('current')}{' '}
-            <span className="font-semibold text-slate-300">{tournament.name}</span>
-            {' · '}
-            {t('matchCount', { count: matches.length })}
-          </p>
-        )}
+          {tournament && (
+            <p className="text-xs text-slate-500">
+              {t('current')}{' '}
+              <span className="font-semibold text-slate-300">{tournament.name}</span>
+              {' · '}
+              {t('matchCount', { count: matches.length })}
+            </p>
+          )}
 
-        <StartTournamentButton leagueId={leagueId} players={players} />
+          <StartTournamentButton leagueId={leagueId} players={players} onCreated={onTournamentCreated} />
 
-        {tournament && (
-          <FinishTournamentButton
-            tournamentId={tournament.id}
-            onFinished={onTournamentFinished}
-          />
-        )}
-      </section>
+          {tournament && (
+            <FinishTournamentButton
+              tournamentId={tournament.id}
+              onFinished={onTournamentFinished}
+            />
+          )}
+        </section>
+      )}
 
       {/* Draft room card — shown when a live draft is still in progress */}
       {tournament && tournament.draft_status !== 'completed' && (
@@ -383,8 +407,8 @@ function MatchdayPanel({
                       />
                     </Link>
 
-                    {/* Pencil edit button — only for finished matches */}
-                    {canEdit && (
+                    {/* Pencil edit button — manager only, for finished matches */}
+                    {canEdit && isManager && (
                       <button
                         onClick={() => setEditingMatch(m)}
                         aria-label={tEdit('editAriaLabel')}
@@ -434,8 +458,8 @@ function MatchdayPanel({
         </Link>
       </div>
 
-      {/* Edit match modal */}
-      {editingMatch && (
+      {/* Edit match modal — manager only */}
+      {editingMatch && isManager && (
         <EditMatchModal
           match={editingMatch}
           homeTeam={teamsMap.get(editingMatch.home_team_id)}
@@ -453,11 +477,12 @@ function MatchdayPanel({
 // ── Roster panel ───────────────────────────────────────────────────────────────
 
 interface RosterPanelProps {
-  leagueId: string
-  players:  Player[]
+  leagueId:  string
+  players:   Player[]
+  isManager: boolean
 }
 
-function RosterPanel({ leagueId, players }: RosterPanelProps) {
+function RosterPanel({ leagueId, players, isManager }: RosterPanelProps) {
   const t = useTranslations('dashboard')
 
   return (
@@ -465,9 +490,9 @@ function RosterPanel({ leagueId, players }: RosterPanelProps) {
       {players.length === 0 ? (
         <p className="py-8 text-center text-sm text-slate-500">{t('noPlayers')}</p>
       ) : (
-        <PlayerList players={players} />
+        <PlayerList players={players} isManager={isManager} />
       )}
-      <AddPlayerForm leagueId={leagueId} />
+      {isManager && <AddPlayerForm leagueId={leagueId} />}
     </div>
   )
 }

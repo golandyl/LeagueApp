@@ -96,6 +96,8 @@
   },
   "teams": {
     "avgRating": "متوسط",
+    "pitchView": "الملعب",
+    "statsView": "إحصاءات",
     "noTeams": "لا فرق بعد — ابدأ يوم بطولة.",
     "shareWhatsApp": "مشاركة عبر واتساب",
     "swapPlayer": "تبديل لاعب",

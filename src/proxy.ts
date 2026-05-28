@@ -25,7 +25,7 @@ function stripLocale(pathname: string, locale: string): string {
 
 // Routes that do not require authentication.
 // Checked against the path *without* locale prefix.
-const PUBLIC_PREFIXES  = ['/login', '/register', '/league', '/draft']
+const PUBLIC_PREFIXES  = ['/login', '/register', '/league', '/draft', '/manager-dashboard', '/match']
 const MANAGER_PREFIXES = ['/manager']
 const PLAYER_PREFIXES  = ['/player']
 

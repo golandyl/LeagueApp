@@ -96,6 +96,8 @@
   },
   "teams": {
     "avgRating": "ממוצע",
+    "pitchView": "מגרש",
+    "statsView": "סטטיסטיקה",
     "noTeams": "אין קבוצות עדיין — התחל יום טורניר.",
     "shareWhatsApp": "שתף בוואטסאפ",
     "swapPlayer": "החלפת שחקן",

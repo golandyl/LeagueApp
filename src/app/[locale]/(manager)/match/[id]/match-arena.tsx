@@ -79,10 +79,11 @@ interface Props {
   homePlayers:      Player[]
   awayPlayers:      Player[]
   tournamentFormat: string
+  isManager:        boolean
 }
 
 export function MatchArena({
-  match, league, homeTeam, awayTeam, homePlayers, awayPlayers, tournamentFormat,
+  match, league, homeTeam, awayTeam, homePlayers, awayPlayers, tournamentFormat, isManager,
 }: Props) {
   const t        = useTranslations('match')
   const supabase = createClient()
@@ -196,21 +197,25 @@ export function MatchArena({
       isOwnGoal:     sel.isOwnGoal,
     }])
 
-    if (league.win_score !== null) {
-      const winner =
-        nextHome >= league.win_score ? 'home' :
-        nextAway >= league.win_score ? 'away' : null
-      if (winner) {
-        pauseTimer()
-        setEndReason({ kind: 'win_score', winner, phase: phase as 'regulation' | 'overtime' })
-        return
+    // Auto-end checks only apply when the manager is present to confirm the result.
+    // Anonymous scorekeepers can record goals freely; the manager ends the match.
+    if (isManager) {
+      if (league.win_score !== null) {
+        const winner =
+          nextHome >= league.win_score ? 'home' :
+          nextAway >= league.win_score ? 'away' : null
+        if (winner) {
+          pauseTimer()
+          setEndReason({ kind: 'win_score', winner, phase: phase as 'regulation' | 'overtime' })
+          return
+        }
       }
-    }
 
-    if (phase === 'overtime' && league.overtime_type === 'GOLDEN_GOAL' && nextHome !== nextAway) {
-      const winner = nextHome > nextAway ? 'home' : 'away'
-      pauseTimer()
-      setEndReason({ kind: 'win_score', winner, phase: 'overtime' })
+      if (phase === 'overtime' && league.overtime_type === 'GOLDEN_GOAL' && nextHome !== nextAway) {
+        const winner = nextHome > nextAway ? 'home' : 'away'
+        pauseTimer()
+        setEndReason({ kind: 'win_score', winner, phase: 'overtime' })
+      }
     }
   }
 
@@ -442,7 +447,7 @@ export function MatchArena({
         running={timerRunning}
         isStoppageTime={isStoppageTime}
         onToggle={toggleTimer}
-        onWhistle={handleWhistle}
+        onWhistle={isManager ? handleWhistle : undefined}
       />
 
       <button
@@ -473,7 +478,7 @@ export function MatchArena({
         />
       )}
 
-      {endReason && (
+      {endReason && isManager && (
         <EndMatchModal
           reason={endReason}
           homeTeam={homeTeam}

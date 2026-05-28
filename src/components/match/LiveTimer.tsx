@@ -10,7 +10,7 @@ interface Props {
   running:        boolean
   isStoppageTime: boolean
   onToggle:       () => void
-  onWhistle:      () => void
+  onWhistle?:     () => void
 }
 
 function fmt(secs: number): string {
@@ -53,7 +53,7 @@ export function LiveTimer({ seconds, phase, running, isStoppageTime, onToggle, o
       </div>
 
       {/* Action button */}
-      {isStoppageTime ? (
+      {isStoppageTime && onWhistle ? (
         <button
           onClick={onWhistle}
           className="w-full max-w-sm rounded-2xl bg-red-600 py-6 text-2xl font-black uppercase tracking-widest text-white transition-all active:scale-95 active:bg-red-700"

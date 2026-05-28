@@ -96,6 +96,8 @@
   },
   "teams": {
     "avgRating": "均",
+    "pitchView": "球场",
+    "statsView": "数据",
     "noTeams": "暂无球队 — 请开始一个赛事日。",
     "shareWhatsApp": "分享至 WhatsApp",
     "swapPlayer": "交换球员",

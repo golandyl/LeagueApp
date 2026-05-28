@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { setRequestLocale } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { MatchArena } from './match-arena'
 import type { Tables } from '@/types/database'
@@ -10,8 +11,12 @@ interface Props {
 }
 
 export default async function MatchPage({ params }: Props) {
-  const { id: matchId } = await params
+  const { locale, id: matchId } = await params
+  setRequestLocale(locale)
+
   const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
 
   const { data: match } = await supabase
     .from('matches')
@@ -39,6 +44,8 @@ export default async function MatchPage({ params }: Props) {
 
   if (!league || !homeTeam || !awayTeam) notFound()
 
+  const isManager = !!user && user.id === league.manager_id
+
   const homeIds = homeTpRows?.map(r => r.player_id) ?? []
   const awayIds = awayTpRows?.map(r => r.player_id) ?? []
 
@@ -60,6 +67,7 @@ export default async function MatchPage({ params }: Props) {
       homePlayers={homePlayers ?? []}
       awayPlayers={awayPlayers ?? []}
       tournamentFormat={tournament?.format ?? 'round_robin'}
+      isManager={isManager}
     />
   )
 }

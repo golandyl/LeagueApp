@@ -1,4 +1,4 @@
-import { notFound, redirect }     from 'next/navigation'
+import { notFound }                from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link }                   from '@/i18n/navigation'
 import { createClient }           from '@/lib/supabase/server'
@@ -21,7 +21,6 @@ export default async function ManagerDashboardPage({ params }: Props) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${locale}/login`)
 
   const [{ data: league }, { data: players }] = await Promise.all([
     supabase.from('leagues').select('*').eq('id', leagueId).single(),
@@ -34,7 +33,8 @@ export default async function ManagerDashboardPage({ params }: Props) {
   ])
 
   if (!league) notFound()
-  if (league.manager_id !== user!.id) redirect(`/${locale}/login`)
+
+  const isManager = !!user && user.id === league.manager_id
 
   const { data: tournament } = await supabase
     .from('tournaments')
@@ -81,7 +81,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
             </p>
             <div className="mt-0.5 flex items-center gap-2">
               <h1 className="truncate text-2xl font-black">{league.name}</h1>
-              <LeagueSettingsModal league={league} />
+              {isManager && <LeagueSettingsModal league={league} />}
             </div>
             <p className="mt-1 text-xs text-slate-500">
               {league.match_length_minutes} min
@@ -90,15 +90,17 @@ export default async function ManagerDashboardPage({ params }: Props) {
             </p>
           </div>
 
-          <div className="flex shrink-0 flex-col items-end gap-2">
-            <Link
-              href="/create-league"
-              className="text-xs font-semibold text-sky-400 transition-colors hover:text-sky-300"
-            >
-              {t('newLeague')}
-            </Link>
-            <SignOutButton />
-          </div>
+          {isManager && (
+            <div className="flex shrink-0 flex-col items-end gap-2">
+              <Link
+                href="/create-league"
+                className="text-xs font-semibold text-sky-400 transition-colors hover:text-sky-300"
+              >
+                {t('newLeague')}
+              </Link>
+              <SignOutButton />
+            </div>
+          )}
         </div>
       </div>
 
@@ -111,6 +113,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
         matches={matches}
         teams={teams}
         teamPlayers={teamPlayers}
+        isManager={isManager}
       />
 
     </main>

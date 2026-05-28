@@ -96,6 +96,8 @@
   },
   "teams": {
     "avgRating": "Avg",
+    "pitchView": "Pitch",
+    "statsView": "Stats",
     "noTeams": "No teams yet — start a tournament day.",
     "shareWhatsApp": "Share to WhatsApp",
     "swapPlayer": "Swap Player",

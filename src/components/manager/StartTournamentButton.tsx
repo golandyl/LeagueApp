@@ -9,13 +9,16 @@ import type { DraftPlayer } from '@/lib/team-generator'
 import type { Tables } from '@/types/database'
 
 type Player     = Tables<'players'>
+type Tournament = Tables<'tournaments'>
+type Match      = Tables<'matches'>
 type Step       = 'attendance' | 'method' | 'format'
 type Format     = 'round_robin' | 'winner_continues' | 'cup'
 type Generation = 'balanced' | 'random' | 'live_draft'
 
 interface Props {
-  leagueId: string
-  players:  Player[]
+  leagueId:   string
+  players:    Player[]
+  onCreated?: (tournament: Tournament, matches: Match[]) => void
 }
 
 const TEAM_COLORS      = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899']
@@ -32,7 +35,7 @@ const POSITION_STYLE: Record<string, string> = {
 type Slot    = { _id: string; isGhost?: boolean }
 type RawTeam = { players: Slot[] }
 
-export function StartTournamentButton({ leagueId, players }: Props) {
+export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
   const t       = useTranslations('tournament')
   const tDraft  = useTranslations('draft')
   const tCommon = useTranslations('common')
@@ -138,7 +141,9 @@ export function StartTournamentButton({ leagueId, players }: Props) {
 
       // ── Path B: Balanced or Pure Random ───────────────────────────────────
 
-      // 1. Create tournament
+      // 1. Create tournament — select('*') so we can hand the full row back
+      //    to the dashboard via onCreated without a second fetch.
+      console.info('[StartTournamentButton] Step 1: inserting tournament', { format, generation })
       const { data: tournament, error: tErr } = await supabase
         .from('tournaments')
         .insert({
@@ -149,10 +154,14 @@ export function StartTournamentButton({ leagueId, players }: Props) {
           draft_status: 'completed' as const,
           format:       format,
         })
-        .select('id')
+        .select('*')
         .single()
 
-      if (tErr || !tournament) throw new Error(tErr?.message ?? tCommon('error'))
+      if (tErr || !tournament) {
+        console.error('[StartTournamentButton] Step 1 FAILED', tErr)
+        throw new Error(tErr?.message ?? tCommon('error'))
+      }
+      console.info('[StartTournamentButton] Step 1 OK – tournament', tournament.id)
 
       // 2. Build player slots, then generate teams
       const draftPlayers = presentPlayers.map(p => ({
@@ -189,6 +198,7 @@ export function StartTournamentButton({ leagueId, players }: Props) {
       }
 
       // 3. Insert teams
+      console.info('[StartTournamentButton] Step 3: inserting', safeNumTeams, 'teams')
       const { data: insertedTeams, error: teamsErr } = await supabase
         .from('teams')
         .insert(
@@ -201,7 +211,19 @@ export function StartTournamentButton({ leagueId, players }: Props) {
         )
         .select('id')
 
-      if (teamsErr || !insertedTeams) throw new Error(teamsErr?.message ?? tCommon('error'))
+      if (teamsErr || !insertedTeams) {
+        console.error('[StartTournamentButton] Step 3 FAILED', teamsErr)
+        throw new Error(teamsErr?.message ?? tCommon('error'))
+      }
+      // Guard: ensure every team row was acknowledged before we use the IDs.
+      // An empty or partial return here would cause undefined access in the
+      // match-building step below (especially for winner_continues which reads
+      // insertedTeams[0] and insertedTeams[1] directly).
+      if (insertedTeams.length < safeNumTeams) {
+        console.error('[StartTournamentButton] Step 3: DB returned', insertedTeams.length, 'rows, expected', safeNumTeams)
+        throw new Error(`Team creation incomplete (${insertedTeams.length}/${safeNumTeams})`)
+      }
+      console.info('[StartTournamentButton] Step 3 OK – teams', insertedTeams.map(t => t.id))
 
       // 4. Insert team_players (non-ghost only)
       const teamPlayerRows = generated.flatMap((team, i) =>
@@ -258,13 +280,27 @@ export function StartTournamentButton({ leagueId, players }: Props) {
         }
       }
 
+      let insertedMatches: Match[] = []
       if (matchRows.length > 0) {
-        const { error: matchErr } = await supabase.from('matches').insert(matchRows)
-        if (matchErr) throw new Error(matchErr.message)
+        console.info('[StartTournamentButton] Step 5: inserting', matchRows.length, 'match(es) for format', format)
+        const { data: mData, error: matchErr } = await supabase
+          .from('matches')
+          .insert(matchRows)
+          .select('*')
+        if (matchErr) {
+          console.error('[StartTournamentButton] Step 5 FAILED', matchErr)
+          throw new Error(matchErr.message)
+        }
+        insertedMatches = mData ?? []
+        console.info('[StartTournamentButton] Step 5 OK – matches', insertedMatches.map(m => m.id))
       }
 
       setOpen(false)
       setLoading(false)
+      // Update the dashboard state immediately — don't wait for router.refresh().
+      // Without this, useState(tournament) keeps the old null value because React
+      // never re-runs useState initialisers when props change after mount.
+      onCreated?.(tournament, insertedMatches)
       router.refresh()
 
     } catch (err) {

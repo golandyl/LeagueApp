@@ -10,10 +10,11 @@ type Player = Tables<'players'>
 const POSITION_ORDER: Record<string, number> = { GK: 0, DEF: 1, MID: 2, FWD: 3 }
 
 interface Props {
-  players: Player[]
+  players:    Player[]
+  isManager?: boolean
 }
 
-export function PlayerList({ players: initialPlayers }: Props) {
+export function PlayerList({ players: initialPlayers, isManager = false }: Props) {
   const t = useTranslations('players')
 
   const [players, setPlayers] = useState<Player[]>(initialPlayers)
@@ -43,9 +44,11 @@ export function PlayerList({ players: initialPlayers }: Props) {
       <div className="mb-4 divide-y divide-slate-700/50 rounded-2xl bg-slate-800 overflow-hidden">
         {sorted.map(p => (
           <div key={p.id} className="flex items-center gap-3 px-4 py-3">
-            <span className="w-6 shrink-0 text-center text-sm font-black text-amber-400">
-              {p.rating}
-            </span>
+            {isManager && (
+              <span className="w-6 shrink-0 text-center text-sm font-black text-amber-400">
+                {p.rating}
+              </span>
+            )}
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold text-white">{p.full_name}</p>
@@ -57,26 +60,28 @@ export function PlayerList({ players: initialPlayers }: Props) {
 
             <span className="shrink-0 text-xs text-slate-500">{p.stamina}</span>
 
-            <button
-              onClick={() => setEditing(p)}
-              aria-label={t('editPlayer')}
-              className="shrink-0 rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-700 hover:text-slate-200 active:scale-90"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3.5 w-3.5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
+            {isManager && (
+              <button
+                onClick={() => setEditing(p)}
+                aria-label={t('editPlayer')}
+                className="shrink-0 rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-700 hover:text-slate-200 active:scale-90"
               >
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3.5 w-3.5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+              </button>
+            )}
           </div>
         ))}
       </div>
 
-      {editing && (
+      {editing && isManager && (
         <EditPlayerModal
           player={editing}
           onSave={handleSave}

@@ -9,6 +9,7 @@ type Team       = Tables<'teams'>
 type Player     = Tables<'players'>
 type Tournament = Tables<'tournaments'>
 type Position   = 'GK' | 'DEF' | 'MID' | 'FWD'
+type ViewMode   = 'pitch' | 'stats'
 
 interface TeamPlayerRow { player_id: string; team_id: string }
 
@@ -214,9 +215,12 @@ function TeamCard({
   onPlayerTap:      (playerId: string) => void
   readOnly?:        boolean
 }) {
-  const t     = useTranslations('teams')
-  const byPos = groupByPos(roster)
-  const avg   = calcAvg(roster)
+  const t      = useTranslations('teams')
+  const byPos  = groupByPos(roster)
+  const avg    = calcAvg(roster)
+  const [viewMode, setViewMode] = useState<ViewMode>('pitch')
+
+  const isThisTeamSelected = selectedPlayerId !== null && roster.some(p => p.id === selectedPlayerId)
 
   return (
     <div className="overflow-hidden rounded-2xl bg-slate-800 shadow-lg">
@@ -230,53 +234,205 @@ function TeamCard({
           />
         )}
         <span className="min-w-0 flex-1 truncate font-black text-white">{team.name}</span>
-        {/* Prominent rating badge */}
-        <div className="shrink-0 rounded-2xl bg-emerald-900/40 px-3.5 py-2 text-center ring-1 ring-emerald-700/40">
-          <p className="text-2xl font-black tabular-nums leading-none text-emerald-300">{avg}</p>
-          <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-emerald-600/80">
-            {t('avgRating')}
-          </p>
-        </div>
+        {/* Avg rating badge — hidden for non-managers */}
+        {!readOnly && (
+          <div className="shrink-0 rounded-2xl bg-emerald-900/40 px-3.5 py-2 text-center ring-1 ring-emerald-700/40">
+            <p className="text-2xl font-black tabular-nums leading-none text-emerald-300">{avg}</p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-emerald-600/80">
+              {t('avgRating')}
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Tactics board */}
-      <div
-        className="relative mx-3 mb-3 overflow-hidden rounded-xl"
-        style={{ minHeight: '232px', backgroundColor: '#052e16' }}
-      >
-        <PitchMarkings />
-        <div
-          className="relative z-10 flex flex-col justify-between px-4 py-5"
-          style={{ minHeight: '232px' }}
+      {/* View mode toggle */}
+      <div className="mx-3 mb-3 flex gap-0.5 rounded-xl bg-slate-900/60 p-0.5">
+        <button
+          onClick={() => setViewMode('pitch')}
+          className={[
+            'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold transition-colors',
+            viewMode === 'pitch'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'text-slate-500 hover:text-slate-400',
+          ].join(' ')}
         >
-          {PITCH_ORDER.map(pos => {
-            const pp = byPos[pos]
-            if (pp.length === 0) return null
-            return (
-              <div key={pos} className="flex items-center justify-center gap-3">
-                {pp.map(player => (
-                  <PlayerPin
-                    key={player.id}
-                    player={player}
-                    pos={pos}
-                    isSelected={selectedPlayerId === player.id}
-                    onTap={onPlayerTap}
-                    readOnly={readOnly}
-                  />
-                ))}
-              </div>
-            )
-          })}
-        </div>
+          <PitchIcon />
+          {t('pitchView')}
+        </button>
+        <button
+          onClick={() => setViewMode('stats')}
+          className={[
+            'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold transition-colors',
+            viewMode === 'stats'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'text-slate-500 hover:text-slate-400',
+          ].join(' ')}
+        >
+          <ListIcon />
+          {t('statsView')}
+        </button>
       </div>
+
+      {/* Pitch view */}
+      {viewMode === 'pitch' && (
+        <div
+          className="relative mx-3 mb-3 overflow-hidden rounded-xl"
+          style={{ minHeight: '232px', backgroundColor: '#052e16' }}
+        >
+          <PitchMarkings />
+          <div
+            className="relative z-10 flex flex-col justify-between px-4 py-5"
+            style={{ minHeight: '232px' }}
+          >
+            {PITCH_ORDER.map(pos => {
+              const pp = byPos[pos]
+              if (pp.length === 0) return null
+              return (
+                <div key={pos} className="flex items-center justify-center gap-3">
+                  {pp.map(player => (
+                    <PlayerPin
+                      key={player.id}
+                      player={player}
+                      pos={pos}
+                      isSelected={selectedPlayerId === player.id}
+                      onTap={onPlayerTap}
+                      readOnly={readOnly}
+                    />
+                  ))}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Stats view */}
+      {viewMode === 'stats' && (
+        <StatsRoster
+          roster={roster}
+          selectedPlayerId={selectedPlayerId}
+          onPlayerTap={onPlayerTap}
+          readOnly={readOnly}
+        />
+      )}
 
       {/* Swap hint — hidden in read-only mode */}
-      {!readOnly && selectedPlayerId && roster.some(p => p.id === selectedPlayerId) && (
+      {!readOnly && isThisTeamSelected && (
         <p className="px-4 pb-3 text-center text-xs font-semibold text-amber-400">
           {t('swapHint')}
         </p>
       )}
     </div>
+  )
+}
+
+// ── Stats roster ───────────────────────────────────────────────────────────────
+
+function StatsRoster({
+  roster, selectedPlayerId, onPlayerTap, readOnly,
+}: {
+  roster:           Player[]
+  selectedPlayerId: string | null
+  onPlayerTap:      (playerId: string) => void
+  readOnly?:        boolean
+}) {
+  const byPos = groupByPos(roster)
+
+  return (
+    <div className="mx-3 mb-3 space-y-2.5">
+      {PITCH_ORDER.map(pos => {
+        const group = byPos[pos]
+        if (group.length === 0) return null
+        return (
+          <div key={pos}>
+            {/* Position group label */}
+            <p
+              className="mb-1.5 px-1 text-[9px] font-black uppercase tracking-widest"
+              style={{ color: PIN_COLOR[pos] }}
+            >
+              {pos}
+            </p>
+            <div className="space-y-1.5">
+              {group.map(player => (
+                <StatPlayerCard
+                  key={player.id}
+                  player={player}
+                  pos={pos}
+                  isSelected={selectedPlayerId === player.id}
+                  onTap={onPlayerTap}
+                  readOnly={readOnly}
+                />
+              ))}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Stat player card ───────────────────────────────────────────────────────────
+
+function StatPlayerCard({
+  player, pos, isSelected, onTap, readOnly,
+}: {
+  player:     Player
+  pos:        Position
+  isSelected: boolean
+  onTap:      (playerId: string) => void
+  readOnly?:  boolean
+}) {
+  const pinColor = PIN_COLOR[pos]
+
+  const inner = (
+    <div
+      className={[
+        'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all',
+        isSelected
+          ? 'bg-amber-500/20 ring-1 ring-amber-500/50'
+          : 'bg-slate-700/50',
+      ].join(' ')}
+    >
+      {/* Position badge */}
+      <span
+        className="shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-black uppercase"
+        style={{ backgroundColor: `${pinColor}22`, color: pinColor }}
+      >
+        {pos}
+      </span>
+      {/* Player name */}
+      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
+        {player.full_name}
+      </span>
+      {/* Individual rating — hidden for non-managers */}
+      {!readOnly && (
+        <span
+          className={[
+            'shrink-0 text-base font-black tabular-nums',
+            isSelected ? 'text-amber-400' : 'text-slate-200',
+          ].join(' ')}
+        >
+          {player.rating}
+        </span>
+      )}
+    </div>
+  )
+
+  if (readOnly) {
+    return <div>{inner}</div>
+  }
+
+  return (
+    <button
+      onClick={() => onTap(player.id)}
+      className={[
+        'w-full text-start transition-transform active:scale-[0.98]',
+        isSelected ? 'scale-[1.01]' : '',
+      ].join(' ')}
+      aria-pressed={isSelected}
+    >
+      {inner}
+    </button>
   )
 }
 
@@ -290,7 +446,6 @@ function PitchMarkings() {
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      {/* All marks in one group for a single opacity */}
       <g stroke="white" fill="none" opacity="0.07" strokeWidth="0.7">
         <line   x1="0"  y1="70" x2="100" y2="70" />
         <circle cx="50" cy="70" r="14" />
@@ -412,7 +567,7 @@ function SwapSheet({
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-white">{player.full_name}</p>
                   <p className="text-xs text-slate-400">
-                    {team?.name} · {player.position} · ★{player.rating}
+                    {team?.name} · {player.position}
                   </p>
                 </div>
                 <svg
@@ -444,6 +599,33 @@ function SwapSheet({
         </div>
       </div>
     </div>
+  )
+}
+
+// ── Toggle icons ───────────────────────────────────────────────────────────────
+
+function PitchIcon() {
+  return (
+    <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <rect x="1" y="2" width="14" height="12" rx="1" />
+      <line x1="8" y1="2" x2="8" y2="14" />
+      <circle cx="8" cy="8" r="2" />
+      <line x1="1" y1="8" x2="4" y2="8" />
+      <line x1="12" y1="8" x2="15" y2="8" />
+    </svg>
+  )
+}
+
+function ListIcon() {
+  return (
+    <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <line x1="5" y1="4" x2="14" y2="4" />
+      <line x1="5" y1="8" x2="14" y2="8" />
+      <line x1="5" y1="12" x2="14" y2="12" />
+      <circle cx="2.5" cy="4"  r="1" fill="currentColor" stroke="none" />
+      <circle cx="2.5" cy="8"  r="1" fill="currentColor" stroke="none" />
+      <circle cx="2.5" cy="12" r="1" fill="currentColor" stroke="none" />
+    </svg>
   )
 }
 

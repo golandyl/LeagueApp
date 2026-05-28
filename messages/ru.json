@@ -96,6 +96,8 @@
   },
   "teams": {
     "avgRating": "Ср.",
+    "pitchView": "Поле",
+    "statsView": "Статы",
     "noTeams": "Команд пока нет — запустите турнирный день.",
     "shareWhatsApp": "Поделиться в WhatsApp",
     "swapPlayer": "Замена игрока",

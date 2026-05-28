@@ -96,6 +96,8 @@
   },
   "teams": {
     "avgRating": "Med",
+    "pitchView": "Campo",
+    "statsView": "Stats",
     "noTeams": "Sin equipos aún — inicia un día de torneo.",
     "shareWhatsApp": "Compartir por WhatsApp",
     "swapPlayer": "Intercambiar jugador",
