@@ -70,20 +70,20 @@ export default async function ManagerDashboardPage({ params }: Props) {
     : tCreate('overtimeTypeClassic')
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white">
+    <main className="min-h-screen bg-zinc-950 text-white">
 
       {/* ── Page header ── */}
-      <div className="bg-slate-800 px-5 py-5 shadow-lg">
+      <div className="bg-zinc-900 px-5 py-5 shadow-lg">
         <div className="mx-auto flex max-w-2xl items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+            <p className="text-xs font-bold uppercase tracking-tight text-zinc-400">
               {t('header')}
             </p>
             <div className="mt-0.5 flex items-center gap-2">
               <h1 className="truncate text-2xl font-black">{league.name}</h1>
               {isManager && <LeagueSettingsModal league={league} />}
             </div>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-zinc-500">
               {league.match_length_minutes} min
               {league.win_score ? ` · ${t('firstTo', { n: league.win_score })}` : ''}
               {league.overtime_enabled ? ` · ${t('otLabel')}: ${otModeLabel}` : ''}
@@ -94,7 +94,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
             <div className="flex shrink-0 flex-col items-end gap-2">
               <Link
                 href="/create-league"
-                className="text-xs font-semibold text-sky-400 transition-colors hover:text-sky-300"
+                className="text-xs font-semibold text-zinc-400 transition-colors hover:text-zinc-200"
               >
                 {t('newLeague')}
               </Link>
@@ -108,6 +108,9 @@ export default async function ManagerDashboardPage({ params }: Props) {
       <DashboardTabs
         leagueId={leagueId}
         leagueName={league.name}
+        signupStatus={league.signup_status ?? 'closed'}
+        signupDate={league.signup_date ?? null}
+        maxCapacity={league.max_capacity ?? 16}
         players={resolvedPlayers}
         tournament={tournament ?? null}
         matches={matches}

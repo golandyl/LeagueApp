@@ -11,9 +11,11 @@ import { FinishTournamentButton } from './FinishTournamentButton'
 import { TeamsPanel }             from './TeamsPanel'
 import { AdminPanel }             from './AdminPanel'
 import { HistoryPanel }           from './HistoryPanel'
-import { EditMatchModal }         from '@/components/match/EditMatchModal'
-import { TournamentSignup }       from './TournamentSignup'
+import { EditMatchModal }          from '@/components/match/EditMatchModal'
+import { SignupControlPanel }      from './SignupControlPanel'
 import type { Tables } from '@/types/database'
+
+type Signup = Tables<'tournament_signups'>
 
 type Player     = Tables<'players'>
 type Tournament = Tables<'tournaments'>
@@ -23,20 +25,26 @@ type Team       = Tables<'teams'>
 type TabId = 'matchday' | 'teams' | 'roster' | 'history' | 'admin'
 
 export interface DashboardTabsProps {
-  leagueId:    string
-  leagueName:  string
-  players:     Player[]
-  tournament:  Tournament | null
-  matches:     Match[]
+  leagueId:     string
+  leagueName:   string
+  signupStatus: string
+  signupDate:   string | null
+  maxCapacity:  number
+  players:      Player[]
+  tournament:   Tournament | null
+  matches:      Match[]
   // Plain arrays — Maps aren't serialisable across the RSC boundary
-  teams:       Team[]
-  teamPlayers: { player_id: string; team_id: string }[]
-  isManager:   boolean
+  teams:        Team[]
+  teamPlayers:  { player_id: string; team_id: string }[]
+  isManager:    boolean
 }
 
 export function DashboardTabs({
   leagueId,
   leagueName,
+  signupStatus,
+  signupDate,
+  maxCapacity,
   players,
   tournament,
   matches: initialMatches,
@@ -130,12 +138,12 @@ export function DashboardTabs({
       {/*
         `flex` on the container + `dir` on <html> means the tabs automatically
         reverse order in Hebrew/Arabic — no extra rtl: classes needed here.
-        The `border-b border-slate-800` line is the "rail" that all tabs sit on.
+        The `border-b border-zinc-800` line is the "rail" that all tabs sit on.
         The active tab uses `-mb-px border-b-2 border-emerald-500` to draw its
         coloured indicator ON TOP of that rail (overlap trick).
       */}
       <div
-        className="flex border-b border-slate-800 px-2"
+        className="flex border-b border-zinc-800 px-2"
         role="tablist"
         aria-label={t('header')}
       >
@@ -146,10 +154,10 @@ export function DashboardTabs({
           aria-controls="panel-matchday"
           onClick={() => setActive('matchday')}
           className={[
-            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
             active === 'matchday'
               ? '-mb-px border-b-2 border-emerald-500 text-white'
-              : 'text-slate-500 hover:text-slate-300',
+              : 'text-zinc-500 hover:text-zinc-300',
           ].join(' ')}
         >
           {t('tabMatchday')}
@@ -170,10 +178,10 @@ export function DashboardTabs({
             aria-controls="panel-teams"
             onClick={() => setActive('teams')}
             className={[
-              'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+              'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
               active === 'teams'
                 ? '-mb-px border-b-2 border-emerald-500 text-white'
-                : 'text-slate-500 hover:text-slate-300',
+                : 'text-zinc-500 hover:text-zinc-300',
             ].join(' ')}
           >
             {t('tabTeams')}
@@ -182,7 +190,7 @@ export function DashboardTabs({
                 'rounded-full px-1.5 py-px text-[10px] font-black tabular-nums transition-colors',
                 active === 'teams'
                   ? 'bg-emerald-500/20 text-emerald-300'
-                  : 'bg-slate-700 text-slate-400',
+                  : 'bg-zinc-800 text-zinc-400',
               ].join(' ')}
             >
               {teams.length}
@@ -197,10 +205,10 @@ export function DashboardTabs({
           aria-controls="panel-roster"
           onClick={() => setActive('roster')}
           className={[
-            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
             active === 'roster'
               ? '-mb-px border-b-2 border-emerald-500 text-white'
-              : 'text-slate-500 hover:text-slate-300',
+              : 'text-zinc-500 hover:text-zinc-300',
           ].join(' ')}
         >
           {t('tabRoster')}
@@ -210,7 +218,7 @@ export function DashboardTabs({
                 'rounded-full px-1.5 py-px text-[10px] font-black tabular-nums transition-colors',
                 active === 'roster'
                   ? 'bg-emerald-500/20 text-emerald-300'
-                  : 'bg-slate-700 text-slate-400',
+                  : 'bg-zinc-800 text-zinc-400',
               ].join(' ')}
             >
               {players.length}
@@ -225,10 +233,10 @@ export function DashboardTabs({
           aria-controls="panel-history"
           onClick={() => setActive('history')}
           className={[
-            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
             active === 'history'
               ? '-mb-px border-b-2 border-emerald-500 text-white'
-              : 'text-slate-500 hover:text-slate-300',
+              : 'text-zinc-500 hover:text-zinc-300',
           ].join(' ')}
         >
           {t('tabHistory')}
@@ -242,10 +250,10 @@ export function DashboardTabs({
             aria-controls="panel-admin"
             onClick={() => setActive('admin')}
             className={[
-              'ms-auto flex items-center gap-1.5 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+              'ms-auto flex items-center gap-1.5 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
               active === 'admin'
                 ? '-mb-px border-b-2 border-rose-500 text-rose-300'
-                : 'text-slate-600 hover:text-slate-400',
+                : 'text-zinc-600 hover:text-zinc-400',
             ].join(' ')}
           >
             {tAdmin('tabAdmin')}
@@ -280,6 +288,9 @@ export function DashboardTabs({
         >
           <MatchdayPanel
             leagueId={leagueId}
+            signupStatus={signupStatus}
+            signupDate={signupDate}
+            maxCapacity={maxCapacity}
             players={players}
             tournament={activeTournament}
             matches={liveMatches}
@@ -329,6 +340,9 @@ export function DashboardTabs({
 
 interface MatchdayPanelProps {
   leagueId:               string
+  signupStatus:           string
+  signupDate:             string | null
+  maxCapacity:            number
   players:                Player[]
   tournament:             Tournament | null
   matches:                Match[]
@@ -341,6 +355,9 @@ interface MatchdayPanelProps {
 
 function MatchdayPanel({
   leagueId,
+  signupStatus,
+  signupDate,
+  maxCapacity,
   players,
   tournament,
   matches,
@@ -364,12 +381,15 @@ function MatchdayPanel({
   return (
     <div className="space-y-8">
 
-      {/* Public signup section — visible to everyone, including anonymous players */}
-      <TournamentSignup
-        leagueId={leagueId}
-        tournament={tournament ? { id: tournament.id, max_capacity: tournament.max_capacity } : null}
-        isManager={isManager}
-      />
+      {/* Manager-only: signup window controls + approval banner */}
+      {isManager && (
+        <SignupControlPanel
+          leagueId={leagueId}
+          signupStatus={signupStatus}
+          signupDate={signupDate}
+          maxCapacity={maxCapacity}
+        />
+      )}
 
       {/* Tournament control — only visible to the manager */}
       {isManager && (
@@ -378,7 +398,7 @@ function MatchdayPanel({
 
           {activeLiveMatch ? (
             /* Live guard: hide create/finish controls while a player is actively scoring */
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-emerald-900/30 px-5 py-5 ring-1 ring-emerald-700/60">
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-emerald-900/30 px-5 py-5 ring-1 ring-emerald-700/60">
               <div className="flex items-center gap-3">
                 <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" aria-hidden="true" />
                 <p className="text-sm font-semibold text-emerald-300">{t('liveGameInProgress')}</p>
@@ -393,9 +413,9 @@ function MatchdayPanel({
           ) : (
             <>
               {tournament && (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500">
                   {t('current')}{' '}
-                  <span className="font-semibold text-slate-300">{tournament.name}</span>
+                  <span className="font-semibold text-zinc-300">{tournament.name}</span>
                   {' · '}
                   {t('matchCount', { count: matches.length })}
                 </p>
@@ -405,6 +425,7 @@ function MatchdayPanel({
 
               {tournament && (
                 <FinishTournamentButton
+                  leagueId={leagueId}
                   tournamentId={tournament.id}
                   onFinished={onTournamentFinished}
                 />
@@ -420,16 +441,16 @@ function MatchdayPanel({
           <PanelHeader>{tDraft('draftInProgress')}</PanelHeader>
           <a
             href={`/${locale}/draft/${tournament.id}`}
-            className="flex items-center justify-between gap-3 rounded-2xl bg-sky-900/40 px-5 py-5 ring-1 ring-sky-700/60 transition-all hover:bg-sky-900/60 active:scale-[0.98]"
+            className="flex items-center justify-between gap-3 rounded-xl bg-zinc-900 px-5 py-5 ring-1 ring-zinc-700/40 transition-all hover:bg-zinc-800/60 active:scale-[0.98]"
           >
             <div className="flex items-center gap-3">
-              <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-sky-400" aria-hidden="true" />
+              <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" aria-hidden="true" />
               <div>
                 <p className="font-black text-white">{tDraft('title')}</p>
-                <p className="mt-0.5 text-xs text-sky-300">{tournament.name}</p>
+                <p className="mt-0.5 text-xs text-zinc-300">{tournament.name}</p>
               </div>
             </div>
-            <span className="shrink-0 text-sm font-bold text-sky-300">
+            <span className="shrink-0 text-sm font-bold text-zinc-300">
               {tDraft('openDraftRoom')}
             </span>
           </a>
@@ -442,7 +463,7 @@ function MatchdayPanel({
           <PanelHeader>{t('liveMatchLinks')}</PanelHeader>
 
           {matches.length === 0 ? (
-            <p className="py-4 text-center text-sm text-slate-500">{t('noMatches')}</p>
+            <p className="py-4 text-center text-sm text-zinc-500">{t('noMatches')}</p>
           ) : (
             <div className="space-y-2">
               {matches.map(m => {
@@ -453,12 +474,12 @@ function MatchdayPanel({
                   <div
                     key={m.id}
                     className={[
-                      'flex items-center rounded-2xl transition-all',
+                      'flex items-center rounded-xl transition-all',
                       m.status === 'live'
                         ? 'bg-emerald-900/30 ring-1 ring-emerald-700/60'
                         : m.status === 'completed'
-                        ? 'bg-slate-800/60'
-                        : 'bg-slate-800',
+                        ? 'bg-zinc-900/60'
+                        : 'bg-zinc-900',
                     ].join(' ')}
                   >
                     {/* Main row — navigates to match arena */}
@@ -468,7 +489,7 @@ function MatchdayPanel({
                     >
                       <div className="flex min-w-0 flex-1 items-center gap-2">
                         <TeamChip team={home} unknownLabel={t('unknown')} />
-                        <span className="shrink-0 text-xs font-bold text-slate-500">
+                        <span className="shrink-0 text-xs font-bold text-zinc-500">
                           {t('vs')}
                         </span>
                         <TeamChip team={away} unknownLabel={t('unknown')} />
@@ -485,7 +506,7 @@ function MatchdayPanel({
                       <button
                         onClick={() => setEditingMatch(m)}
                         aria-label={tEdit('editAriaLabel')}
-                        className="shrink-0 rounded-xl p-3 me-1 text-slate-600 transition-colors hover:bg-slate-700 hover:text-slate-300"
+                        className="shrink-0 rounded-xl p-3 me-1 text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                       >
                         <svg
                           className="h-3.5 w-3.5"
@@ -512,10 +533,10 @@ function MatchdayPanel({
       )}
 
       {/* Standings link */}
-      <div className="border-t border-slate-800 pt-2 text-center">
+      <div className="border-t border-zinc-800 pt-2 text-center">
         <Link
           href={`/league/${leagueId}/standings`}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-sky-400 transition-colors hover:text-sky-300"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-400 transition-colors hover:text-zinc-300"
         >
           {t('viewStandings')}
           <svg
@@ -561,7 +582,7 @@ function RosterPanel({ leagueId, players, isManager }: RosterPanelProps) {
   return (
     <div className="space-y-4">
       {players.length === 0 ? (
-        <p className="py-8 text-center text-sm text-slate-500">{t('noPlayers')}</p>
+        <p className="py-8 text-center text-sm text-zinc-500">{t('noPlayers')}</p>
       ) : (
         <PlayerList players={players} isManager={isManager} />
       )}
@@ -574,14 +595,14 @@ function RosterPanel({ leagueId, players, isManager }: RosterPanelProps) {
 
 function PanelHeader({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-xs font-black uppercase tracking-widest text-slate-400">
+    <h2 className="text-xs font-black uppercase tracking-tight text-zinc-400">
       {children}
     </h2>
   )
 }
 
 function TeamChip({ team, unknownLabel }: { team: Team | undefined; unknownLabel: string }) {
-  if (!team) return <span className="text-sm text-slate-500">{unknownLabel}</span>
+  if (!team) return <span className="text-sm text-zinc-500">{unknownLabel}</span>
   return (
     <span className="flex min-w-0 items-center gap-1.5 truncate">
       {team.color && (
@@ -594,6 +615,8 @@ function TeamChip({ team, unknownLabel }: { team: Team | undefined; unknownLabel
     </span>
   )
 }
+
+// ── Match badge ────────────────────────────────────────────────────────────────
 
 function MatchBadge({
   match,
@@ -619,7 +642,7 @@ function MatchBadge({
     )
   }
   return (
-    <span className="flex shrink-0 items-center gap-1 rounded-lg bg-slate-700 px-2.5 py-1 text-xs font-bold text-slate-400">
+    <span className="flex shrink-0 items-center gap-1 rounded-lg bg-zinc-800 px-2.5 py-1 text-xs font-bold text-zinc-400">
       {kickOffLabel}
       <svg
         className="h-3 w-3 rtl:rotate-180"

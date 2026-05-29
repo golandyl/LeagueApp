@@ -199,6 +199,7 @@
     "blowWhistle": "Свисток",
     "pause": "Пауза",
     "resume": "Продолжить",
+    "paused": "На паузе",
     "whichTeamScored": "Какая команда забила?",
     "whoScored": "Кто забил?",
     "whoAssisted": "Кто отдал пас?",
@@ -209,7 +210,11 @@
     "noPlayersOnTeam": "В этой команде нет игроков",
     "wcNextMatchReady": "Следующий матч",
     "wcCreatingNext": "Готовим следующий матч…",
-    "wcStartNext": "Начать следующий матч →"
+    "wcStartNext": "Начать следующий матч →",
+    "endMatch": "Завершить матч",
+    "penaltyDecisive": "Решающий пенальти",
+    "penaltyWhichTeam": "Какая команда забила пенальти?",
+    "backToHome": "Вернуться на главную"
   },
   "editMatch": {
     "title": "Редактировать результат матча",
@@ -273,17 +278,32 @@
     "draftInProgress": "Драфт идёт"
   },
   "signup": {
+    "pageTitle": "Запись на игровой день",
     "title": "Запись на игровой день",
-    "namePlaceholder": "Ваше имя",
     "signUpButton": "Записаться",
-    "signingUp": "Записываем…",
+    "signingUp": "Запись…",
     "alreadySignedUp": "Вы записаны! ✓",
-    "attending": "Участники ({count}/{max})",
+    "attending": "Участвуют ({count}/{max})",
     "waitingList": "Лист ожидания ({count})",
     "waitingBadge": "Ожидание",
     "removeAriaLabel": "Удалить",
-    "emptyHint": "Пока никто не записался — поделитесь ссылкой!",
-    "full": "Мест нет — вы будете в листе ожидания"
+    "emptyHint": "Ещё нет записей — поделитесь ссылкой!",
+    "full": "Мест нет — вы будете добавлены в лист ожидания",
+    "closed": "Запись закрыта",
+    "closedDesc": "Менеджер ещё не открыл регистрацию на следующий игровой день.",
+    "openFor": "Регистрация открыта на",
+    "selectPlaceholder": "Выберите своё имя…",
+    "noPlayersAvailable": "Все игроки уже записались.",
+    "notOnList": "Моего имени нет в списке",
+    "requestNamePlaceholder": "Введите полное имя для запроса на вступление",
+    "requestButton": "Запросить вступление",
+    "requestSent": "Запрос отправлен! Менеджер рассмотрит его. ✓",
+    "backToList": "← Вернуться к списку",
+    "alreadyJoined": "Уже записались ({count}/{max})",
+    "activeLineup": "Основной состав",
+    "waitingRoom": "Список ожидания",
+    "publicBannerCta": "Запись открыта — нажмите здесь для регистрации",
+    "registeredPlayers": "Зарегистрированные игроки"
   },
   "standings": {
     "noTournaments": "Турниров пока нет.",
@@ -306,6 +326,31 @@
     "noData": "Данных пока нет",
     "goalUnit": "{count, plural, one {гол} few {гола} other {голов}}",
     "assistUnit": "{count, plural, one {пас} few {паса} other {пасов}}",
-    "winUnit": "{count, plural, one {победа} few {победы} other {побед}}"
+    "winUnit": "{count, plural, one {победа} few {победы} other {побед}}",
+    "signupBannerLive": "Запись открыта на {date}",
+    "signupBannerLiveNoDate": "Запись открыта",
+    "signupBannerCta": "Записаться →"
+  },
+  "signupControl": {
+    "sectionTitle": "Окно регистрации",
+    "statusOpen": "ОТКРЫТО",
+    "statusClosed": "ЗАКРЫТО",
+    "openSignups": "Открыть запись",
+    "closeSignups": "Закрыть запись",
+    "matchdayDate": "Дата игрового дня",
+    "copySignupLink": "Скопировать ссылку записи",
+    "linkCopied": "Скопировано!",
+    "pendingRequests": "{count, plural, one {# запрос на вступление} few {# запроса на вступление} other {# запросов на вступление}}",
+    "approveAndAdd": "Одобрить и добавить",
+    "approving": "Добавление…",
+    "maxPlayers": "Макс. игроков",
+    "currentSignups": "Текущие записи",
+    "waitingBadge": "Ожидание",
+    "saving": "Сохранение…",
+    "liveLabel": "Регистрация активна",
+    "liveSummary": "На {date} · Макс. {cap} игроков",
+    "liveSummaryNoDate": "Макс. {cap} игроков",
+    "clearList": "Очистить список",
+    "clearing": "Очистка…"
   }
 }

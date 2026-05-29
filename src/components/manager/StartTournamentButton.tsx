@@ -26,7 +26,7 @@ const CUP_VALID_COUNTS = [4, 8, 16]
 
 const POSITION_STYLE: Record<string, string> = {
   GK:  'bg-amber-800/70 text-amber-200',
-  DEF: 'bg-sky-800/70 text-sky-200',
+  DEF: 'bg-blue-900/70 text-blue-200',
   MID: 'bg-violet-800/70 text-violet-200',
   FWD: 'bg-emerald-800/70 text-emerald-200',
 }
@@ -338,7 +338,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
     return (
       <button
         onClick={handleOpen}
-        className="w-full rounded-2xl bg-sky-600 py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] active:bg-sky-700"
+        className="w-full rounded-lg bg-emerald-600 py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] active:bg-emerald-700"
       >
         🏆  {t('startNew')}
       </button>
@@ -352,16 +352,16 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
     const noneSelected = presentCount === 0
 
     return (
-      <div className="fixed inset-0 z-50 flex flex-col bg-slate-900">
+      <div className="fixed inset-0 z-50 flex flex-col bg-zinc-950">
 
         {/* Header */}
-        <div className="shrink-0 bg-slate-800 px-4 pb-4 pt-5 shadow-lg">
+        <div className="shrink-0 bg-zinc-900 px-4 pb-4 pt-5 shadow-lg">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-black text-white">{t('selectPlayers')}</h2>
             <button
               onClick={handleClose}
               aria-label={tCommon('cancel')}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-slate-400 transition-colors hover:bg-slate-700 hover:text-white active:bg-slate-600"
+              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white active:bg-zinc-700"
             >
               <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -375,19 +375,19 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
               <button
                 onClick={() => setPresent(new Set(players.map(p => p.id)))}
                 disabled={allSelected}
-                className="rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-bold text-slate-300 transition-colors hover:bg-slate-600 disabled:opacity-40"
+                className="rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-300 transition-colors hover:bg-zinc-700 disabled:opacity-40"
               >
                 {t('selectAll')}
               </button>
               <button
                 onClick={() => setPresent(new Set())}
                 disabled={noneSelected}
-                className="rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-bold text-slate-300 transition-colors hover:bg-slate-600 disabled:opacity-40"
+                className="rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-300 transition-colors hover:bg-zinc-700 disabled:opacity-40"
               >
                 {t('clearAll')}
               </button>
             </div>
-            <span className="shrink-0 rounded-full bg-emerald-900/60 px-3 py-1 text-xs font-black text-emerald-300 ring-1 ring-emerald-700/50">
+            <span className="shrink-0 rounded-full bg-emerald-950/40 px-3 py-1 text-xs font-black text-emerald-300 ring-1 ring-emerald-700/50">
               {t('checkedIn', { count: presentCount })}
             </span>
           </div>
@@ -396,7 +396,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
         {/* Player grid */}
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {players.length === 0 ? (
-            <p className="py-16 text-center text-sm text-slate-500">
+            <p className="py-16 text-center text-sm text-zinc-500">
               {t('needMinPlayers', { min: 2 })}
             </p>
           ) : (
@@ -407,13 +407,13 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
                   <button
                     key={p.id}
                     onClick={() => togglePlayer(p.id)}
-                    className={`relative flex flex-col gap-2 rounded-2xl p-3.5 text-start transition-all active:scale-95 ${
-                      isPresent ? 'bg-slate-700 ring-2 ring-emerald-500' : 'bg-slate-800 opacity-40'
+                    className={`relative flex flex-col gap-2 rounded-xl p-3.5 text-start transition-all active:scale-95 ${
+                      isPresent ? 'bg-zinc-800 ring-2 ring-emerald-500' : 'bg-zinc-900 opacity-40'
                     }`}
                   >
                     <span
                       className={`absolute end-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full text-xs font-black transition-colors ${
-                        isPresent ? 'bg-emerald-500 text-white' : 'bg-slate-600 text-slate-500'
+                        isPresent ? 'bg-emerald-500 text-white' : 'bg-zinc-700 text-zinc-500'
                       }`}
                     >
                       {isPresent ? '✓' : '○'}
@@ -426,12 +426,12 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
                     <div className="flex items-center gap-1.5">
                       <span
                         className={`rounded px-1.5 py-0.5 text-[10px] font-black ${
-                          POSITION_STYLE[p.position] ?? 'bg-slate-700 text-slate-300'
+                          POSITION_STYLE[p.position] ?? 'bg-zinc-800 text-zinc-300'
                         }`}
                       >
                         {p.position}
                       </span>
-                      <span className="text-xs font-semibold tabular-nums text-slate-400">
+                      <span className="text-xs font-semibold tabular-nums text-zinc-400">
                         {p.rating}
                       </span>
                     </div>
@@ -443,24 +443,24 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 space-y-2 border-t border-slate-800 bg-slate-900 px-4 pb-6 pt-4">
+        <div className="shrink-0 space-y-2 border-t border-zinc-800 bg-zinc-950 px-4 pb-6 pt-4">
           <button
             onClick={() => { setNumTeams(safeNumTeams); setStep('method') }}
             disabled={presentCount < 2}
-            className="w-full rounded-2xl bg-sky-600 py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] active:bg-sky-700 disabled:opacity-40"
+            className="w-full rounded-lg bg-emerald-600 py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] active:bg-emerald-700 disabled:opacity-40"
           >
             {t('continueToTeams')}
           </button>
 
           <button
             onClick={handleClose}
-            className="w-full rounded-2xl py-3.5 text-sm font-semibold text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300 active:bg-slate-800"
+            className="w-full rounded-xl py-3.5 text-sm font-semibold text-zinc-500 transition-colors hover:bg-zinc-900 hover:text-zinc-300 active:bg-zinc-900"
           >
             {tCommon('cancel')}
           </button>
 
           {players.length > 0 && (
-            <p className="text-center text-xs text-slate-600">{t('cancelHint')}</p>
+            <p className="text-center text-xs text-zinc-600">{t('cancelHint')}</p>
           )}
         </div>
       </div>
@@ -486,14 +486,14 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
     ]
 
     return (
-      <div className="fixed inset-0 z-50 flex flex-col bg-slate-900">
+      <div className="fixed inset-0 z-50 flex flex-col bg-zinc-950">
 
         {/* Header */}
-        <div className="shrink-0 bg-slate-800 px-4 pb-4 pt-5 shadow-lg">
+        <div className="shrink-0 bg-zinc-900 px-4 pb-4 pt-5 shadow-lg">
           <div className="flex items-center gap-2">
             <button
               onClick={() => { setStep('attendance'); setError(null) }}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-700 hover:text-white"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white"
               aria-label={tCommon('back')}
             >
               <svg className="h-5 w-5 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
@@ -501,7 +501,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
               </svg>
             </button>
             <h2 className="flex-1 text-lg font-black text-white">{t('newDay')}</h2>
-            <button onClick={handleClose} aria-label={tCommon('cancel')} className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-700 hover:text-white">
+            <button onClick={handleClose} aria-label={tCommon('cancel')} className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white">
               ✕
             </button>
           </div>
@@ -511,24 +511,24 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
 
           {/* Day name */}
           <div className="space-y-1.5">
-            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{t('dayName')}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">{t('dayName')}</p>
             <input
               type="text"
               value={dayName}
               onChange={e => setDayName(e.target.value)}
-              className="w-full rounded-xl bg-slate-700 px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full rounded-xl bg-zinc-800 px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           {/* Team count */}
           <div className="space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{t('numTeams')}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">{t('numTeams')}</p>
 
-            <div className="flex items-center justify-between rounded-2xl bg-slate-800 px-6 py-4">
+            <div className="flex items-center justify-between rounded-xl bg-zinc-900 px-6 py-4">
               <button
                 onClick={() => setNumTeams(n => Math.max(2, n - 1))}
                 disabled={safeNumTeams <= 2}
-                className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-700 text-2xl font-black text-white transition-colors active:bg-slate-600 disabled:opacity-30"
+                className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-800 text-2xl font-black text-white transition-colors active:bg-zinc-700 disabled:opacity-30"
               >
                 −
               </button>
@@ -536,14 +536,14 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
               <button
                 onClick={() => setNumTeams(n => Math.min(presentCount, n + 1))}
                 disabled={safeNumTeams >= presentCount}
-                className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-700 text-2xl font-black text-white transition-colors active:bg-slate-600 disabled:opacity-30"
+                className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-800 text-2xl font-black text-white transition-colors active:bg-zinc-700 disabled:opacity-30"
               >
                 +
               </button>
             </div>
 
-            <div className="rounded-xl bg-slate-800/70 px-4 py-3 text-center">
-              <p className="text-xs font-semibold text-slate-400">{t('checkedIn', { count: presentCount })}</p>
+            <div className="rounded-xl bg-zinc-900/70 px-4 py-3 text-center">
+              <p className="text-xs font-semibold text-zinc-400">{t('checkedIn', { count: presentCount })}</p>
               <p className="mt-0.5 text-sm font-bold text-emerald-400">{breakdown}</p>
               {internalGhosts > 0 && (
                 <p className="mt-1 text-xs text-amber-500">{t('ghostFillers', { count: internalGhosts })}</p>
@@ -553,16 +553,16 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
 
           {/* Generation method */}
           <div className="space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{t('balancingLabel')}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">{t('balancingLabel')}</p>
             {generationOptions.map(opt => (
               <button
                 key={opt.id}
                 onClick={() => setGeneration(opt.id)}
                 className={[
-                  'w-full rounded-2xl px-5 py-4 text-start transition-all active:scale-[0.98]',
+                  'w-full rounded-xl px-5 py-4 text-start transition-all active:scale-[0.98]',
                   generation === opt.id
-                    ? 'bg-slate-700 ring-2 ring-emerald-500'
-                    : 'bg-slate-800 hover:bg-slate-700/50',
+                    ? 'bg-zinc-800 ring-2 ring-emerald-500'
+                    : 'bg-zinc-900 hover:bg-zinc-800/50',
                 ].join(' ')}
               >
                 <div className="flex items-start gap-4">
@@ -574,7 +574,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
                         <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-300">✓</span>
                       )}
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-slate-400">{opt.desc}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-zinc-400">{opt.desc}</p>
                   </div>
                 </div>
               </button>
@@ -584,11 +584,11 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-slate-800 bg-slate-900 px-4 py-4">
+        <div className="shrink-0 border-t border-zinc-800 bg-zinc-950 px-4 py-4">
           <button
             onClick={() => { setStep('format'); setError(null) }}
             disabled={presentCount < 2}
-            className="w-full rounded-2xl bg-sky-600 py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] active:bg-sky-700 disabled:opacity-40"
+            className="w-full rounded-lg bg-emerald-600 py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] active:bg-emerald-700 disabled:opacity-40"
           >
             {t('continueToFormat')}
           </button>
@@ -609,14 +609,14 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
   const isLiveDraft = generation === 'live_draft'
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-900">
+    <div className="fixed inset-0 z-50 flex flex-col bg-zinc-950">
 
       {/* Header */}
-      <div className="shrink-0 bg-slate-800 px-4 pb-4 pt-5 shadow-lg">
+      <div className="shrink-0 bg-zinc-900 px-4 pb-4 pt-5 shadow-lg">
         <div className="flex items-center gap-2">
           <button
             onClick={() => { setStep('method'); setError(null) }}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-700 hover:text-white"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white"
             aria-label={tCommon('back')}
           >
             <svg className="h-5 w-5 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
@@ -624,13 +624,13 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
             </svg>
           </button>
           <h2 className="flex-1 text-lg font-black text-white">{t('formatStep')}</h2>
-          <button onClick={handleClose} aria-label={tCommon('cancel')} className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-700 hover:text-white">
+          <button onClick={handleClose} aria-label={tCommon('cancel')} className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white">
             ✕
           </button>
         </div>
         {/* Contextual sub-label when live draft is selected */}
         {isLiveDraft && (
-          <p className="mt-2 text-xs text-sky-400">{t('modeChoosingRink')} · {t('formatHintLiveDraft')}</p>
+          <p className="mt-2 text-xs text-zinc-400">{t('modeChoosingRink')} · {t('formatHintLiveDraft')}</p>
         )}
       </div>
 
@@ -641,10 +641,10 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
             key={f.id}
             onClick={() => { setFormat(f.id); setError(null) }}
             className={[
-              'w-full rounded-2xl px-5 py-5 text-start transition-all active:scale-[0.98]',
+              'w-full rounded-xl px-5 py-5 text-start transition-all active:scale-[0.98]',
               format === f.id
-                ? 'bg-slate-700 ring-2 ring-emerald-500'
-                : 'bg-slate-800 hover:bg-slate-700/50',
+                ? 'bg-zinc-800 ring-2 ring-emerald-500'
+                : 'bg-zinc-900 hover:bg-zinc-800/50',
             ].join(' ')}
           >
             <div className="flex items-start gap-4">
@@ -656,7 +656,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
                     <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-300">✓</span>
                   )}
                 </div>
-                <p className="mt-1 text-xs leading-relaxed text-slate-400">{f.desc}</p>
+                <p className="mt-1 text-xs leading-relaxed text-zinc-400">{f.desc}</p>
                 {f.id === 'cup' && (
                   <p className={`mt-1.5 text-[10px] font-bold ${cupValid ? 'text-emerald-400' : 'text-amber-400'}`}>
                     {t('cupValidCounts')} · {safeNumTeams} {t('numTeams').toLowerCase()}
@@ -680,13 +680,13 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
       </div>
 
       {/* Footer */}
-      <div className="shrink-0 border-t border-slate-800 bg-slate-900 px-4 py-4">
+      <div className="shrink-0 border-t border-zinc-800 bg-zinc-950 px-4 py-4">
         <button
           onClick={handleGenerate}
           disabled={loading || !canGenerate}
           className={[
-            'w-full rounded-2xl py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] disabled:opacity-40',
-            isLiveDraft ? 'bg-sky-600 active:bg-sky-700' : 'bg-emerald-600 active:bg-emerald-700',
+            'w-full rounded-lg py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] disabled:opacity-40',
+            isLiveDraft ? 'bg-emerald-600 active:bg-emerald-700' : 'bg-emerald-600 active:bg-emerald-700',
           ].join(' ')}
         >
           {loading

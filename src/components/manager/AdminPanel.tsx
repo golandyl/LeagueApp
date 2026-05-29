@@ -45,7 +45,10 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
         .select('id')
         .eq('league_id', leagueId)
 
-      if (tFetchErr) throw tFetchErr
+      if (tFetchErr) {
+        console.error('Reset failed details:', tFetchErr)
+        throw tFetchErr
+      }
 
       const tournamentIds = (tournaments ?? []).map(t => t.id)
 
@@ -56,7 +59,10 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
           .select('id')
           .in('tournament_id', tournamentIds)
 
-        if (mFetchErr) throw mFetchErr
+        if (mFetchErr) {
+          console.error('Reset failed details:', mFetchErr)
+          throw mFetchErr
+        }
 
         const matchIds = (matchRows ?? []).map(m => m.id)
 
@@ -66,35 +72,66 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
             .from('match_events')
             .delete()
             .in('match_id', matchIds)
-          if (evErr) throw evErr
+          if (evErr) {
+            console.error('Reset failed details:', evErr)
+            throw evErr
+          }
         }
 
-        // 4. team_players — before matches and teams (FK: team_players.team_id → teams)
+        // 4. team_players
         const { error: tpErr } = await supabase
           .from('team_players').delete().in('tournament_id', tournamentIds)
-        if (tpErr) throw tpErr
+        if (tpErr) {
+          console.error('Reset failed details:', tpErr)
+          throw tpErr
+        }
 
-        // 5. matches — before teams (FK: matches.home/away_team_id → teams)
+        // 5. matches
         const { error: mDelErr } = await supabase
           .from('matches').delete().in('tournament_id', tournamentIds)
-        if (mDelErr) throw mDelErr
+        if (mDelErr) {
+          console.error('Reset failed details:', mDelErr)
+          throw mDelErr
+        }
 
-        // 6. teams — before tournaments (FK: teams.tournament_id → tournaments)
+        // 6. teams
         const { error: teamsErr } = await supabase
           .from('teams').delete().in('tournament_id', tournamentIds)
-        if (teamsErr) throw teamsErr
+        if (teamsErr) {
+          console.error('Reset failed details:', teamsErr)
+          throw teamsErr
+        }
 
         // 7. tournaments
         const { error: tourErr } = await supabase
           .from('tournaments').delete().eq('league_id', leagueId)
-        if (tourErr) throw tourErr
+        if (tourErr) {
+          console.error('Reset failed details:', tourErr)
+          throw tourErr
+        }
       }
 
-      // Clear local match state instantly, then revalidate server data
+      // Core reset succeeded — mark done immediately before optional cleanup
       onReset()
       setSuccess(true)
       setModalOpen(false)
       router.refresh()
+
+      // 8. tournament_signups — non-fatal: table may not exist on instances
+      //    that haven't yet applied migration 20260528000000 or 20260529000000.
+      const { error: signupErr } = await supabase
+        .from('tournament_signups').delete().eq('league_id', leagueId)
+      if (signupErr) {
+        console.error('Reset failed details:', signupErr)
+      }
+
+      // 9. Rotate signup_cycle — non-fatal: column may not exist if the
+      //    20260528000001 / 20260529000000 migration hasn't been applied yet.
+      const { error: cycleErr } = await supabase
+        .from('leagues').update({ signup_cycle: crypto.randomUUID() }).eq('id', leagueId)
+      if (cycleErr) {
+        console.error('Reset failed details:', cycleErr)
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t('deleteError'))
     } finally {
@@ -107,14 +144,14 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
 
       {/* Danger Zone card */}
       <section className="space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-widest text-slate-400">
+        <h2 className="text-xs font-black uppercase tracking-tight text-zinc-500">
           {t('dangerZone')}
         </h2>
 
-        <div className="rounded-2xl border border-rose-900/60 bg-rose-950/20 p-5 space-y-4">
+        <div className="rounded-xl border border-rose-900/50 bg-rose-950/20 p-5 space-y-4">
           <div>
             <p className="font-bold text-rose-300">{t('resetHistory')}</p>
-            <p className="mt-1 text-sm text-slate-400 leading-relaxed">
+            <p className="mt-1 text-sm text-zinc-400 leading-relaxed">
               {t('resetHistoryDesc')}
             </p>
           </div>
@@ -125,7 +162,7 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
 
           <button
             onClick={openModal}
-            className="rounded-xl bg-rose-700 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-rose-600 active:scale-[0.98]"
+            className="rounded-lg bg-rose-700 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-rose-600 active:scale-[0.98]"
           >
             {t('resetHistory')}
           </button>
@@ -135,23 +172,23 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
       {/* Confirmation modal */}
       {modalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4"
           onClick={() => { if (!loading) setModalOpen(false) }}
         >
           <div
-            className="w-full max-w-sm rounded-2xl bg-slate-800 p-6 shadow-2xl space-y-5"
+            className="w-full max-w-sm rounded-xl bg-zinc-900 p-6 shadow-2xl space-y-5 border border-zinc-800"
             onClick={e => e.stopPropagation()}
           >
             <div className="space-y-1">
-              <h3 className="text-lg font-black text-white">{t('modalTitle')}</h3>
-              <p className="text-sm text-slate-400 leading-relaxed">{t('resetHistoryDesc')}</p>
+              <h3 className="text-lg font-black uppercase tracking-tight text-white">{t('modalTitle')}</h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">{t('resetHistoryDesc')}</p>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
+              <label className="block text-xs font-bold uppercase tracking-tight text-zinc-500">
                 {t('typeToConfirm')}
               </label>
-              <p className="font-mono text-xs text-slate-500">"{leagueName}"</p>
+              <p className="font-mono text-xs text-zinc-600">&quot;{leagueName}&quot;</p>
               <input
                 type="text"
                 value={input}
@@ -159,7 +196,7 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
                 placeholder={leagueName}
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
-                className="w-full rounded-lg bg-slate-700 px-3 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-rose-500"
+                className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:ring-2 focus:ring-rose-500"
               />
             </div>
 
@@ -171,14 +208,14 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
               <button
                 onClick={() => setModalOpen(false)}
                 disabled={loading}
-                className="flex-1 rounded-xl bg-slate-700 px-4 py-2.5 text-sm font-bold text-slate-300 transition-colors hover:bg-slate-600 disabled:opacity-50"
+                className="flex-1 rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-bold text-zinc-300 transition-colors hover:bg-zinc-700 disabled:opacity-50"
               >
                 {tCommon('cancel')}
               </button>
               <button
                 onClick={handleReset}
                 disabled={!confirmed || loading}
-                className="flex-1 rounded-xl bg-rose-700 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-rose-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 rounded-lg bg-rose-700 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-rose-600 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {loading ? t('deleting') : t('confirmDelete')}
               </button>

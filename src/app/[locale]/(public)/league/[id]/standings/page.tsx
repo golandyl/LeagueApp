@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { Link } from '@/i18n/navigation'
 import type { Tables } from '@/types/database'
 
 type Match       = Tables<'matches'>
@@ -161,11 +162,30 @@ export default async function StandingsPage({ params }: Props) {
     .limit(1)
     .single()
 
+  const signupOpen = league.signup_status === 'open'
+  const formattedSignupDate = league.signup_date
+    ? new Intl.DateTimeFormat(locale, {
+        weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC',
+      }).format(new Date(league.signup_date + 'T12:00:00Z'))
+    : null
+
   if (!tournament) {
     return (
-      <main className="min-h-screen bg-slate-900 p-6 text-white">
-        <h1 className="mb-2 text-2xl font-black">{league.name}</h1>
-        <p className="text-slate-400">{t('noTournaments')}</p>
+      <main className="min-h-screen bg-zinc-950 text-white">
+        {signupOpen && (
+          <SignupBanner
+            leagueId={leagueId}
+            formattedDate={formattedSignupDate}
+            liveLabel={formattedSignupDate
+              ? t('signupBannerLive', { date: formattedSignupDate })
+              : t('signupBannerLiveNoDate')}
+            ctaLabel={t('signupBannerCta')}
+          />
+        )}
+        <div className="p-6">
+          <h1 className="mb-2 text-2xl font-black">{league.name}</h1>
+          <p className="text-zinc-400">{t('noTournaments')}</p>
+        </div>
       </main>
     )
   }
@@ -201,19 +221,29 @@ export default async function StandingsPage({ params }: Props) {
   const wins      = topWins(resolvedTeamPlayers, resolvedMatches, playersMap)
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white">
+    <main className="min-h-screen bg-zinc-950 text-white">
+      {signupOpen && (
+        <SignupBanner
+          leagueId={leagueId}
+          formattedDate={formattedSignupDate}
+          liveLabel={formattedSignupDate
+            ? t('signupBannerLive', { date: formattedSignupDate })
+            : t('signupBannerLiveNoDate')}
+          ctaLabel={t('signupBannerCta')}
+        />
+      )}
       {/* Header */}
-      <div className="bg-slate-800 px-5 py-6 shadow-lg">
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">{league.name}</p>
+      <div className="bg-zinc-900 px-5 py-6 shadow-lg">
+        <p className="text-xs font-bold uppercase tracking-tight text-zinc-400">{league.name}</p>
         <h1 className="mt-0.5 text-2xl font-black">{tournament.name}</h1>
-        <p className="mt-1 text-sm text-slate-400">{tournament.season}</p>
+        <p className="mt-1 text-sm text-zinc-400">{tournament.season}</p>
       </div>
 
       <div className="mx-auto max-w-3xl space-y-8 px-4 py-8">
 
         {/* ── Leaderboards ─────────────────────────────────────── */}
         <section>
-          <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-tight text-zinc-400">
             {t('individualAwards')}
           </h2>
           <div className="grid gap-4 sm:grid-cols-3">
@@ -225,16 +255,16 @@ export default async function StandingsPage({ params }: Props) {
 
         {/* ── Standings table ───────────────────────────────────── */}
         <section>
-          <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-tight text-zinc-400">
             {t('standingsTitle')}
           </h2>
           {standings.length === 0 ? (
-            <p className="text-center text-sm text-slate-500">{t('noMatches')}</p>
+            <p className="text-center text-sm text-zinc-500">{t('noMatches')}</p>
           ) : (
-            <div className="overflow-x-auto rounded-2xl bg-slate-800 shadow-lg">
+            <div className="overflow-x-auto rounded-xl bg-zinc-900 shadow-lg">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-700 text-xs uppercase tracking-wider text-slate-400">
+                  <tr className="border-b border-zinc-700 text-xs uppercase tracking-wider text-zinc-400">
                     <th className="px-4 py-3 text-start">#</th>
                     <th className="px-4 py-3 text-start">{t('colTeam')}</th>
                     <th className="px-3 py-3 text-center">{t('colGP')}</th>
@@ -251,11 +281,11 @@ export default async function StandingsPage({ params }: Props) {
                   {standings.map((row, i) => (
                     <tr
                       key={row.team.id}
-                      className={`border-b border-slate-700/50 transition-colors last:border-0 ${
+                      className={`border-b border-zinc-700/50 transition-colors last:border-0 ${
                         i === 0 ? 'bg-emerald-900/20' : ''
                       }`}
                     >
-                      <td className="px-4 py-3.5 text-slate-500">{i + 1}</td>
+                      <td className="px-4 py-3.5 text-zinc-500">{i + 1}</td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2.5">
                           {row.team.color && (
@@ -267,15 +297,15 @@ export default async function StandingsPage({ params }: Props) {
                           <span className="font-bold text-white">{row.team.name}</span>
                         </div>
                       </td>
-                      <td className="px-3 py-3.5 text-center text-slate-300">{row.gp}</td>
+                      <td className="px-3 py-3.5 text-center text-zinc-300">{row.gp}</td>
                       <td className="px-3 py-3.5 text-center text-emerald-400">{row.w}</td>
-                      <td className="px-3 py-3.5 text-center text-slate-400">{row.d}</td>
+                      <td className="px-3 py-3.5 text-center text-zinc-400">{row.d}</td>
                       <td className="px-3 py-3.5 text-center text-red-400">{row.l}</td>
-                      <td className="px-3 py-3.5 text-center text-slate-300">{row.gf}</td>
-                      <td className="px-3 py-3.5 text-center text-slate-300">{row.ga}</td>
+                      <td className="px-3 py-3.5 text-center text-zinc-300">{row.gf}</td>
+                      <td className="px-3 py-3.5 text-center text-zinc-300">{row.ga}</td>
                       <td className={`px-3 py-3.5 text-center font-semibold ${
                         row.gd > 0 ? 'text-emerald-400' :
-                        row.gd < 0 ? 'text-red-400' : 'text-slate-400'
+                        row.gd < 0 ? 'text-red-400' : 'text-zinc-400'
                       }`}>
                         {row.gd > 0 ? `+${row.gd}` : row.gd}
                       </td>
@@ -291,9 +321,39 @@ export default async function StandingsPage({ params }: Props) {
         </section>
 
         {/* Points key */}
-        <p className="text-center text-xs text-slate-600">{t('pointsKey')}</p>
+        <p className="text-center text-xs text-zinc-600">{t('pointsKey')}</p>
       </div>
     </main>
+  )
+}
+
+// ── SignupBanner ─────────────────────────────────────────────────────────────
+
+function SignupBanner({
+  leagueId,
+  liveLabel,
+  ctaLabel,
+}: {
+  leagueId:      string
+  formattedDate: string | null
+  liveLabel:     string
+  ctaLabel:      string
+}) {
+  return (
+    <div className="border-b border-emerald-500/30 bg-emerald-950/40">
+      <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3.5">
+        <div className="flex items-center gap-2.5">
+          <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-400" aria-hidden="true" />
+          <p className="text-sm font-black text-emerald-400">{liveLabel}</p>
+        </div>
+        <Link
+          href={`/league/${leagueId}/signup`}
+          className="shrink-0 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-black text-white transition-all hover:bg-emerald-500 active:scale-95"
+        >
+          {ctaLabel}
+        </Link>
+      </div>
+    </div>
   )
 }
 
@@ -307,28 +367,28 @@ function LeaderCard({
   unitFn: (count: number) => string
 }) {
   return (
-    <div className="rounded-2xl bg-slate-800 p-4 shadow-lg">
+    <div className="rounded-xl bg-zinc-900 p-4 shadow-lg">
       <h3 className="mb-3 text-sm font-black text-white">{title}</h3>
       {rows.length === 0 ? (
-        <p className="text-xs text-slate-500">—</p>
+        <p className="text-xs text-zinc-500">—</p>
       ) : (
         <ol className="space-y-2">
           {rows.map((r, i) => (
             <li key={r.player.id} className="flex items-center gap-3">
               <span className={`w-5 shrink-0 text-center text-xs font-black ${
-                i === 0 ? 'text-amber-400' : 'text-slate-500'
+                i === 0 ? 'text-amber-400' : 'text-zinc-500'
               }`}>
                 {i + 1}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-white">{r.player.full_name}</p>
-                <p className="text-xs text-slate-400">{r.player.position}</p>
+                <p className="text-xs text-zinc-400">{r.player.position}</p>
               </div>
               <span className={`shrink-0 text-sm font-black ${
-                i === 0 ? 'text-amber-400' : 'text-slate-300'
+                i === 0 ? 'text-amber-400' : 'text-zinc-300'
               }`}>
                 {r.count}
-                <span className="ms-0.5 text-xs font-normal text-slate-500">
+                <span className="ms-0.5 text-xs font-normal text-zinc-500">
                   {unitFn(r.count)}
                 </span>
               </span>

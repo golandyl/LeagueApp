@@ -18,7 +18,6 @@ export function LeagueSettingsModal({ league }: Props) {
 
   const [open, setOpen] = useState(false)
 
-  // ── Form state ────────────────────────────────────────────────────────────────
   const [matchMin,     setMatchMin]     = useState(league.match_length_minutes)
   const [otMin,        setOtMin]        = useState(league.overtime_length_minutes)
   const [overtimeType, setOvertimeType] = useState<'GOLDEN_GOAL' | 'CLASSIC'>(
@@ -28,7 +27,6 @@ export function LeagueSettingsModal({ league }: Props) {
   const [status,       setStatus]       = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [errorMsg,     setErrorMsg]     = useState<string | null>(null)
 
-  // ── Escape to close ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (!open) return
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') close() }
@@ -43,7 +41,6 @@ export function LeagueSettingsModal({ league }: Props) {
     setErrorMsg(null)
   }
 
-  // ── Save ──────────────────────────────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStatus('saving')
@@ -71,11 +68,11 @@ export function LeagueSettingsModal({ league }: Props) {
 
   return (
     <>
-      {/* ── Trigger ────────────────────────────────────────────────────────── */}
+      {/* Trigger */}
       <button
         onClick={() => setOpen(true)}
         aria-label={t('title')}
-        className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-700 hover:text-white active:scale-95"
+        className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white active:scale-95"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -92,26 +89,26 @@ export function LeagueSettingsModal({ league }: Props) {
         </svg>
       </button>
 
-      {/* ── Modal ──────────────────────────────────────────────────────────── */}
+      {/* Modal */}
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-5"
           onClick={close}
         >
           <div
-            className="w-full max-w-sm rounded-3xl bg-slate-800 shadow-2xl max-h-[90dvh] overflow-y-auto"
+            className="w-full max-w-sm rounded-xl bg-zinc-900 shadow-2xl border border-zinc-800 max-h-[90dvh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <div>
-                <h2 className="text-lg font-black text-white">{t('title')}</h2>
-                <p className="text-xs text-slate-500 mt-0.5">{league.name}</p>
+                <h2 className="text-lg font-black uppercase tracking-tight text-white">{t('title')}</h2>
+                <p className="text-xs text-zinc-500 mt-0.5">{league.name}</p>
               </div>
               <button
                 onClick={close}
                 aria-label={tCommon('cancel')}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-700 hover:text-white"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -120,7 +117,7 @@ export function LeagueSettingsModal({ league }: Props) {
             </div>
 
             {/* Divider */}
-            <div className="h-px bg-slate-700/60 mx-6" />
+            <div className="h-px bg-zinc-800 mx-6" />
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
@@ -153,17 +150,17 @@ export function LeagueSettingsModal({ league }: Props) {
                       key={type}
                       type="button"
                       onClick={() => setOvertimeType(type)}
-                      className={`rounded-xl py-3 text-sm font-bold transition-all ${
+                      className={`rounded-lg py-3 text-sm font-bold transition-all ${
                         overtimeType === type
                           ? 'bg-emerald-600 text-white'
-                          : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                          : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
                       }`}
                     >
                       {type === 'CLASSIC' ? tCreate('overtimeTypeClassic') : tCreate('overtimeTypeGoldenGoal')}
                     </button>
                   ))}
                 </div>
-                <p className="mt-1.5 text-xs text-slate-500">
+                <p className="mt-1.5 text-xs text-zinc-500">
                   {overtimeType === 'GOLDEN_GOAL'
                     ? tCreate('overtimeTypeGoldenGoalHint')
                     : tCreate('overtimeTypeClassicHint')}
@@ -185,14 +182,14 @@ export function LeagueSettingsModal({ league }: Props) {
               </Field>
 
               {errorMsg && (
-                <p className="rounded-xl bg-red-900/40 px-4 py-3 text-sm text-red-300">{errorMsg}</p>
+                <p className="rounded-lg bg-red-950/40 px-4 py-3 text-sm text-red-300">{errorMsg}</p>
               )}
 
               <button
                 type="submit"
                 disabled={status === 'saving' || status === 'saved'}
-                className={`w-full rounded-2xl py-4 text-base font-black text-white transition-all active:scale-[0.97] disabled:opacity-70 ${
-                  status === 'saved' ? 'bg-emerald-600' : 'bg-sky-600 hover:bg-sky-500'
+                className={`w-full rounded-lg py-4 text-base font-black text-white transition-all active:scale-[0.97] disabled:opacity-70 ${
+                  status === 'saved' ? 'bg-emerald-600' : 'bg-emerald-600 hover:bg-emerald-500'
                 }`}
               >
                 {status === 'saving'
@@ -213,7 +210,7 @@ export function LeagueSettingsModal({ league }: Props) {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const inputCls =
-  'w-full rounded-2xl bg-slate-700 px-4 py-3.5 text-base text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-sky-500'
+  'w-full rounded-lg bg-zinc-800 px-4 py-3.5 text-base text-white placeholder:text-zinc-600 outline-none focus:ring-2 focus:ring-emerald-500'
 
 function Field({
   label, hint, children,
@@ -224,8 +221,8 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">{label}</label>
-      {hint && <p className="text-xs text-slate-500 leading-relaxed">{hint}</p>}
+      <label className="block text-xs font-bold uppercase tracking-tight text-zinc-500">{label}</label>
+      {hint && <p className="text-xs text-zinc-500 leading-relaxed">{hint}</p>}
       {children}
     </div>
   )

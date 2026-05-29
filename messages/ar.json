@@ -199,6 +199,7 @@
     "blowWhistle": "اصفر لنهاية الوقت",
     "pause": "إيقاف مؤقت",
     "resume": "استئناف",
+    "paused": "موقوف مؤقتاً",
     "whichTeamScored": "أي فريق سجّل؟",
     "whoScored": "من سجّل؟",
     "whoAssisted": "من صنع الهدف؟",
@@ -209,7 +210,11 @@
     "noPlayersOnTeam": "لا يوجد لاعبون في هذا الفريق",
     "wcNextMatchReady": "المباراة التالية",
     "wcCreatingNext": "جارٍ تجهيز المباراة التالية…",
-    "wcStartNext": "ابدأ المباراة التالية →"
+    "wcStartNext": "ابدأ المباراة التالية →",
+    "endMatch": "إنهاء المباراة",
+    "penaltyDecisive": "ركلة الترجيح",
+    "penaltyWhichTeam": "أي فريق سجّل ركلة الترجيح؟",
+    "backToHome": "العودة إلى الرئيسية"
   },
   "editMatch": {
     "title": "تعديل نتيجة المباراة",
@@ -273,17 +278,32 @@
     "draftInProgress": "الاختيار جارٍ"
   },
   "signup": {
-    "title": "سجّل في يوم المباريات",
-    "namePlaceholder": "اسمك",
-    "signUpButton": "سجّل",
+    "pageTitle": "التسجيل ليوم المباراة",
+    "title": "التسجيل ليوم المباراة",
+    "signUpButton": "تسجيل",
     "signingUp": "جارٍ التسجيل…",
-    "alreadySignedUp": "أنت مسجّل! ✓",
-    "attending": "المشاركون ({count}/{max})",
+    "alreadySignedUp": "لقد سجلت! ✓",
+    "attending": "الحضور ({count}/{max})",
     "waitingList": "قائمة الانتظار ({count})",
     "waitingBadge": "انتظار",
     "removeAriaLabel": "إزالة",
-    "emptyHint": "لا مسجّلين بعد — شارك الرابط!",
-    "full": "الظرفية ممتلئة — ستُضاف إلى قائمة الانتظار"
+    "emptyHint": "لا يوجد تسجيلات بعد — شارك الرابط!",
+    "full": "ممتلئ — ستُضاف إلى قائمة الانتظار",
+    "closed": "التسجيل مغلق",
+    "closedDesc": "لم يفتح المدير التسجيل ليوم المباراة القادم بعد.",
+    "openFor": "التسجيل مفتوح لـ",
+    "selectPlaceholder": "اختر اسمك…",
+    "noPlayersAvailable": "جميع اللاعبين مسجلون بالفعل.",
+    "notOnList": "اسمي ليس في القائمة",
+    "requestNamePlaceholder": "أدخل اسمك الكامل لطلب الانضمام",
+    "requestButton": "طلب الانضمام",
+    "requestSent": "تم إرسال الطلب! سيراجعه المدير. ✓",
+    "backToList": "← العودة للقائمة",
+    "alreadyJoined": "المسجلون ({count}/{max})",
+    "activeLineup": "التشكيلة النشطة",
+    "waitingRoom": "غرفة الانتظار",
+    "publicBannerCta": "التسجيل مفتوح — انقر هنا للتسجيل",
+    "registeredPlayers": "اللاعبون المسجلون"
   },
   "standings": {
     "noTournaments": "لا توجد بطولات بعد.",
@@ -306,6 +326,31 @@
     "noData": "لا توجد بيانات بعد",
     "goalUnit": "{count, plural, one {هدف} two {هدفان} few {أهداف} other {أهداف}}",
     "assistUnit": "{count, plural, one {تمريرة} two {تمريرتان} few {تمريرات} other {تمريرات}}",
-    "winUnit": "{count, plural, one {انتصار} two {انتصاران} few {انتصارات} other {انتصارات}}"
+    "winUnit": "{count, plural, one {انتصار} two {انتصاران} few {انتصارات} other {انتصارات}}",
+    "signupBannerLive": "التسجيل مفتوح لـ {date}",
+    "signupBannerLiveNoDate": "التسجيل مفتوح الآن",
+    "signupBannerCta": "سجل الآن ←"
+  },
+  "signupControl": {
+    "sectionTitle": "نافذة التسجيل",
+    "statusOpen": "مفتوح",
+    "statusClosed": "مغلق",
+    "openSignups": "فتح التسجيل",
+    "closeSignups": "إغلاق التسجيل",
+    "matchdayDate": "تاريخ يوم المباراة",
+    "copySignupLink": "نسخ رابط التسجيل",
+    "linkCopied": "تم النسخ!",
+    "pendingRequests": "{count, plural, one {طلب انضمام # معلق} other {# طلبات انضمام معلقة}}",
+    "approveAndAdd": "موافقة وإضافة",
+    "approving": "جارٍ الإضافة…",
+    "maxPlayers": "الحد الأقصى للاعبين",
+    "currentSignups": "التسجيلات الحالية",
+    "waitingBadge": "انتظار",
+    "saving": "جارٍ الحفظ…",
+    "liveLabel": "التسجيل نشط",
+    "liveSummary": "لـ{date} · حتى {cap} لاعبين",
+    "liveSummaryNoDate": "حتى {cap} لاعبين",
+    "clearList": "مسح القائمة",
+    "clearing": "جارٍ المسح…"
   }
 }

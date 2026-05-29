@@ -32,6 +32,10 @@ export type Database = {
           points_ot_win: number
           points_penalties_win: number
           points_regular_win: number
+          max_capacity:  number
+          signup_cycle:  string
+          signup_date:   string | null
+          signup_status: string
           updated_at: string
           win_score: number | null
         }
@@ -42,6 +46,7 @@ export type Database = {
           is_public?: boolean
           manager_id: string
           match_length_minutes?: number
+          max_capacity?: number
           name: string
           overtime_enabled?: boolean
           overtime_length_minutes?: number
@@ -52,6 +57,9 @@ export type Database = {
           points_ot_win?: number
           points_penalties_win?: number
           points_regular_win?: number
+          signup_cycle?:  string
+          signup_date?:   string | null
+          signup_status?: string
           updated_at?: string
           win_score?: number | null
         }
@@ -62,6 +70,7 @@ export type Database = {
           is_public?: boolean
           manager_id?: string
           match_length_minutes?: number
+          max_capacity?: number
           name?: string
           overtime_enabled?: boolean
           overtime_length_minutes?: number
@@ -72,6 +81,9 @@ export type Database = {
           points_ot_win?: number
           points_penalties_win?: number
           points_regular_win?: number
+          signup_cycle?:  string
+          signup_date?:   string | null
+          signup_status?: string
           updated_at?: string
           win_score?: number | null
         }
@@ -178,6 +190,7 @@ export type Database = {
           league_id: string
           match_date: string
           notes: string | null
+          paused_at: string | null
           played_at: string | null
           status: Database["public"]["Enums"]["match_status"]
           tournament_id: string
@@ -196,6 +209,7 @@ export type Database = {
           league_id: string
           match_date: string
           notes?: string | null
+          paused_at?: string | null
           played_at?: string | null
           status?: Database["public"]["Enums"]["match_status"]
           tournament_id: string
@@ -214,6 +228,7 @@ export type Database = {
           league_id?: string
           match_date?: string
           notes?: string | null
+          paused_at?: string | null
           played_at?: string | null
           status?: Database["public"]["Enums"]["match_status"]
           tournament_id?: string
@@ -355,28 +370,37 @@ export type Database = {
       }
       tournament_signups: {
         Row: {
-          id:            string
-          league_id:     string
-          tournament_id: string | null
-          player_name:   string
-          status:        'active' | 'waiting'
-          created_at:    string
+          id:                  string
+          league_id:           string
+          tournament_id:       string | null
+          player_name:         string
+          player_id:           string | null
+          is_unlisted_request: boolean
+          requested_name:      string | null
+          status:              'active' | 'waiting'
+          created_at:          string
         }
         Insert: {
-          id?:            string
-          league_id:      string
-          tournament_id?: string | null
-          player_name:    string
-          status?:        'active' | 'waiting'
-          created_at?:    string
+          id?:                   string
+          league_id:             string
+          tournament_id?:        string | null
+          player_name:           string
+          player_id?:            string | null
+          is_unlisted_request?:  boolean
+          requested_name?:       string | null
+          status?:               'active' | 'waiting'
+          created_at?:           string
         }
         Update: {
-          id?:            string
-          league_id?:     string
-          tournament_id?: string | null
-          player_name?:   string
-          status?:        'active' | 'waiting'
-          created_at?:    string
+          id?:                   string
+          league_id?:            string
+          tournament_id?:        string | null
+          player_name?:          string
+          player_id?:            string | null
+          is_unlisted_request?:  boolean
+          requested_name?:       string | null
+          status?:               'active' | 'waiting'
+          created_at?:           string
         }
         Relationships: [
           {
@@ -506,7 +530,7 @@ export type Database = {
         | "yellow_card"
         | "red_card"
         | "substitution"
-      match_status: "scheduled" | "live" | "completed" | "cancelled"
+      match_status: "scheduled" | "live" | "paused" | "completed" | "cancelled"
       position_type: "GK" | "DEF" | "MID" | "FWD"
       stamina_level: "Low" | "Med" | "High"
       tournament_status: "draft" | "active" | "completed"
@@ -641,7 +665,7 @@ export const Constants = {
     Enums: {
       draft_status: ["pending", "active", "completed"],
       event_type: ["goal", "assist", "yellow_card", "red_card", "substitution"],
-      match_status: ["scheduled", "live", "completed", "cancelled"],
+      match_status: ["scheduled", "live", "paused", "completed", "cancelled"],
       position_type: ["GK", "DEF", "MID", "FWD"],
       stamina_level: ["Low", "Med", "High"],
       tournament_status: ["draft", "active", "completed"],

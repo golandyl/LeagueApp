@@ -199,6 +199,7 @@
     "blowWhistle": "吹终场哨",
     "pause": "暂停",
     "resume": "继续",
+    "paused": "已暂停",
     "whichTeamScored": "哪支球队进球？",
     "whoScored": "谁进球？",
     "whoAssisted": "谁助攻？",
@@ -209,7 +210,11 @@
     "noPlayersOnTeam": "该队没有球员",
     "wcNextMatchReady": "下一场比赛",
     "wcCreatingNext": "正在准备下一场比赛…",
-    "wcStartNext": "开始下一场比赛 →"
+    "wcStartNext": "开始下一场比赛 →",
+    "endMatch": "结束比赛",
+    "penaltyDecisive": "决定性点球",
+    "penaltyWhichTeam": "哪支球队踢进了点球？",
+    "backToHome": "返回主页"
   },
   "editMatch": {
     "title": "编辑比赛结果",
@@ -273,17 +278,32 @@
     "draftInProgress": "选秀进行中"
   },
   "signup": {
-    "title": "报名参加比赛日",
-    "namePlaceholder": "你的名字",
+    "pageTitle": "比赛日报名",
+    "title": "比赛日报名",
     "signUpButton": "报名",
     "signingUp": "报名中…",
-    "alreadySignedUp": "你已报名！✓",
-    "attending": "参与者（{count}/{max}）",
-    "waitingList": "候补名单（{count}）",
+    "alreadySignedUp": "已报名！✓",
+    "attending": "参与人数 ({count}/{max})",
+    "waitingList": "候补名单 ({count})",
     "waitingBadge": "候补",
     "removeAriaLabel": "移除",
-    "emptyHint": "暂无报名 — 快分享链接吧！",
-    "full": "已满 — 你将被加入候补名单"
+    "emptyHint": "暂无报名 — 分享链接吧！",
+    "full": "已满 — 您将被添加至候补名单",
+    "closed": "报名已关闭",
+    "closedDesc": "管理员尚未开放下次比赛日的报名。",
+    "openFor": "报名开放至",
+    "selectPlaceholder": "选择您的姓名…",
+    "noPlayersAvailable": "所有球员均已报名。",
+    "notOnList": "名单中没有我的名字",
+    "requestNamePlaceholder": "输入全名申请加入",
+    "requestButton": "申请加入",
+    "requestSent": "申请已发送！管理员将进行审核。✓",
+    "backToList": "← 返回列表",
+    "alreadyJoined": "已报名 ({count}/{max})",
+    "activeLineup": "首发名单",
+    "waitingRoom": "候补区",
+    "publicBannerCta": "报名开放 — 点击此处报名",
+    "registeredPlayers": "已报名球员"
   },
   "standings": {
     "noTournaments": "暂无赛事。",
@@ -306,6 +326,31 @@
     "noData": "暂无数据",
     "goalUnit": "{count, plural, other {{count} 球}}",
     "assistUnit": "{count, plural, other {{count} 次助攻}}",
-    "winUnit": "{count, plural, other {{count} 胜}}"
+    "winUnit": "{count, plural, other {{count} 胜}}",
+    "signupBannerLive": "{date} 报名开放中",
+    "signupBannerLiveNoDate": "报名正在进行中",
+    "signupBannerCta": "立即报名 →"
+  },
+  "signupControl": {
+    "sectionTitle": "报名窗口",
+    "statusOpen": "开放",
+    "statusClosed": "已关闭",
+    "openSignups": "开放报名",
+    "closeSignups": "关闭报名",
+    "matchdayDate": "比赛日期",
+    "copySignupLink": "复制报名链接",
+    "linkCopied": "已复制！",
+    "pendingRequests": "{count}条待审加入申请",
+    "approveAndAdd": "批准并添加",
+    "approving": "添加中…",
+    "maxPlayers": "最大人数",
+    "currentSignups": "当前报名",
+    "waitingBadge": "候补",
+    "saving": "保存中…",
+    "liveLabel": "报名进行中",
+    "liveSummary": "{date} · 最多{cap}人",
+    "liveSummaryNoDate": "最多{cap}人",
+    "clearList": "清空名单",
+    "clearing": "清空中…"
   }
 }

@@ -9,7 +9,7 @@ interface Props {
   phase:          Phase
   running:        boolean
   isStoppageTime: boolean
-  onToggle:       () => void
+  onToggle?:      () => void
   onWhistle?:     () => void
 }
 
@@ -30,6 +30,10 @@ export function LiveTimer({ seconds, phase, running, isStoppageTime, onToggle, o
         <span className="animate-pulse rounded-full bg-red-600 px-5 py-1.5 text-sm font-black uppercase tracking-widest text-white">
           ⏱ {t('stoppageTime')}
         </span>
+      ) : !running ? (
+        <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-5 py-1.5 text-sm font-black uppercase tracking-widest text-amber-400">
+          ⏸ {t('paused')}
+        </span>
       ) : phase === 'overtime' ? (
         <span className="rounded-full bg-amber-500 px-5 py-1.5 text-sm font-black uppercase tracking-widest text-white">
           {t('extraTimePill')}
@@ -45,11 +49,6 @@ export function LiveTimer({ seconds, phase, running, isStoppageTime, onToggle, o
         }`}
       >
         {fmt(seconds)}
-        {!running && !isStoppageTime && (
-          <span className="ms-3 inline-block animate-pulse text-[min(6vw,2.5rem)] align-middle">
-            ⏸
-          </span>
-        )}
       </div>
 
       {/* Action button */}
@@ -60,7 +59,7 @@ export function LiveTimer({ seconds, phase, running, isStoppageTime, onToggle, o
         >
           🔴  {t('blowWhistle')}
         </button>
-      ) : (
+      ) : onToggle ? (
         <button
           onClick={onToggle}
           className={`w-full max-w-sm rounded-2xl py-6 text-2xl font-black uppercase tracking-widest transition-all active:scale-95 ${
@@ -71,7 +70,7 @@ export function LiveTimer({ seconds, phase, running, isStoppageTime, onToggle, o
         >
           {running ? `⏸  ${t('pause')}` : `▶  ${t('resume')}`}
         </button>
-      )}
+      ) : null}
     </div>
   )
 }

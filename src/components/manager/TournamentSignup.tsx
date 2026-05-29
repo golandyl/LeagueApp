@@ -5,37 +5,96 @@ import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
 
-type Signup = Tables<'tournament_signups'>
+type Signup    = Tables<'tournament_signups'>
+type PlayerRef = { id: string; full_name: string }
 
 interface Props {
-  leagueId:    string
-  tournament:  { id: string; max_capacity: number } | null
-  isManager:   boolean
+  leagueId:     string
+  signupCycle:  string
+  /** Initial status from RSC; real-time subscription keeps it live */
+  signupStatus: string
+  /** Initial date from RSC; real-time subscription keeps it live */
+  signupDate:   string | null
+  /** Capacity from leagues.max_capacity; real-time subscription keeps it live */
+  maxCapacity:  number
+  tournament:   { id: string } | null
+  players:      PlayerRef[]
+  isManager:    boolean
 }
 
-function storageKey(leagueId: string) {
-  return `has_signed_up_${leagueId}`
+function storageKey(leagueId: string, cycle: string) {
+  return `has_signed_up_${leagueId}_${cycle}`
 }
 
-export function TournamentSignup({ leagueId, tournament, isManager }: Props) {
-  const t      = useTranslations('signup')
+export function TournamentSignup({
+  leagueId,
+  signupCycle,
+  signupStatus:  initStatus,
+  signupDate:    initDate,
+  maxCapacity:   initCap,
+  tournament,
+  players,
+  isManager,
+}: Props) {
+  const t       = useTranslations('signup')
   const tCommon = useTranslations('common')
 
   const supabase = useMemo(() => createClient(), [])
-  const maxCap   = tournament?.max_capacity ?? 16
 
-  const [signups,    setSignups]    = useState<Signup[]>([])
-  const [name,       setName]       = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [signedUp,   setSignedUp]   = useState(false)
-  const [error,      setError]      = useState<string | null>(null)
+  // Live values — kept in sync with the manager's DB updates via realtime
+  const [liveStatus, setLiveStatus] = useState(initStatus)
+  const [liveDate,   setLiveDate]   = useState(initDate)
+  const [liveCap,    setLiveCap]    = useState(initCap)
 
-  // Check localStorage on first client render only
+  const [signups,      setSignups]      = useState<Signup[]>([])
+  const [selectedId,   setSelectedId]   = useState('')
+  const [unlistedMode, setUnlistedMode] = useState(false)
+  const [requestName,  setRequestName]  = useState('')
+  const [submitting,   setSubmitting]   = useState(false)
+  const [signedUp,     setSignedUp]     = useState(false)
+  const [requestSent,  setRequestSent]  = useState(false)
+  const [error,        setError]        = useState<string | null>(null)
+
+  // Sync RSC-provided props on hydration
+  useEffect(() => { setLiveStatus(initStatus) }, [initStatus])
+  useEffect(() => { setLiveDate(initDate)     }, [initDate])
+  useEffect(() => { setLiveCap(initCap)       }, [initCap])
+
+  // Check localStorage for current cycle; prune stale keys
   useEffect(() => {
-    setSignedUp(!!localStorage.getItem(storageKey(leagueId)))
-  }, [leagueId])
+    const currentKey = storageKey(leagueId, signupCycle)
+    setSignedUp(!!localStorage.getItem(currentKey))
+    const staleKeys = Object.keys(localStorage).filter(
+      k => k.startsWith(`has_signed_up_${leagueId}_`) && k !== currentKey,
+    )
+    staleKeys.forEach(k => localStorage.removeItem(k))
+  }, [leagueId, signupCycle])
 
-  // Initial fetch — ordered by created_at so the list is stable
+  // Subscribe to league row updates so the page flips open/closed in real time
+  // when the manager toggles the signup window, without a page reload.
+  useEffect(() => {
+    const channel = supabase
+      .channel(`league-meta:${leagueId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'leagues', filter: `id=eq.${leagueId}` },
+        (payload) => {
+          const row = payload.new as {
+            signup_status?: string
+            signup_date?:   string | null
+            max_capacity?:  number
+          }
+          if (row.signup_status !== undefined) setLiveStatus(row.signup_status)
+          if ('signup_date'   in row) setLiveDate(row.signup_date ?? null)
+          if (row.max_capacity !== undefined) setLiveCap(row.max_capacity)
+        },
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [leagueId, supabase])
+
+  // Initial fetch of signups
   useEffect(() => {
     supabase
       .from('tournament_signups')
@@ -45,7 +104,7 @@ export function TournamentSignup({ leagueId, tournament, isManager }: Props) {
       .then(({ data }) => setSignups((data ?? []) as Signup[]))
   }, [leagueId, supabase])
 
-  // Realtime subscription — keeps the list in sync across all open devices
+  // Realtime subscription for signups
   useEffect(() => {
     const channel = supabase
       .channel(`signups:${leagueId}`)
@@ -75,32 +134,65 @@ export function TournamentSignup({ leagueId, tournament, isManager }: Props) {
     return () => { supabase.removeChannel(channel) }
   }, [leagueId, supabase])
 
+  // Player IDs already signed up via a linked record
+  const signedUpPlayerIds = useMemo(
+    () => new Set(signups.filter(s => s.player_id).map(s => s.player_id as string)),
+    [signups],
+  )
+
+  const availablePlayers = useMemo(
+    () => players.filter(p => !signedUpPlayerIds.has(p.id)),
+    [players, signedUpPlayerIds],
+  )
+
   async function handleSignUp(e: FormEvent) {
     e.preventDefault()
-    const trimmed = name.trim()
-    if (!trimmed || submitting) return
+    if (submitting) return
+
+    const mainSignups = signups.filter(s => !s.is_unlisted_request)
+    const activeCount = mainSignups.filter(s => s.status === 'active').length
+    const status: 'active' | 'waiting' = activeCount < liveCap ? 'active' : 'waiting'
 
     setSubmitting(true)
     setError(null)
 
     try {
-      const activeCount = signups.filter(s => s.status === 'active').length
-      const status: 'active' | 'waiting' = activeCount < maxCap ? 'active' : 'waiting'
-
-      const { error: dbErr } = await supabase
-        .from('tournament_signups')
-        .insert({
-          league_id:     leagueId,
-          tournament_id: tournament?.id ?? null,
-          player_name:   trimmed,
-          status,
-        })
-
-      if (dbErr) throw dbErr
-
-      localStorage.setItem(storageKey(leagueId), 'true')
-      setSignedUp(true)
-      setName('')
+      if (unlistedMode) {
+        const trimmed = requestName.trim()
+        if (!trimmed) return
+        const { error: dbErr } = await supabase
+          .from('tournament_signups')
+          .insert({
+            league_id:           leagueId,
+            tournament_id:       tournament?.id ?? null,
+            player_name:         trimmed,
+            requested_name:      trimmed,
+            is_unlisted_request: true,
+            player_id:           null,
+            status:              'active',
+          })
+        if (dbErr) throw dbErr
+        localStorage.setItem(storageKey(leagueId, signupCycle), 'true')
+        setRequestSent(true)
+      } else {
+        if (!selectedId) return
+        const player = players.find(p => p.id === selectedId)
+        if (!player) return
+        const { error: dbErr } = await supabase
+          .from('tournament_signups')
+          .insert({
+            league_id:           leagueId,
+            tournament_id:       tournament?.id ?? null,
+            player_name:         player.full_name,
+            player_id:           player.id,
+            is_unlisted_request: false,
+            status,
+          })
+        if (dbErr) throw dbErr
+        localStorage.setItem(storageKey(leagueId, signupCycle), 'true')
+        setSignedUp(true)
+        setSelectedId('')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : tCommon('error'))
     } finally {
@@ -109,94 +201,196 @@ export function TournamentSignup({ leagueId, tournament, isManager }: Props) {
   }
 
   async function handleRemove(signup: Signup) {
-    const wasActive = signup.status === 'active'
-    // Capture the first waiting person before state changes
+    const wasActive    = signup.status === 'active' && !signup.is_unlisted_request
     const firstWaiting = wasActive
       ? signups
-          .filter(s => s.status === 'waiting' && s.id !== signup.id)
+          .filter(s => s.status === 'waiting' && s.id !== signup.id && !s.is_unlisted_request)
           .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0]
       : undefined
 
     const { error: delErr } = await supabase
-      .from('tournament_signups')
-      .delete()
-      .eq('id', signup.id)
-
+      .from('tournament_signups').delete().eq('id', signup.id)
     if (delErr) return
 
-    // Realtime handles the DELETE state update; promote waiting → active if needed
     if (firstWaiting) {
-      await supabase
-        .from('tournament_signups')
-        .update({ status: 'active' })
-        .eq('id', firstWaiting.id)
-      // Realtime UPDATE event handles the state update for the promoted row
+      await supabase.from('tournament_signups').update({ status: 'active' }).eq('id', firstWaiting.id)
     }
   }
 
-  const activeSignups  = signups.filter(s => s.status === 'active')
-  const waitingSignups = signups.filter(s => s.status === 'waiting')
-  const isFull         = activeSignups.length >= maxCap
+  const mainSignups    = signups.filter(s => !s.is_unlisted_request)
+  const activeSignups  = mainSignups.filter(s => s.status === 'active')
+  const waitingSignups = mainSignups.filter(s => s.status === 'waiting')
+  const isFull         = activeSignups.length >= liveCap
 
+  const formattedDate = liveDate
+    ? new Intl.DateTimeFormat('en', {
+        weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC',
+      }).format(new Date(liveDate + 'T12:00:00Z'))
+    : null
+
+  // ── Closed state (non-managers only) ───────────────────────────────────────
+  if (liveStatus === 'closed' && !isManager) {
+    return (
+      <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="flex items-center gap-2.5">
+          <span className="h-2 w-2 shrink-0 rounded-full bg-zinc-700" aria-hidden="true" />
+          <h2 className="text-xs font-black uppercase tracking-tight text-zinc-500">
+            {t('closed')}
+          </h2>
+        </div>
+        <p className="text-sm leading-relaxed text-zinc-600">{t('closedDesc')}</p>
+
+        <div className="space-y-1 border-t border-zinc-800 pt-3">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-xs font-black uppercase tracking-tight text-zinc-500">
+              {t('registeredPlayers')}
+            </p>
+            <span className="text-xs font-bold tabular-nums text-zinc-600">
+              {activeSignups.length} / {liveCap}
+            </span>
+          </div>
+          {activeSignups.length === 0 ? (
+            <p className="py-1 text-center text-sm text-zinc-700">{t('emptyHint')}</p>
+          ) : (
+            activeSignups.map((s, i) => (
+              <div key={s.id} className="flex items-center gap-2 border-b border-zinc-800/60 px-1 py-2 last:border-0">
+                <span className="w-4 shrink-0 text-right text-xs tabular-nums text-zinc-700">
+                  {i + 1}
+                </span>
+                <span className="flex-1 text-sm font-semibold text-zinc-400">{s.player_name}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  // ── Open state ─────────────────────────────────────────────────────────────
   return (
-    <section className="space-y-4 rounded-2xl bg-slate-800 p-4">
+    <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xs font-black uppercase tracking-widest text-slate-400">
-          {t('title')}
-        </h2>
-        <span className="rounded-full bg-slate-700 px-2.5 py-0.5 text-xs font-bold tabular-nums text-slate-400">
-          {activeSignups.length}/{maxCap}
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h2 className="text-xs font-black uppercase tracking-tight text-zinc-500">
+            {t('title')}
+          </h2>
+          {formattedDate && (
+            <p className="mt-0.5 text-[11px] font-black uppercase tracking-tight text-emerald-500">
+              {t('openFor')}: {formattedDate}
+            </p>
+          )}
+        </div>
+        <span className="shrink-0 rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs font-bold tabular-nums text-zinc-400">
+          {activeSignups.length}/{liveCap}
         </span>
       </div>
 
-      {/* Sign-up form or confirmation */}
+      {/* Form / confirmation */}
       {signedUp ? (
-        <p className="rounded-xl bg-emerald-900/30 px-4 py-3 text-sm font-semibold text-emerald-300 ring-1 ring-emerald-700/40">
+        <p className="rounded-lg bg-emerald-950/40 px-4 py-3 text-sm font-semibold text-emerald-400 ring-1 ring-emerald-800/40">
           {t('alreadySignedUp')}
         </p>
+      ) : requestSent ? (
+        <p className="rounded-lg bg-amber-950/40 px-4 py-3 text-sm font-semibold text-amber-400 ring-1 ring-amber-800/40">
+          {t('requestSent')}
+        </p>
       ) : (
-        <form onSubmit={handleSignUp} className="flex gap-2">
-          <input
-            type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder={t('namePlaceholder')}
-            maxLength={64}
-            autoComplete="name"
-            className="min-w-0 flex-1 rounded-xl bg-slate-700 px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-500 focus:ring-2 focus:ring-sky-500"
-          />
-          <button
-            type="submit"
-            disabled={submitting || !name.trim()}
-            className="shrink-0 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-black text-white transition-all active:scale-95 active:bg-sky-700 disabled:opacity-40"
-          >
-            {submitting ? t('signingUp') : t('signUpButton')}
-          </button>
+        <form onSubmit={handleSignUp} className="space-y-3">
+          {!unlistedMode ? (
+            <>
+              <select
+                value={selectedId}
+                onChange={e => setSelectedId(e.target.value)}
+                disabled={availablePlayers.length === 0}
+                className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
+              >
+                <option value="" disabled>
+                  {availablePlayers.length === 0 ? t('noPlayersAvailable') : t('selectPlaceholder')}
+                </option>
+                {availablePlayers.map(p => (
+                  <option key={p.id} value={p.id}>{p.full_name}</option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                disabled={submitting || !selectedId}
+                className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-black text-white transition-all active:scale-95 active:bg-emerald-700 disabled:opacity-40"
+              >
+                {submitting ? t('signingUp') : t('signUpButton')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setUnlistedMode(true)}
+                className="w-full text-center text-xs font-semibold text-zinc-600 transition-colors hover:text-zinc-400"
+              >
+                {t('notOnList')}
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                type="text"
+                value={requestName}
+                onChange={e => setRequestName(e.target.value)}
+                placeholder={t('requestNamePlaceholder')}
+                maxLength={64}
+                autoComplete="name"
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white outline-none placeholder:text-zinc-600 focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                type="submit"
+                disabled={submitting || !requestName.trim()}
+                className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-black text-white transition-all active:scale-95 active:bg-emerald-700 disabled:opacity-40"
+              >
+                {submitting ? t('signingUp') : t('requestButton')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setUnlistedMode(false); setRequestName('') }}
+                className="w-full text-center text-xs font-semibold text-zinc-600 transition-colors hover:text-zinc-400"
+              >
+                {t('backToList')}
+              </button>
+            </>
+          )}
         </form>
       )}
 
-      {isFull && !signedUp && (
-        <p className="text-xs text-amber-400">{t('full')}</p>
+      {isFull && !signedUp && !requestSent && !unlistedMode && (
+        <p className="text-xs text-amber-500">{t('full')}</p>
       )}
 
-      {error && (
-        <p className="text-xs text-red-400">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-400">{error}</p>}
 
-      {/* Active list */}
-      {activeSignups.length > 0 && (
-        <div className="space-y-1.5">
-          <p className="text-xs font-bold text-slate-400">
-            {t('attending', { count: activeSignups.length, max: maxCap })}
-          </p>
-          {activeSignups.map((s, i) => (
+      {/* ── Registered players — always rendered in the DOM ──────────
+          This section is unconditional so it is visible immediately,
+          even before anyone has signed up (shows 0 / cap).           */}
+      <div className="border-t border-zinc-800 pt-4 space-y-2">
+
+        {/* Section header + live count */}
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-xs font-black uppercase tracking-tight text-zinc-400">
+            {t('registeredPlayers')}
+          </h3>
+          <span className="text-xs font-bold tabular-nums text-zinc-500">
+            {activeSignups.length} / {liveCap}
+          </span>
+        </div>
+
+        {/* Active lineup */}
+        {activeSignups.length === 0 ? (
+          <p className="py-2 text-center text-sm text-zinc-700">{t('emptyHint')}</p>
+        ) : (
+          activeSignups.map((s, i) => (
             <div
               key={s.id}
-              className="flex items-center gap-2 rounded-lg bg-slate-700/50 px-3 py-2"
+              className="flex items-center gap-2 border-b border-zinc-800 px-1 py-2 last:border-0"
             >
-              <span className="w-4 shrink-0 text-right text-xs font-bold tabular-nums text-slate-500">
+              <span className="w-4 shrink-0 text-right text-xs tabular-nums text-zinc-700">
                 {i + 1}
               </span>
               <span className="flex-1 text-sm font-semibold text-white">{s.player_name}</span>
@@ -204,51 +398,46 @@ export function TournamentSignup({ leagueId, tournament, isManager }: Props) {
                 <button
                   onClick={() => handleRemove(s)}
                   aria-label={t('removeAriaLabel')}
-                  className="shrink-0 rounded-full p-1 text-slate-500 transition-colors hover:bg-slate-600 hover:text-red-400 active:scale-90"
+                  className="shrink-0 rounded-full p-1 text-zinc-600 transition-colors hover:bg-zinc-700 hover:text-red-400 active:scale-90"
                 >
                   <TrashIcon />
                 </button>
               )}
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
 
-      {/* Waiting list */}
-      {waitingSignups.length > 0 && (
-        <div className="space-y-1.5">
-          <p className="text-xs font-bold text-amber-500">
-            {t('waitingList', { count: waitingSignups.length })}
-          </p>
-          {waitingSignups.map((s, i) => (
-            <div
-              key={s.id}
-              className="flex items-center gap-2 rounded-lg bg-amber-900/20 px-3 py-2 ring-1 ring-amber-700/30"
-            >
-              <span className="w-4 shrink-0 text-right text-xs font-bold tabular-nums text-amber-700">
-                {i + 1}
-              </span>
-              <span className="flex-1 text-sm font-semibold text-amber-200">{s.player_name}</span>
-              <span className="shrink-0 text-[10px] font-black uppercase tracking-wide text-amber-600">
-                {t('waitingBadge')}
-              </span>
-              {isManager && (
-                <button
-                  onClick={() => handleRemove(s)}
-                  aria-label={t('removeAriaLabel')}
-                  className="shrink-0 rounded-full p-1 text-amber-700 transition-colors hover:bg-amber-900/40 hover:text-red-400 active:scale-90"
-                >
-                  <TrashIcon />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+        {/* Waiting room — only shown when there are waitlisted players */}
+        {waitingSignups.length > 0 && (
+          <div className="pt-1">
+            <p className="mb-1.5 text-xs font-bold text-amber-700">{t('waitingRoom')}</p>
+            {waitingSignups.map((s, i) => (
+              <div
+                key={s.id}
+                className="flex items-center gap-2 border-b border-zinc-800 px-1 py-2 last:border-0"
+              >
+                <span className="w-4 shrink-0 text-right text-xs tabular-nums text-amber-800">
+                  {activeSignups.length + i + 1}
+                </span>
+                <span className="flex-1 text-sm font-semibold text-zinc-400">{s.player_name}</span>
+                <span className="shrink-0 text-[10px] font-black uppercase tracking-wide text-amber-700">
+                  {t('waitingBadge')}
+                </span>
+                {isManager && (
+                  <button
+                    onClick={() => handleRemove(s)}
+                    aria-label={t('removeAriaLabel')}
+                    className="shrink-0 rounded-full p-1 text-amber-800 transition-colors hover:bg-amber-950/40 hover:text-red-400 active:scale-90"
+                  >
+                    <TrashIcon />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
-      {signups.length === 0 && (
-        <p className="py-2 text-center text-sm text-slate-600">{t('emptyHint')}</p>
-      )}
+      </div>
     </section>
   )
 }

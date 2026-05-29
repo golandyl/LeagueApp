@@ -57,18 +57,18 @@ export default function CreateLeaguePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-900 flex items-center justify-center px-6 py-12">
+    <main className="min-h-screen bg-zinc-950 flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
 
         <div className="mb-8">
-          <Link href="/" className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-300">
+          <Link href="/" className="mb-4 inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300">
             <svg className="h-4 w-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5M12 5l-7 7 7 7" />
             </svg>
             {tCommon('back')}
           </Link>
-          <h1 className="text-2xl font-black text-white">{t('title')}</h1>
-          <p className="mt-1 text-sm text-slate-400">{t('subtitle')}</p>
+          <h1 className="text-2xl font-black uppercase tracking-tight text-white">{t('title')}</h1>
+          <p className="mt-1 text-sm text-zinc-400">{t('subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -114,17 +114,17 @@ export default function CreateLeaguePage() {
                   key={type}
                   type="button"
                   onClick={() => setOvertimeType(type)}
-                  className={`rounded-2xl py-3.5 text-sm font-bold transition-all ${
+                  className={`rounded-lg py-3.5 text-sm font-bold transition-all ${
                     overtimeType === type
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
                   }`}
                 >
                   {type === 'CLASSIC' ? t('overtimeTypeClassic') : t('overtimeTypeGoldenGoal')}
                 </button>
               ))}
             </div>
-            <p className="mt-1.5 text-xs text-slate-500">
+            <p className="mt-1.5 text-xs text-zinc-500">
               {overtimeType === 'GOLDEN_GOAL'
                 ? t('overtimeTypeGoldenGoalHint')
                 : t('overtimeTypeClassicHint')}
@@ -146,13 +146,13 @@ export default function CreateLeaguePage() {
           </Field>
 
           {error && (
-            <p className="rounded-xl bg-red-900/40 px-4 py-3 text-sm text-red-300">{error}</p>
+            <p className="rounded-lg bg-red-950/40 px-4 py-3 text-sm text-red-300">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-emerald-500 py-4 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] disabled:opacity-60"
+            className="w-full rounded-lg bg-emerald-600 py-4 text-base font-black uppercase tracking-tight text-white transition-all active:scale-[0.97] active:bg-emerald-700 disabled:opacity-60"
           >
             {loading ? t('submitting') : t('submit')}
           </button>
@@ -164,7 +164,7 @@ export default function CreateLeaguePage() {
 }
 
 const inputCls =
-  'w-full rounded-2xl bg-slate-800 px-5 py-4 text-base text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-emerald-500'
+  'w-full rounded-lg bg-zinc-900 px-5 py-4 text-base text-white placeholder:text-zinc-600 outline-none focus:ring-2 focus:ring-emerald-500 border border-zinc-800'
 
 function Field({
   label, hint, children,
@@ -175,8 +175,8 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">{label}</label>
-      {hint && <p className="text-xs text-slate-500 leading-relaxed">{hint}</p>}
+      <label className="block text-xs font-bold uppercase tracking-tight text-zinc-500">{label}</label>
+      {hint && <p className="text-xs text-zinc-500 leading-relaxed">{hint}</p>}
       {children}
     </div>
   )

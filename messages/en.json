@@ -199,6 +199,7 @@
     "blowWhistle": "Blow Whistle",
     "pause": "Pause",
     "resume": "Resume",
+    "paused": "Paused",
     "whichTeamScored": "Which team scored?",
     "whoScored": "Who scored?",
     "whoAssisted": "Who assisted?",
@@ -209,7 +210,11 @@
     "noPlayersOnTeam": "No players on this team",
     "wcNextMatchReady": "Next Match",
     "wcCreatingNext": "Preparing next match…",
-    "wcStartNext": "Start Next Match →"
+    "wcStartNext": "Start Next Match →",
+    "endMatch": "End Match",
+    "penaltyDecisive": "Decisive Penalty",
+    "penaltyWhichTeam": "Which team scored the penalty?",
+    "backToHome": "Back to Home"
   },
   "editMatch": {
     "title": "Edit Match Result",
@@ -273,8 +278,8 @@
     "draftInProgress": "Draft in progress"
   },
   "signup": {
+    "pageTitle": "Matchday Sign-Up",
     "title": "Sign Up for Matchday",
-    "namePlaceholder": "Your name",
     "signUpButton": "Sign Up",
     "signingUp": "Signing up…",
     "alreadySignedUp": "You're signed up! ✓",
@@ -283,7 +288,44 @@
     "waitingBadge": "Waiting",
     "removeAriaLabel": "Remove",
     "emptyHint": "No sign-ups yet — share this link!",
-    "full": "Full — you'll be added to the waiting list"
+    "full": "Full — you'll be added to the waiting list",
+    "closed": "Signups Closed",
+    "closedDesc": "The manager has not opened registration for the next matchday yet.",
+    "openFor": "Registration open for",
+    "selectPlaceholder": "Choose your name…",
+    "noPlayersAvailable": "All players have signed up.",
+    "notOnList": "My name is not on the list",
+    "requestNamePlaceholder": "Enter your full name to request to join",
+    "requestButton": "Request to Join",
+    "requestSent": "Request sent! The manager will review it. ✓",
+    "backToList": "← Back to list",
+    "alreadyJoined": "Already Joined ({count}/{max})",
+    "activeLineup": "Active Lineup",
+    "waitingRoom": "Waiting Room",
+    "publicBannerCta": "Registration Open — Click Here to Sign Up",
+    "registeredPlayers": "Registered Players"
+  },
+  "signupControl": {
+    "sectionTitle": "Signup Window",
+    "statusOpen": "OPEN",
+    "statusClosed": "CLOSED",
+    "openSignups": "Open Signups",
+    "closeSignups": "Close Signups",
+    "matchdayDate": "Matchday Date",
+    "maxPlayers": "Max Players",
+    "copySignupLink": "Copy Signup Link",
+    "linkCopied": "Copied!",
+    "currentSignups": "Current Signups",
+    "waitingBadge": "Waiting",
+    "pendingRequests": "{count, plural, one {# Pending Joining Request} other {# Pending Joining Requests}}",
+    "approveAndAdd": "Approve & Add",
+    "approving": "Adding…",
+    "saving": "Saving…",
+    "liveLabel": "Registration Active",
+    "liveSummary": "For {date} · Max {cap} players",
+    "liveSummaryNoDate": "Max {cap} players",
+    "clearList": "Clear List",
+    "clearing": "Clearing…"
   },
   "standings": {
     "noTournaments": "No tournaments yet.",
@@ -306,6 +348,9 @@
     "noData": "No data yet",
     "goalUnit": "{count, plural, one {goal} other {goals}}",
     "assistUnit": "{count, plural, one {assist} other {assists}}",
-    "winUnit": "{count, plural, one {win} other {wins}}"
+    "winUnit": "{count, plural, one {win} other {wins}}",
+    "signupBannerLive": "Registration is Live for {date}",
+    "signupBannerLiveNoDate": "Registration is Now Live",
+    "signupBannerCta": "Sign Up Now →"
   }
 }

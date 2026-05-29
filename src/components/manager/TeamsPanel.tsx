@@ -151,7 +151,7 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp,
   // ── Render ─────────────────────────────────────────────────────────────────────
 
   if (teams.length === 0) {
-    return <p className="py-8 text-center text-sm text-slate-500">{t('noTeams')}</p>
+    return <p className="py-8 text-center text-sm text-zinc-500">{t('noTeams')}</p>
   }
 
   return (
@@ -161,7 +161,7 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp,
       {!readOnly && (
         <button
           onClick={handleShareWhatsApp}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] py-4 text-sm font-black text-white shadow-lg transition-all active:scale-[0.97] active:opacity-90"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-4 text-sm font-black text-white shadow-lg transition-all active:scale-[0.97] active:opacity-90"
         >
           <WhatsAppIcon />
           {t('shareWhatsApp')}
@@ -223,7 +223,7 @@ function TeamCard({
   const isThisTeamSelected = selectedPlayerId !== null && roster.some(p => p.id === selectedPlayerId)
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-slate-800 shadow-lg">
+    <div className="overflow-hidden rounded-xl bg-zinc-900 shadow-lg">
 
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3">
@@ -236,9 +236,9 @@ function TeamCard({
         <span className="min-w-0 flex-1 truncate font-black text-white">{team.name}</span>
         {/* Avg rating badge — hidden for non-managers */}
         {!readOnly && (
-          <div className="shrink-0 rounded-2xl bg-emerald-900/40 px-3.5 py-2 text-center ring-1 ring-emerald-700/40">
+          <div className="shrink-0 rounded-xl bg-emerald-950/30 px-3.5 py-2 text-center ring-1 ring-emerald-700/40">
             <p className="text-2xl font-black tabular-nums leading-none text-emerald-300">{avg}</p>
-            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-emerald-600/80">
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-tight text-emerald-600/80">
               {t('avgRating')}
             </p>
           </div>
@@ -246,14 +246,14 @@ function TeamCard({
       </div>
 
       {/* View mode toggle */}
-      <div className="mx-3 mb-3 flex gap-0.5 rounded-xl bg-slate-900/60 p-0.5">
+      <div className="mx-3 mb-3 flex gap-0.5 rounded-xl bg-zinc-950/60 p-0.5">
         <button
           onClick={() => setViewMode('pitch')}
           className={[
             'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold transition-colors',
             viewMode === 'pitch'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-400',
+              ? 'bg-zinc-800 text-white shadow-sm'
+              : 'text-zinc-500 hover:text-zinc-400',
           ].join(' ')}
         >
           <PitchIcon />
@@ -264,8 +264,8 @@ function TeamCard({
           className={[
             'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold transition-colors',
             viewMode === 'stats'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-400',
+              ? 'bg-zinc-800 text-white shadow-sm'
+              : 'text-zinc-500 hover:text-zinc-400',
           ].join(' ')}
         >
           <ListIcon />
@@ -347,7 +347,7 @@ function StatsRoster({
           <div key={pos}>
             {/* Position group label */}
             <p
-              className="mb-1.5 px-1 text-[9px] font-black uppercase tracking-widest"
+              className="mb-1.5 px-1 text-[9px] font-black uppercase tracking-tight"
               style={{ color: PIN_COLOR[pos] }}
             >
               {pos}
@@ -390,7 +390,7 @@ function StatPlayerCard({
         'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all',
         isSelected
           ? 'bg-amber-500/20 ring-1 ring-amber-500/50'
-          : 'bg-slate-700/50',
+          : 'bg-zinc-800/50',
       ].join(' ')}
     >
       {/* Position badge */}
@@ -409,7 +409,7 @@ function StatPlayerCard({
         <span
           className={[
             'shrink-0 text-base font-black tabular-nums',
-            isSelected ? 'text-amber-400' : 'text-slate-200',
+            isSelected ? 'text-amber-400' : 'text-zinc-200',
           ].join(' ')}
         >
           {player.rating}
@@ -532,17 +532,17 @@ function SwapSheet({
       onClick={onCancel}
     >
       <div
-        className="max-h-[65vh] overflow-y-auto rounded-t-3xl bg-slate-800 shadow-2xl"
+        className="max-h-[65vh] overflow-y-auto rounded-t-xl bg-zinc-900 shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Drag handle */}
-        <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-slate-600" />
+        <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-zinc-700" />
 
         <div className="px-5 pb-3 pt-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+          <p className="text-xs font-bold uppercase tracking-tight text-zinc-400">
             {t('swapPlayer')}
           </p>
-          <p className="mt-1 text-sm text-slate-300">
+          <p className="mt-1 text-sm text-zinc-300">
             {t('swapWith')}{' '}
             <span className="font-black text-amber-400">{sourcePlayer.full_name}</span>
           </p>
@@ -556,7 +556,7 @@ function SwapSheet({
                 key={player.id}
                 onClick={() => onSwap(player.id)}
                 disabled={loading}
-                className="flex w-full items-center gap-3 rounded-2xl bg-slate-700/60 px-4 py-3.5 text-start transition-all active:scale-[0.98] active:bg-slate-600 disabled:opacity-50"
+                className="flex w-full items-center gap-3 rounded-xl bg-zinc-800/60 px-4 py-3.5 text-start transition-all active:scale-[0.98] active:bg-zinc-700 disabled:opacity-50"
               >
                 {team?.color && (
                   <span
@@ -566,12 +566,12 @@ function SwapSheet({
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-white">{player.full_name}</p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-zinc-400">
                     {team?.name} · {player.position}
                   </p>
                 </div>
                 <svg
-                  className="h-4 w-4 shrink-0 text-slate-500 rtl:rotate-180"
+                  className="h-4 w-4 shrink-0 text-zinc-500 rtl:rotate-180"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -585,14 +585,14 @@ function SwapSheet({
           })}
 
           {options.length === 0 && (
-            <p className="py-4 text-center text-sm text-slate-500">{t('noSwapOptions')}</p>
+            <p className="py-4 text-center text-sm text-zinc-500">{t('noSwapOptions')}</p>
           )}
         </div>
 
-        <div className="border-t border-slate-700/60 px-5 py-4">
+        <div className="border-t border-zinc-800/60 px-5 py-4">
           <button
             onClick={onCancel}
-            className="w-full rounded-2xl py-3.5 text-sm font-semibold text-slate-400 transition-colors hover:bg-slate-700 hover:text-slate-200 active:bg-slate-700"
+            className="w-full rounded-xl py-3.5 text-sm font-semibold text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 active:bg-zinc-800"
           >
             {tCommon('cancel')}
           </button>
