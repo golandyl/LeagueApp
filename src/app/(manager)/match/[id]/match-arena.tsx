@@ -29,16 +29,19 @@ interface RecordedGoal {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 interface Props {
-  match:       Match
-  league:      League
-  homeTeam:    Team
-  awayTeam:    Team
-  homePlayers: Player[]
-  awayPlayers: Player[]
+  match:            Match
+  league:           League
+  homeTeam:         Team
+  awayTeam:         Team
+  homePlayers:      Player[]
+  awayPlayers:      Player[]
+  tournamentFormat: string
 }
 
-export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awayPlayers }: Props) {
+export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awayPlayers, tournamentFormat }: Props) {
   const supabase = createClient()
+
+  const isWinnerContinues = tournamentFormat === 'winner_continues'
 
   // ── DB-derived state ──────────────────────────────────────────────────────────
   const [matchStatus, setMatchStatus] = useState<MatchStatus>(
@@ -58,9 +61,11 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
   )
 
   // ── UI-only state ─────────────────────────────────────────────────────────────
-  const [showGoalModal, setShowGoalModal] = useState(false)
-  const [endReason,     setEndReason]     = useState<EndReason | null>(null)
-  const [saving,        setSaving]        = useState(false)
+  const [showGoalModal,    setShowGoalModal]    = useState(false)
+  const [endReason,        setEndReason]        = useState<EndReason | null>(null)
+  const [saving,           setSaving]           = useState(false)
+  const [nextMatchId,      setNextMatchId]      = useState<string | null>(null)
+  const [nextMatchLoading, setNextMatchLoading] = useState(false)
 
   // ── Timer ─────────────────────────────────────────────────────────────────────
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -169,6 +174,28 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
     })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match.id])
+
+  // ── Next scheduled match query ────────────────────────────────────────────────
+  useEffect(() => {
+    if (matchStatus !== 'ended' || !match.tournament_id) return
+    setNextMatchLoading(true)
+    void (async () => {
+      try {
+        const { data } = await supabase
+          .from('matches')
+          .select('id')
+          .eq('tournament_id', match.tournament_id!)
+          .eq('status', 'scheduled')
+          .order('match_date', { ascending: true })
+          .limit(1)
+          .maybeSingle()
+        setNextMatchId(data?.id ?? null)
+      } finally {
+        setNextMatchLoading(false)
+      }
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchStatus])
 
   // ── Realtime ──────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -314,8 +341,30 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
       vc = 'PENALTIES'; finalAway = awayScore + 1
     }
 
+    let wcWinnerId: string | null = null
+    if (isWinnerContinues) {
+      if (decision === 'wc_keep_home' || decision === 'penalties_home') wcWinnerId = homeTeam.id
+      else if (decision === 'wc_keep_away' || decision === 'penalties_away') wcWinnerId = awayTeam.id
+      else if (finalHome > finalAway) wcWinnerId = homeTeam.id
+      else if (finalAway > finalHome) wcWinnerId = awayTeam.id
+    }
+
     setSaving(true)
     try {
+      if (wcWinnerId && match.tournament_id) {
+        setNextMatchLoading(true)
+        try {
+          const { data: nextId } = await supabase.rpc('advance_wc_tournament', {
+            p_winner_id:     wcWinnerId,
+            p_tournament_id: match.tournament_id,
+            p_league_id:     match.league_id,
+          })
+          setNextMatchId(nextId)
+        } finally {
+          setNextMatchLoading(false)
+        }
+      }
+
       await supabase.from('matches').update({
         status:            'completed',
         home_score:        finalHome,
@@ -354,6 +403,9 @@ export function MatchArena({ match, league, homeTeam, awayTeam, homePlayers, awa
         homePlayers={homePlayers}
         awayPlayers={awayPlayers}
         victoryCondition={finalVC}
+        leagueId={match.league_id}
+        nextMatchId={nextMatchId}
+        nextMatchLoading={nextMatchLoading}
       />
     )
   }
@@ -529,6 +581,7 @@ function PreMatch({
 function FinalScreen({
   homeTeam, awayTeam, homeScore, awayScore, goals,
   homePlayers, awayPlayers, victoryCondition,
+  leagueId, nextMatchId, nextMatchLoading,
 }: {
   homeTeam:         Team
   awayTeam:         Team
@@ -538,6 +591,9 @@ function FinalScreen({
   homePlayers:      Player[]
   awayPlayers:      Player[]
   victoryCondition: Enums<'victory_condition'> | null
+  leagueId:         string
+  nextMatchId:      string | null
+  nextMatchLoading: boolean
 }) {
   const vcLabel =
     victoryCondition === 'OVERTIME'  ? 'After Extra Time' :
@@ -559,6 +615,24 @@ function FinalScreen({
 
       {vcLabel && (
         <p className="text-center text-sm font-semibold text-amber-400">{vcLabel}</p>
+      )}
+
+      {nextMatchLoading ? (
+        <p className="text-center text-sm text-zinc-500">Loading next match…</p>
+      ) : nextMatchId ? (
+        <Link
+          href={`/match/${nextMatchId}`}
+          className="block w-full rounded-xl bg-emerald-600 py-5 text-center text-xl font-black text-white transition-all active:scale-[0.97] active:bg-emerald-700"
+        >
+          Next Game →
+        </Link>
+      ) : (
+        <Link
+          href={`/league/${leagueId}`}
+          className="block w-full rounded-xl bg-zinc-700 py-5 text-center text-xl font-black text-white transition-all active:scale-[0.97] active:bg-zinc-600"
+        >
+          End Tournament
+        </Link>
       )}
 
       {goals.length > 0 ? (

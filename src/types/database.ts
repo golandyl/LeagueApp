@@ -519,8 +519,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_league_manager: { Args: { p_league_id: string }; Returns: boolean }
-      league_is_public: { Args: { p_league_id: string }; Returns: boolean }
+      is_league_manager:      { Args: { p_league_id: string }; Returns: boolean }
+      league_is_public:       { Args: { p_league_id: string }; Returns: boolean }
+      advance_wc_tournament:  { Args: { p_winner_id: string; p_tournament_id: string; p_league_id: string }; Returns: string | null }
     }
     Enums: {
       draft_status: "pending" | "active" | "completed"

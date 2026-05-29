@@ -69,8 +69,8 @@ export function MatchArena({
   const [showGoalModal, setShowGoalModal] = useState(false)
   const [endReason,     setEndReason]     = useState<EndReason | null>(null)
   const [saving,        setSaving]        = useState(false)
-  const [nextMatchId,   setNextMatchId]   = useState<string | null>(null)
-  const [wcLoading,     setWcLoading]     = useState(false)
+  const [nextMatchId,      setNextMatchId]      = useState<string | null>(null)
+  const [nextMatchLoading, setNextMatchLoading] = useState(false)
 
   // ── Timer ─────────────────────────────────────────────────────────────────────
   // Live: recalculate Date.now() - played_at every second. Refresh-proof and
@@ -186,6 +186,29 @@ export function MatchArena({
     })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match.id])
+
+  // ── Next scheduled match query (runs when match ends) ────────────────────────
+  useEffect(() => {
+    if (matchStatus !== 'ended' || !match.tournament_id) return
+    if (nextMatchId !== null) return  // WC fast path already set it
+    setNextMatchLoading(true)
+    void (async () => {
+      try {
+        const { data } = await supabase
+          .from('matches')
+          .select('id')
+          .eq('tournament_id', match.tournament_id!)
+          .eq('status', 'scheduled')
+          .order('match_date', { ascending: true })
+          .limit(1)
+          .maybeSingle()
+        setNextMatchId(prev => prev ?? data?.id ?? null)
+      } finally {
+        setNextMatchLoading(false)
+      }
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchStatus])
 
   // ── Realtime: blindly overwrite state from DB payloads ───────────────────────
   useEffect(() => {
@@ -312,58 +335,6 @@ export function MatchArena({
     void handleEndDecision(side === 'home' ? 'penalties_home' : 'penalties_away')
   }
 
-  // ── Winner Continues queue engine ─────────────────────────────────────────────
-  async function createNextWCMatch(winnerId: string): Promise<string | null> {
-    const [{ data: allTeams }, { data: completedMatches }] = await Promise.all([
-      supabase.from('teams').select('id').eq('tournament_id', match.tournament_id),
-      supabase.from('matches')
-        .select('home_team_id, away_team_id, played_at')
-        .eq('tournament_id', match.tournament_id)
-        .eq('status', 'completed'),
-    ])
-
-    if (!allTeams || allTeams.length < 2) return null
-
-    const lastPlayedMap = new Map<string, string | null>()
-    for (const team of allTeams) lastPlayedMap.set(team.id, null)
-    for (const m of completedMatches ?? []) {
-      if (!m.played_at) continue
-      const hPrev = lastPlayedMap.get(m.home_team_id)
-      if (!hPrev || m.played_at > hPrev) lastPlayedMap.set(m.home_team_id, m.played_at)
-      const aPrev = lastPlayedMap.get(m.away_team_id)
-      if (!aPrev || m.played_at > aPrev) lastPlayedMap.set(m.away_team_id, m.played_at)
-    }
-
-    const queue = allTeams
-      .filter(t => t.id !== winnerId)
-      .sort((a, b) => {
-        const pa = lastPlayedMap.get(a.id)
-        const pb = lastPlayedMap.get(b.id)
-        if (!pa && !pb) return 0
-        if (!pa) return -1
-        if (!pb) return 1
-        return pa < pb ? -1 : 1
-      })
-
-    const nextOpponent = queue[0]
-    if (!nextOpponent) return null
-
-    const { data: newMatch } = await supabase
-      .from('matches')
-      .insert({
-        league_id:     match.league_id,
-        tournament_id: match.tournament_id,
-        home_team_id:  winnerId,
-        away_team_id:  nextOpponent.id,
-        status:        'scheduled',
-        match_date:    new Date().toISOString(),
-      })
-      .select('id')
-      .single()
-
-    return newMatch?.id ?? null
-  }
-
   // ── End match ─────────────────────────────────────────────────────────────────
   async function handleEndDecision(decision: EndDecision) {
     if (decision === 'enter_ot') {
@@ -399,6 +370,24 @@ export function MatchArena({
 
     setSaving(true)
     try {
+      // WC: create next match BEFORE setting matchStatus='ended'.
+      // This ensures nextMatchId is already populated when the useEffect fires,
+      // preventing the race where the SELECT returns empty and falls back to
+      // "End Tournament" while the INSERT is still in flight.
+      if (wcWinnerId && match.tournament_id) {
+        setNextMatchLoading(true)
+        try {
+          const { data: nextId } = await supabase.rpc('advance_wc_tournament', {
+            p_winner_id:     wcWinnerId,
+            p_tournament_id: match.tournament_id,
+            p_league_id:     match.league_id,
+          })
+          setNextMatchId(nextId)
+        } finally {
+          setNextMatchLoading(false)
+        }
+      }
+
       await supabase.from('matches').update({
         status:            'completed',
         home_score:        finalHome,
@@ -409,16 +398,6 @@ export function MatchArena({
       setMatchStatus('ended')
     } finally {
       setSaving(false)
-    }
-
-    if (wcWinnerId) {
-      setWcLoading(true)
-      try {
-        const nextId = await createNextWCMatch(wcWinnerId)
-        setNextMatchId(nextId)
-      } finally {
-        setWcLoading(false)
-      }
     }
   }
 
@@ -447,8 +426,9 @@ export function MatchArena({
         homePlayers={homePlayers}
         awayPlayers={awayPlayers}
         victoryCondition={finalVC}
+        leagueId={match.league_id}
         nextMatchId={nextMatchId}
-        wcLoading={wcLoading}
+        nextMatchLoading={nextMatchLoading}
       />
     )
   }
@@ -479,8 +459,8 @@ export function MatchArena({
         phase={phase === 'penalties' ? 'overtime' : phase}
         running={timerRunning}
         isStoppageTime={isStoppageTime}
-        onToggle={isManager && !autoTimerStopped ? () => { void handleTogglePause() } : undefined}
-        onWhistle={autoTimerStopped || !timerRunning ? undefined : (isManager ? handleWhistle : undefined)}
+        onToggle={!autoTimerStopped ? () => { void handleTogglePause() } : undefined}
+        onWhistle={autoTimerStopped || !timerRunning ? undefined : handleWhistle}
       />
 
       {autoTimerStopped ? (
@@ -549,7 +529,7 @@ export function MatchArena({
         />
       )}
 
-      {endReason && isManager && (
+      {endReason && (
         <EndMatchModal
           reason={endReason}
           homeTeam={homeTeam}
@@ -627,7 +607,7 @@ function PreMatch({
 function FinalScreen({
   homeTeam, awayTeam, homeScore, awayScore, goals,
   homePlayers, awayPlayers, victoryCondition,
-  nextMatchId, wcLoading,
+  leagueId, nextMatchId, nextMatchLoading,
 }: {
   homeTeam:         Team
   awayTeam:         Team
@@ -637,8 +617,9 @@ function FinalScreen({
   homePlayers:      Player[]
   awayPlayers:      Player[]
   victoryCondition: Enums<'victory_condition'> | null
+  leagueId:         string
   nextMatchId:      string | null
-  wcLoading:        boolean
+  nextMatchLoading: boolean
 }) {
   const t = useTranslations('match')
 
@@ -664,22 +645,22 @@ function FinalScreen({
         <p className="text-center text-sm font-semibold text-amber-400">{vcLabel}</p>
       )}
 
-      {(wcLoading || nextMatchId) && (
-        <div className="rounded-xl bg-zinc-900 p-5">
-          <p className="mb-3 text-xs font-bold uppercase tracking-tight text-zinc-400">
-            {t('wcNextMatchReady')}
-          </p>
-          {wcLoading ? (
-            <p className="text-sm text-zinc-500">{t('wcCreatingNext')}</p>
-          ) : nextMatchId ? (
-            <Link
-              href={`/match/${nextMatchId}`}
-              className="block w-full rounded-xl bg-emerald-600 py-5 text-center text-base font-black text-white transition-all active:scale-[0.97] active:bg-emerald-700"
-            >
-              {t('wcStartNext')}
-            </Link>
-          ) : null}
-        </div>
+      {nextMatchLoading ? (
+        <p className="text-center text-sm text-zinc-500">{t('wcCreatingNext')}</p>
+      ) : nextMatchId ? (
+        <Link
+          href={`/match/${nextMatchId}`}
+          className="block w-full rounded-xl bg-emerald-600 py-5 text-center text-xl font-black text-white transition-all active:scale-[0.97] active:bg-emerald-700"
+        >
+          {t('nextGame')} →
+        </Link>
+      ) : (
+        <Link
+          href={`/league/${leagueId}`}
+          className="block w-full rounded-xl bg-zinc-700 py-5 text-center text-xl font-black text-white transition-all active:scale-[0.97] active:bg-zinc-600"
+        >
+          {t('endTournament')}
+        </Link>
       )}
 
       {goals.length > 0 ? (

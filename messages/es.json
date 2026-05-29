@@ -214,7 +214,9 @@
     "endMatch": "Finalizar partido",
     "penaltyDecisive": "Penalti decisivo",
     "penaltyWhichTeam": "¿Qué equipo marcó el penalti?",
-    "backToHome": "Volver al inicio"
+    "backToHome": "Volver al inicio",
+    "nextGame": "Siguiente partido",
+    "endTournament": "Fin del torneo"
   },
   "editMatch": {
     "title": "Editar resultado del partido",

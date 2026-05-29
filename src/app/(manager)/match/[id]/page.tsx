@@ -23,12 +23,14 @@ export default async function MatchPage({ params }: Props) {
 
   const [
     { data: league },
+    { data: tournament },
     { data: homeTeam },
     { data: awayTeam },
     { data: homeTpRows },
     { data: awayTpRows },
   ] = await Promise.all([
     supabase.from('leagues').select('*').eq('id', match.league_id).single(),
+    supabase.from('tournaments').select('id, format').eq('id', match.tournament_id).single(),
     supabase.from('teams').select('*').eq('id', match.home_team_id).single(),
     supabase.from('teams').select('*').eq('id', match.away_team_id).single(),
     supabase.from('team_players').select('player_id').eq('team_id', match.home_team_id).eq('tournament_id', match.tournament_id),
@@ -57,6 +59,7 @@ export default async function MatchPage({ params }: Props) {
       awayTeam={awayTeam}
       homePlayers={homePlayers ?? []}
       awayPlayers={awayPlayers ?? []}
+      tournamentFormat={tournament?.format ?? 'round_robin'}
     />
   )
 }

@@ -214,7 +214,9 @@
     "endMatch": "Завершить матч",
     "penaltyDecisive": "Решающий пенальти",
     "penaltyWhichTeam": "Какая команда забила пенальти?",
-    "backToHome": "Вернуться на главную"
+    "backToHome": "Вернуться на главную",
+    "nextGame": "Следующий матч",
+    "endTournament": "Конец турнира"
   },
   "editMatch": {
     "title": "Редактировать результат матча",

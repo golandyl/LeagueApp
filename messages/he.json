@@ -214,7 +214,9 @@
     "endMatch": "סיום משחק",
     "penaltyDecisive": "פנדל הכרעה",
     "penaltyWhichTeam": "איזו קבוצה הבקיעה פנדל?",
-    "backToHome": "חזרה לדף הבית"
+    "backToHome": "חזרה לדף הבית",
+    "nextGame": "המשחק הבא",
+    "endTournament": "סיום הטורניר"
   },
   "editMatch": {
     "title": "עריכת תוצאת משחק",
