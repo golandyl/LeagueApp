@@ -376,9 +376,11 @@ export function MatchArena({
       // "End Tournament" while the INSERT is still in flight.
       if (wcWinnerId && match.tournament_id) {
         setNextMatchLoading(true)
+        const wcLoserId = wcWinnerId === homeTeam.id ? awayTeam.id : homeTeam.id
         try {
           const { data: nextId } = await supabase.rpc('advance_wc_tournament', {
             p_winner_id:     wcWinnerId,
+            p_loser_id:      wcLoserId,
             p_tournament_id: match.tournament_id,
             p_league_id:     match.league_id,
           })

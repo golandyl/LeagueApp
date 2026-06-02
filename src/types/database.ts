@@ -475,6 +475,7 @@ export type Database = {
           start_date:    string | null
           status:        Database["public"]["Enums"]["tournament_status"]
           updated_at:    string
+          wc_queue:      string[]
         }
         Insert: {
           created_at?:   string
@@ -489,6 +490,7 @@ export type Database = {
           start_date?:   string | null
           status?:       Database["public"]["Enums"]["tournament_status"]
           updated_at?:   string
+          wc_queue?:     string[]
         }
         Update: {
           created_at?:   string
@@ -503,6 +505,7 @@ export type Database = {
           start_date?:   string | null
           status?:       Database["public"]["Enums"]["tournament_status"]
           updated_at?:   string
+          wc_queue?:     string[]
         }
         Relationships: [
           {
@@ -521,7 +524,7 @@ export type Database = {
     Functions: {
       is_league_manager:      { Args: { p_league_id: string }; Returns: boolean }
       league_is_public:       { Args: { p_league_id: string }; Returns: boolean }
-      advance_wc_tournament:  { Args: { p_winner_id: string; p_tournament_id: string; p_league_id: string }; Returns: string | null }
+      advance_wc_tournament:  { Args: { p_winner_id: string; p_loser_id: string; p_tournament_id: string; p_league_id: string }; Returns: string | null }
     }
     Enums: {
       draft_status: "pending" | "active" | "completed"

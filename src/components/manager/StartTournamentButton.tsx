@@ -273,6 +273,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
         status:        'scheduled'
         match_date:    string
       }[] = []
+      let wcInitialQueue: string[] = []
 
       if (format === 'round_robin') {
         for (let i = 0; i < insertedTeams.length; i++) {
@@ -291,6 +292,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
           home_team_id: shuffled[0].id, away_team_id: shuffled[1].id,
           status: 'scheduled', match_date: now,
         })
+        wcInitialQueue = shuffled.slice(2).map(t => t.id)
       } else if (format === 'cup') {
         const n = insertedTeams.length
         for (let i = 0; i < Math.floor(n / 2); i++) {
@@ -315,6 +317,18 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
         }
         insertedMatches = mData ?? []
         console.info('[StartTournamentButton] Step 5 OK – matches', insertedMatches.map(m => m.id))
+      }
+
+      if (format === 'winner_continues') {
+        console.info('[StartTournamentButton] Step 5b: persisting wc_queue', wcInitialQueue)
+        const { error: queueErr } = await supabase
+          .from('tournaments')
+          .update({ wc_queue: wcInitialQueue })
+          .eq('id', tournament.id)
+        if (queueErr) {
+          console.error('[StartTournamentButton] Step 5b FAILED', queueErr)
+          throw new Error(queueErr.message)
+        }
       }
 
       setOpen(false)
