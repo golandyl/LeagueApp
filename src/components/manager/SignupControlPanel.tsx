@@ -39,6 +39,7 @@ export function SignupControlPanel({
   const [clearing,        setClearing]        = useState(false)
   const [copied,          setCopied]          = useState(false)
   const [removing,        setRemoving]        = useState<string | null>(null)
+  const [declining,       setDeclining]       = useState<string | null>(null)
   const [pendingApproval, setPendingApproval] = useState<Signup | null>(null)
   const [signups,         setSignups]         = useState<Signup[]>([])
 
@@ -170,6 +171,16 @@ export function SignupControlPanel({
     }
 
     setRemoving(null)
+  }
+
+  async function declineRequest(signup: Signup) {
+    setDeclining(signup.id)
+    const { error } = await supabase
+      .from('tournament_signups')
+      .delete()
+      .eq('id', signup.id)
+    if (error) console.error('Failed to decline request:', error)
+    setDeclining(null)
   }
 
   async function clearSignups() {
@@ -436,6 +447,14 @@ export function SignupControlPanel({
                 >
                   {t('approveAndAdd')}
                 </button>
+                <button
+                  onClick={() => declineRequest(req)}
+                  disabled={declining === req.id}
+                  aria-label={t('declineRequest')}
+                  className="shrink-0 rounded-full p-1.5 text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-red-400 active:scale-90 disabled:opacity-40"
+                >
+                  {declining === req.id ? <MiniSpinner /> : <TrashIcon />}
+                </button>
               </div>
             ))}
           </div>
@@ -696,6 +715,21 @@ function XMarkIcon() {
         d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
         clipRule="evenodd"
       />
+    </svg>
+  )
+}
+
+function TrashIcon() {
+  return (
+    <svg
+      className="h-3.5 w-3.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
     </svg>
   )
 }

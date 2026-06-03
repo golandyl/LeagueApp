@@ -119,7 +119,11 @@
     "editPlayer": "Редактировать игрока",
     "updatePlayer": "Обновить игрока",
     "vipLabel": "VIP",
-    "vipToggle": "VIP-игрок"
+    "vipToggle": "VIP-игрок",
+    "deletePlayer": "Удалить игрока",
+    "deleteConfirm": "Навсегда удалить {name}? Это действие нельзя отменить.",
+    "deleteError": "Невозможно удалить игрока с историей матчей. Отредактируйте имя вместо этого.",
+    "deleting": "Удаление…"
   },
   "tournament": {
     "startNew": "Начать новый турнирный день",
@@ -364,6 +368,7 @@
     "liveVipLabel": "VIP-регистрация активна",
     "removeSignup": "Удалить",
     "createAndAdd": "Создать и добавить в список",
-    "requestedAs": "Запрошен как"
+    "requestedAs": "Запрошен как",
+    "declineRequest": "Отклонить"
   }
 }

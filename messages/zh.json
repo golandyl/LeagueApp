@@ -119,7 +119,11 @@
     "editPlayer": "编辑球员",
     "updatePlayer": "更新球员",
     "vipLabel": "VIP",
-    "vipToggle": "VIP球员"
+    "vipToggle": "VIP球员",
+    "deletePlayer": "删除球员",
+    "deleteConfirm": "永久删除 {name}？此操作无法撤销。",
+    "deleteError": "无法删除有比赛记录的球员，请改为编辑其姓名。",
+    "deleting": "删除中…"
   },
   "tournament": {
     "startNew": "开始新的赛事日",
@@ -364,6 +368,7 @@
     "liveVipLabel": "VIP报名进行中",
     "removeSignup": "移除",
     "createAndAdd": "创建并添加到列表",
-    "requestedAs": "请求名称"
+    "requestedAs": "请求名称",
+    "declineRequest": "拒绝"
   }
 }

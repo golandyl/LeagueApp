@@ -119,7 +119,11 @@
     "editPlayer": "تعديل اللاعب",
     "updatePlayer": "تحديث اللاعب",
     "vipLabel": "VIP",
-    "vipToggle": "لاعب VIP"
+    "vipToggle": "لاعب VIP",
+    "deletePlayer": "حذف اللاعب",
+    "deleteConfirm": "حذف {name} نهائيًا؟ لا يمكن التراجع عن هذا.",
+    "deleteError": "لا يمكن حذف لاعب لديه سجل مباريات. يرجى تعديل اسمه بدلاً.",
+    "deleting": "جارٍ الحذف…"
   },
   "tournament": {
     "startNew": "بدء يوم بطولة جديد",
@@ -364,6 +368,7 @@
     "liveVipLabel": "تسجيل VIP نشط",
     "removeSignup": "إزالة",
     "createAndAdd": "أنشئ وأضف للقائمة",
-    "requestedAs": "طلب باسم"
+    "requestedAs": "طلب باسم",
+    "declineRequest": "رفض"
   }
 }

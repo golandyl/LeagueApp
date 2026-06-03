@@ -13,12 +13,13 @@ type Position = typeof POSITIONS[number]
 type Stamina  = typeof STAMINAS[number]
 
 interface Props {
-  player:  Player
-  onSave:  (updated: Player) => void
-  onClose: () => void
+  player:   Player
+  onSave:   (updated: Player) => void
+  onDelete: (id: string) => void
+  onClose:  () => void
 }
 
-export function EditPlayerModal({ player, onSave, onClose }: Props) {
+export function EditPlayerModal({ player, onSave, onDelete, onClose }: Props) {
   const t       = useTranslations('players')
   const tCommon = useTranslations('common')
 
@@ -26,9 +27,11 @@ export function EditPlayerModal({ player, onSave, onClose }: Props) {
   const [rating,   setRating]   = useState(player.rating)
   const [position, setPosition] = useState<Position>(player.position as Position)
   const [stamina,  setStamina]  = useState<Stamina>(player.stamina as Stamina)
-  const [isVip,    setIsVip]    = useState(player.is_vip ?? false)
-  const [saving,   setSaving]   = useState(false)
-  const [error,    setError]    = useState<string | null>(null)
+  const [isVip,        setIsVip]        = useState(player.is_vip ?? false)
+  const [saving,       setSaving]       = useState(false)
+  const [deleting,     setDeleting]     = useState(false)
+  const [error,        setError]        = useState<string | null>(null)
+  const [deleteError,  setDeleteError]  = useState<string | null>(null)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
@@ -54,6 +57,28 @@ export function EditPlayerModal({ player, onSave, onClose }: Props) {
     }
 
     onSave({ ...player, full_name: name.trim(), rating, position, stamina, is_vip: isVip })
+  }
+
+  async function handleDelete() {
+    if (!window.confirm(t('deleteConfirm', { name: player.full_name }))) return
+    setDeleteError(null)
+    setDeleting(true)
+
+    const supabase = createClient()
+    const { error: deleteErr } = await supabase
+      .from('players')
+      .delete()
+      .eq('id', player.id)
+
+    setDeleting(false)
+
+    if (deleteErr) {
+      const isFkViolation = (deleteErr as { code?: string }).code === '23503'
+      setDeleteError(isFkViolation ? t('deleteError') : deleteErr.message)
+      return
+    }
+
+    onDelete(player.id)
   }
 
   return (
@@ -162,10 +187,27 @@ export function EditPlayerModal({ player, onSave, onClose }: Props) {
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || deleting}
               className="flex-1 rounded-xl bg-sky-600 py-3 text-sm font-black text-white transition-all active:bg-sky-700 disabled:opacity-60"
             >
               {saving ? tCommon('saving') : t('updatePlayer')}
+            </button>
+          </div>
+
+          {/* Destructive zone */}
+          <div className="border-t border-slate-700/60 pt-1">
+            {deleteError && (
+              <p className="mb-3 rounded-xl bg-red-900/40 px-4 py-2 text-sm text-red-300">
+                {deleteError}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={saving || deleting}
+              className="w-full rounded-xl border border-red-900/40 py-2.5 text-sm font-black text-red-500/80 transition-all hover:border-red-700/60 hover:bg-red-950/30 hover:text-red-400 active:scale-[0.98] disabled:opacity-40"
+            >
+              {deleting ? t('deleting') : t('deletePlayer')}
             </button>
           </div>
         </form>

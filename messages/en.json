@@ -119,7 +119,11 @@
     "editPlayer": "Edit Player",
     "updatePlayer": "Update Player",
     "vipLabel": "VIP",
-    "vipToggle": "VIP Player"
+    "vipToggle": "VIP Player",
+    "deletePlayer": "Delete Player",
+    "deleteConfirm": "Permanently delete {name}? This cannot be undone.",
+    "deleteError": "Cannot delete a player with existing match history. Please edit their name instead.",
+    "deleting": "Deleting…"
   },
   "tournament": {
     "startNew": "Start New Tournament Day",
@@ -338,7 +342,8 @@
     "liveVipLabel": "VIP Registration Active",
     "removeSignup": "Remove",
     "createAndAdd": "Create & Add to List",
-    "requestedAs": "Requested as"
+    "requestedAs": "Requested as",
+    "declineRequest": "Decline"
   },
   "standings": {
     "noTournaments": "No tournaments yet.",

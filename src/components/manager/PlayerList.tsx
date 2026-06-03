@@ -37,6 +37,11 @@ export function PlayerList({ players: initialPlayers, isManager = false }: Props
     setEditing(null)
   }
 
+  function handleDelete(id: string) {
+    setPlayers(prev => prev.filter(p => p.id !== id))
+    setEditing(null)
+  }
+
   return (
     <>
       <div className="mb-4 divide-y divide-zinc-800/60 rounded-xl bg-zinc-900 overflow-hidden">
@@ -92,6 +97,7 @@ export function PlayerList({ players: initialPlayers, isManager = false }: Props
         <EditPlayerModal
           player={editing}
           onSave={handleSave}
+          onDelete={handleDelete}
           onClose={() => setEditing(null)}
         />
       )}

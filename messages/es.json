@@ -119,7 +119,11 @@
     "editPlayer": "Editar jugador",
     "updatePlayer": "Actualizar jugador",
     "vipLabel": "VIP",
-    "vipToggle": "Jugador VIP"
+    "vipToggle": "Jugador VIP",
+    "deletePlayer": "Eliminar jugador",
+    "deleteConfirm": "¿Eliminar permanentemente a {name}? Esta acción no se puede deshacer.",
+    "deleteError": "No se puede eliminar un jugador con historial de partidos. Edita su nombre en su lugar.",
+    "deleting": "Eliminando…"
   },
   "tournament": {
     "startNew": "Iniciar nuevo día de torneo",
@@ -364,6 +368,7 @@
     "liveVipLabel": "Registro VIP activo",
     "removeSignup": "Eliminar",
     "createAndAdd": "Crear y agregar a la lista",
-    "requestedAs": "Solicitado como"
+    "requestedAs": "Solicitado como",
+    "declineRequest": "Rechazar"
   }
 }

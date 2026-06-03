@@ -119,7 +119,11 @@
     "editPlayer": "ערוך שחקן",
     "updatePlayer": "עדכן שחקן",
     "vipLabel": "VIP",
-    "vipToggle": "שחקן VIP"
+    "vipToggle": "שחקן VIP",
+    "deletePlayer": "מחק שחקן",
+    "deleteConfirm": "למחוק לצמיתות את {name}? לא ניתן לבטל פעולה זו.",
+    "deleteError": "לא ניתן למחוק שחקן עם היסטוריית משחקים. ערוך את שמו במקום.",
+    "deleting": "מוחק…"
   },
   "tournament": {
     "startNew": "התחל יום טורניר חדש",
@@ -364,6 +368,7 @@
     "liveVipLabel": "הרשמת VIP פעילה",
     "removeSignup": "הסר",
     "createAndAdd": "צור והוסף לרשימה",
-    "requestedAs": "ביקש בשם"
+    "requestedAs": "ביקש בשם",
+    "declineRequest": "דחה"
   }
 }
