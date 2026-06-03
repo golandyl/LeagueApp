@@ -335,7 +335,10 @@
     "openVipSignups": "Open VIP Signup",
     "openRegularSignups": "Open Regular Signup",
     "statusVipOnly": "VIP ONLY",
-    "liveVipLabel": "VIP Registration Active"
+    "liveVipLabel": "VIP Registration Active",
+    "removeSignup": "Remove",
+    "createAndAdd": "Create & Add to List",
+    "requestedAs": "Requested as"
   },
   "standings": {
     "noTournaments": "No tournaments yet.",

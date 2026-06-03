@@ -361,6 +361,9 @@
     "openVipSignups": "开放VIP报名",
     "openRegularSignups": "开放全员报名",
     "statusVipOnly": "仅VIP",
-    "liveVipLabel": "VIP报名进行中"
+    "liveVipLabel": "VIP报名进行中",
+    "removeSignup": "移除",
+    "createAndAdd": "创建并添加到列表",
+    "requestedAs": "请求名称"
   }
 }

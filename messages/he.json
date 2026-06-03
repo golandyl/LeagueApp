@@ -361,6 +361,9 @@
     "openVipSignups": "פתח הרשמת VIP",
     "openRegularSignups": "פתח הרשמה לכולם",
     "statusVipOnly": "VIP בלבד",
-    "liveVipLabel": "הרשמת VIP פעילה"
+    "liveVipLabel": "הרשמת VIP פעילה",
+    "removeSignup": "הסר",
+    "createAndAdd": "צור והוסף לרשימה",
+    "requestedAs": "ביקש בשם"
   }
 }

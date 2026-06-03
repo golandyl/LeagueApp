@@ -361,6 +361,9 @@
     "openVipSignups": "Открыть VIP-запись",
     "openRegularSignups": "Открыть запись для всех",
     "statusVipOnly": "ТОЛЬКО VIP",
-    "liveVipLabel": "VIP-регистрация активна"
+    "liveVipLabel": "VIP-регистрация активна",
+    "removeSignup": "Удалить",
+    "createAndAdd": "Создать и добавить в список",
+    "requestedAs": "Запрошен как"
   }
 }

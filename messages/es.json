@@ -361,6 +361,9 @@
     "openVipSignups": "Abrir inscripción VIP",
     "openRegularSignups": "Abrir inscripción para todos",
     "statusVipOnly": "SOLO VIP",
-    "liveVipLabel": "Registro VIP activo"
+    "liveVipLabel": "Registro VIP activo",
+    "removeSignup": "Eliminar",
+    "createAndAdd": "Crear y agregar a la lista",
+    "requestedAs": "Solicitado como"
   }
 }
