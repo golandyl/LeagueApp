@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
 
 type Signup    = Tables<'tournament_signups'>
-type PlayerRef = { id: string; full_name: string }
+type PlayerRef = { id: string; full_name: string; is_vip: boolean }
 
 interface Props {
   leagueId:     string
@@ -140,10 +140,10 @@ export function TournamentSignup({
     [signups],
   )
 
-  const availablePlayers = useMemo(
-    () => players.filter(p => !signedUpPlayerIds.has(p.id)),
-    [players, signedUpPlayerIds],
-  )
+  const availablePlayers = useMemo(() => {
+    const notSignedUp = players.filter(p => !signedUpPlayerIds.has(p.id))
+    return liveStatus === 'vip_only' ? notSignedUp.filter(p => p.is_vip) : notSignedUp
+  }, [players, signedUpPlayerIds, liveStatus])
 
   async function handleSignUp(e: FormEvent) {
     e.preventDefault()
@@ -287,6 +287,19 @@ export function TournamentSignup({
         </span>
       </div>
 
+      {/* VIP-only phase notice */}
+      {liveStatus === 'vip_only' && (
+        <div className="flex items-center gap-2.5 rounded-lg bg-amber-950/40 px-3 py-2.5 ring-1 ring-amber-800/40">
+          <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber-400" aria-hidden="true" />
+          <div>
+            <p className="text-xs font-black uppercase tracking-tight text-amber-400">
+              {t('vipOnly')}
+            </p>
+            <p className="text-[11px] text-amber-600/80">{t('vipOnlyDesc')}</p>
+          </div>
+        </div>
+      )}
+
       {/* Form / confirmation */}
       {signedUp ? (
         <p className="rounded-lg bg-emerald-950/40 px-4 py-3 text-sm font-semibold text-emerald-400 ring-1 ring-emerald-800/40">
@@ -320,13 +333,15 @@ export function TournamentSignup({
               >
                 {submitting ? t('signingUp') : t('signUpButton')}
               </button>
-              <button
-                type="button"
-                onClick={() => setUnlistedMode(true)}
-                className="w-full text-center text-xs font-semibold text-zinc-600 transition-colors hover:text-zinc-400"
-              >
-                {t('notOnList')}
-              </button>
+              {liveStatus !== 'vip_only' && (
+                <button
+                  type="button"
+                  onClick={() => setUnlistedMode(true)}
+                  className="w-full text-center text-xs font-semibold text-zinc-600 transition-colors hover:text-zinc-400"
+                >
+                  {t('notOnList')}
+                </button>
+              )}
             </>
           ) : (
             <>

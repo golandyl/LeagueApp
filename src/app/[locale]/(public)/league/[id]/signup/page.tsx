@@ -24,7 +24,7 @@ export default async function LeagueSignupPage({ params }: Props) {
   const [{ data: playersData }, { data: tournament }] = await Promise.all([
     supabase
       .from('players')
-      .select('id, full_name')
+      .select('id, full_name, is_vip')
       .eq('league_id', leagueId)
       .eq('is_ghost', false)
       .order('full_name'),

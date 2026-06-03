@@ -99,39 +99,25 @@ export function SignupControlPanel({
 
   // ── Actions ──────────────────────────────────────────────────────────────────
 
-  async function openSignup() {
-    const cap       = Math.max(1, parseInt(capacity, 10) || 16)
-    // Coerce: empty string must never reach a Postgres DATE column
-    const safeDate  = date.trim() || null
-    const prevStat  = status
+  async function openSignup(newStatus: 'vip_only' | 'open') {
+    const cap      = Math.max(1, parseInt(capacity, 10) || 16)
+    const safeDate = date.trim() || null
+    const prevStat = status
     setCapacity(String(cap))
-    setStatus('open')
+    setStatus(newStatus)
     setSaving(true)
 
-    const payload: { signup_status: string; max_capacity: number; signup_date: string | null } = {
-      signup_status: 'open',
-      max_capacity:  cap,
-      signup_date:   safeDate,
-    }
-
-    console.log('Opening signups — payload:', JSON.stringify(payload))
+    const payload = { signup_status: newStatus, max_capacity: cap, signup_date: safeDate }
     const { error } = await supabase.from('leagues').update(payload).eq('id', leagueId)
     if (error) {
-      console.error(
-        'Supabase update failed:',
-        JSON.stringify(error, null, 2),
-        '| message:', (error as { message?: string }).message,
-        '| code:',    (error as { code?: string }).code,
-        '| details:', (error as { details?: string }).details,
-        '| hint:',    (error as { hint?: string }).hint,
-        '| Payload:', payload,
-      )
+      console.error('Supabase update failed:', error, '| Payload:', payload)
       setStatus(prevStat)
     }
     setSaving(false)
   }
 
   async function closeSignup() {
+    const prevStat = status
     setStatus('closed')
     setSaving(true)
     const { error } = await supabase
@@ -139,13 +125,8 @@ export function SignupControlPanel({
       .update({ signup_status: 'closed' })
       .eq('id', leagueId)
     if (error) {
-      console.error(
-        'Supabase close failed:',
-        JSON.stringify(error, null, 2),
-        '| message:', (error as { message?: string }).message,
-        '| code:',    (error as { code?: string }).code,
-      )
-      setStatus('open')
+      console.error('Supabase close failed:', error)
+      setStatus(prevStat)
     }
     setSaving(false)
   }
@@ -216,7 +197,8 @@ export function SignupControlPanel({
   }
 
   // ── Derived ──────────────────────────────────────────────────────────────────
-  const isOpen         = status === 'open'
+  const isOpen         = status === 'open' || status === 'vip_only'
+  const isVipOnly      = status === 'vip_only'
   const cap            = Math.max(1, parseInt(capacity, 10) || 16)
   const mainSignups    = signups.filter(s => !s.is_unlisted_request)
   const activeSignups  = mainSignups.filter(s => s.status === 'active')
@@ -240,9 +222,11 @@ export function SignupControlPanel({
         </h2>
         <span className={[
           'rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-tight',
-          isOpen ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-800 text-zinc-500',
+          status === 'open'     ? 'bg-emerald-500/20 text-emerald-400' :
+          status === 'vip_only' ? 'bg-amber-500/20 text-amber-400' :
+                                  'bg-zinc-800 text-zinc-500',
         ].join(' ')}>
-          {isOpen ? t('statusOpen') : t('statusClosed')}
+          {status === 'open' ? t('statusOpen') : status === 'vip_only' ? t('statusVipOnly') : t('statusClosed')}
         </span>
       </div>
 
@@ -278,13 +262,22 @@ export function SignupControlPanel({
               </div>
             </div>
 
-            <button
-              onClick={openSignup}
-              disabled={saving || clearing}
-              className="w-full rounded-lg bg-emerald-600 py-3 text-sm font-black text-white transition-all hover:bg-emerald-500 active:scale-[0.98] disabled:opacity-50"
-            >
-              {saving ? t('saving') : t('openSignups')}
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => openSignup('vip_only')}
+                disabled={saving || clearing}
+                className="rounded-lg bg-amber-600 py-3 text-sm font-black text-white transition-all hover:bg-amber-500 active:scale-[0.98] disabled:opacity-50"
+              >
+                {saving ? t('saving') : t('openVipSignups')}
+              </button>
+              <button
+                onClick={() => openSignup('open')}
+                disabled={saving || clearing}
+                className="rounded-lg bg-emerald-600 py-3 text-sm font-black text-white transition-all hover:bg-emerald-500 active:scale-[0.98] disabled:opacity-50"
+              >
+                {saving ? t('saving') : t('openRegularSignups')}
+              </button>
+            </div>
 
             <button
               onClick={clearSignups}
@@ -300,11 +293,20 @@ export function SignupControlPanel({
         {isOpen && (
           <>
             {/* Live summary */}
-            <div className="flex items-start gap-3 rounded-lg bg-emerald-950/30 px-4 py-3 ring-1 ring-emerald-900/50">
-              <span className="mt-1 h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-400" aria-hidden="true" />
+            <div className={[
+              'flex items-start gap-3 rounded-lg px-4 py-3 ring-1',
+              isVipOnly ? 'bg-amber-950/30 ring-amber-900/50' : 'bg-emerald-950/30 ring-emerald-900/50',
+            ].join(' ')}>
+              <span className={[
+                'mt-1 h-2 w-2 shrink-0 animate-pulse rounded-full',
+                isVipOnly ? 'bg-amber-400' : 'bg-emerald-400',
+              ].join(' ')} aria-hidden="true" />
               <div>
-                <p className="text-[10px] font-black uppercase tracking-tight text-emerald-500">
-                  {t('liveLabel')}
+                <p className={[
+                  'text-[10px] font-black uppercase tracking-tight',
+                  isVipOnly ? 'text-amber-500' : 'text-emerald-500',
+                ].join(' ')}>
+                  {isVipOnly ? t('liveVipLabel') : t('liveLabel')}
                 </p>
                 <p className="mt-0.5 text-sm font-semibold text-zinc-200">
                   {formattedDate

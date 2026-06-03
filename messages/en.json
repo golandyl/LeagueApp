@@ -117,7 +117,9 @@
     "adding": "Adding…",
     "add": "Add Player",
     "editPlayer": "Edit Player",
-    "updatePlayer": "Update Player"
+    "updatePlayer": "Update Player",
+    "vipLabel": "VIP",
+    "vipToggle": "VIP Player"
   },
   "tournament": {
     "startNew": "Start New Tournament Day",
@@ -305,7 +307,9 @@
     "activeLineup": "Active Lineup",
     "waitingRoom": "Waiting Room",
     "publicBannerCta": "Registration Open — Click Here to Sign Up",
-    "registeredPlayers": "Registered Players"
+    "registeredPlayers": "Registered Players",
+    "vipOnly": "VIP Sign-Up Only",
+    "vipOnlyDesc": "Only VIP players can register right now."
   },
   "signupControl": {
     "sectionTitle": "Signup Window",
@@ -327,7 +331,11 @@
     "liveSummary": "For {date} · Max {cap} players",
     "liveSummaryNoDate": "Max {cap} players",
     "clearList": "Clear List",
-    "clearing": "Clearing…"
+    "clearing": "Clearing…",
+    "openVipSignups": "Open VIP Signup",
+    "openRegularSignups": "Open Regular Signup",
+    "statusVipOnly": "VIP ONLY",
+    "liveVipLabel": "VIP Registration Active"
   },
   "standings": {
     "noTournaments": "No tournaments yet.",

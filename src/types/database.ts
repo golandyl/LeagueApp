@@ -274,6 +274,7 @@ export type Database = {
           full_name: string
           id: string
           is_ghost: boolean
+          is_vip: boolean
           league_id: string
           manager_id: string | null
           position: Database["public"]["Enums"]["position_type"]
@@ -286,6 +287,7 @@ export type Database = {
           full_name: string
           id?: string
           is_ghost?: boolean
+          is_vip?: boolean
           league_id: string
           manager_id?: string | null
           position: Database["public"]["Enums"]["position_type"]
@@ -298,6 +300,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_ghost?: boolean
+          is_vip?: boolean
           league_id?: string
           manager_id?: string | null
           position?: Database["public"]["Enums"]["position_type"]

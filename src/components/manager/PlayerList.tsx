@@ -48,8 +48,13 @@ export function PlayerList({ players: initialPlayers, isManager = false }: Props
               </span>
             )}
 
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 flex items-center gap-1.5">
               <p className="truncate text-sm font-bold text-white">{p.full_name}</p>
+              {p.is_vip && (
+                <span className="shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-black tracking-wide text-amber-400">
+                  VIP
+                </span>
+              )}
             </div>
 
             {isManager && (

@@ -22,6 +22,7 @@ export function AddPlayerForm({ leagueId }: Props) {
   const [rating,   setRating]   = useState(5)
   const [position, setPosition] = useState<Position>('MID')
   const [stamina,  setStamina]  = useState<Stamina>('Med')
+  const [isVip,    setIsVip]    = useState(false)
   const [error,    setError]    = useState<string | null>(null)
   const [loading,  setLoading]  = useState(false)
 
@@ -38,6 +39,7 @@ export function AddPlayerForm({ leagueId }: Props) {
       stamina,
       league_id: leagueId,
       is_ghost:  false,
+      is_vip:    isVip,
     })
 
     if (insertError) {
@@ -46,7 +48,7 @@ export function AddPlayerForm({ leagueId }: Props) {
       return
     }
 
-    setName(''); setRating(5); setPosition('MID'); setStamina('Med')
+    setName(''); setRating(5); setPosition('MID'); setStamina('Med'); setIsVip(false)
     setLoading(false)
     setOpen(false)
     router.refresh()
@@ -108,6 +110,26 @@ export function AddPlayerForm({ leagueId }: Props) {
             {STAMINAS.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
+      </div>
+
+      {/* VIP toggle */}
+      <div className="flex items-center justify-between rounded-xl bg-slate-700/60 px-4 py-3">
+        <span className="text-sm font-bold text-slate-300">{t('vipToggle')}</span>
+        <button
+          type="button"
+          onClick={() => setIsVip(v => !v)}
+          role="switch"
+          aria-checked={isVip}
+          className={[
+            'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
+            isVip ? 'bg-amber-500' : 'bg-slate-600',
+          ].join(' ')}
+        >
+          <span className={[
+            'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform',
+            isVip ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0',
+          ].join(' ')} />
+        </button>
       </div>
 
       {error && <p className="rounded-xl bg-red-900/40 px-4 py-2 text-sm text-red-300">{error}</p>}

@@ -117,7 +117,9 @@
     "adding": "מוסיף…",
     "add": "הוסף שחקן",
     "editPlayer": "ערוך שחקן",
-    "updatePlayer": "עדכן שחקן"
+    "updatePlayer": "עדכן שחקן",
+    "vipLabel": "VIP",
+    "vipToggle": "שחקן VIP"
   },
   "tournament": {
     "startNew": "התחל יום טורניר חדש",
@@ -305,7 +307,9 @@
     "activeLineup": "הרכב פעיל",
     "waitingRoom": "רשימת המתנה",
     "publicBannerCta": "הרשמה פתוחה - לחץ כאן להרשמה",
-    "registeredPlayers": "שחקנים שנרשמו"
+    "registeredPlayers": "שחקנים שנרשמו",
+    "vipOnly": "הרשמת VIP בלבד",
+    "vipOnlyDesc": "רק שחקני VIP יכולים להירשם כרגע."
   },
   "standings": {
     "noTournaments": "אין טורנירים עדיין.",
@@ -353,6 +357,10 @@
     "liveSummary": "ל{date} · עד {cap} שחקנים",
     "liveSummaryNoDate": "עד {cap} שחקנים",
     "clearList": "נקה רשימה",
-    "clearing": "מנקה…"
+    "clearing": "מנקה…",
+    "openVipSignups": "פתח הרשמת VIP",
+    "openRegularSignups": "פתח הרשמה לכולם",
+    "statusVipOnly": "VIP בלבד",
+    "liveVipLabel": "הרשמת VIP פעילה"
   }
 }

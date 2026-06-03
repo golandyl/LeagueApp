@@ -117,7 +117,9 @@
     "adding": "Добавление…",
     "add": "Добавить игрока",
     "editPlayer": "Редактировать игрока",
-    "updatePlayer": "Обновить игрока"
+    "updatePlayer": "Обновить игрока",
+    "vipLabel": "VIP",
+    "vipToggle": "VIP-игрок"
   },
   "tournament": {
     "startNew": "Начать новый турнирный день",
@@ -305,7 +307,9 @@
     "activeLineup": "Основной состав",
     "waitingRoom": "Список ожидания",
     "publicBannerCta": "Запись открыта — нажмите здесь для регистрации",
-    "registeredPlayers": "Зарегистрированные игроки"
+    "registeredPlayers": "Зарегистрированные игроки",
+    "vipOnly": "Только VIP-запись",
+    "vipOnlyDesc": "Сейчас могут регистрироваться только VIP-игроки."
   },
   "standings": {
     "noTournaments": "Турниров пока нет.",
@@ -353,6 +357,10 @@
     "liveSummary": "На {date} · Макс. {cap} игроков",
     "liveSummaryNoDate": "Макс. {cap} игроков",
     "clearList": "Очистить список",
-    "clearing": "Очистка…"
+    "clearing": "Очистка…",
+    "openVipSignups": "Открыть VIP-запись",
+    "openRegularSignups": "Открыть запись для всех",
+    "statusVipOnly": "ТОЛЬКО VIP",
+    "liveVipLabel": "VIP-регистрация активна"
   }
 }

@@ -26,6 +26,7 @@ export function EditPlayerModal({ player, onSave, onClose }: Props) {
   const [rating,   setRating]   = useState(player.rating)
   const [position, setPosition] = useState<Position>(player.position as Position)
   const [stamina,  setStamina]  = useState<Stamina>(player.stamina as Stamina)
+  const [isVip,    setIsVip]    = useState(player.is_vip ?? false)
   const [saving,   setSaving]   = useState(false)
   const [error,    setError]    = useState<string | null>(null)
 
@@ -43,7 +44,7 @@ export function EditPlayerModal({ player, onSave, onClose }: Props) {
     const supabase = createClient()
     const { error: updateError } = await supabase
       .from('players')
-      .update({ full_name: name.trim(), rating, position, stamina })
+      .update({ full_name: name.trim(), rating, position, stamina, is_vip: isVip })
       .eq('id', player.id)
 
     setSaving(false)
@@ -52,7 +53,7 @@ export function EditPlayerModal({ player, onSave, onClose }: Props) {
       return
     }
 
-    onSave({ ...player, full_name: name.trim(), rating, position, stamina })
+    onSave({ ...player, full_name: name.trim(), rating, position, stamina, is_vip: isVip })
   }
 
   return (
@@ -125,6 +126,26 @@ export function EditPlayerModal({ player, onSave, onClose }: Props) {
                 {STAMINAS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
+          </div>
+
+          {/* VIP toggle */}
+          <div className="flex items-center justify-between rounded-xl bg-slate-700/60 px-4 py-3">
+            <span className="text-sm font-bold text-slate-300">{t('vipToggle')}</span>
+            <button
+              type="button"
+              onClick={() => setIsVip(v => !v)}
+              role="switch"
+              aria-checked={isVip}
+              className={[
+                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
+                isVip ? 'bg-amber-500' : 'bg-slate-600',
+              ].join(' ')}
+            >
+              <span className={[
+                'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform',
+                isVip ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0',
+              ].join(' ')} />
+            </button>
           </div>
 
           {error && (

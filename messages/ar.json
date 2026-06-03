@@ -117,7 +117,9 @@
     "adding": "جارٍ الإضافة…",
     "add": "إضافة لاعب",
     "editPlayer": "تعديل اللاعب",
-    "updatePlayer": "تحديث اللاعب"
+    "updatePlayer": "تحديث اللاعب",
+    "vipLabel": "VIP",
+    "vipToggle": "لاعب VIP"
   },
   "tournament": {
     "startNew": "بدء يوم بطولة جديد",
@@ -305,7 +307,9 @@
     "activeLineup": "التشكيلة النشطة",
     "waitingRoom": "غرفة الانتظار",
     "publicBannerCta": "التسجيل مفتوح — انقر هنا للتسجيل",
-    "registeredPlayers": "اللاعبون المسجلون"
+    "registeredPlayers": "اللاعبون المسجلون",
+    "vipOnly": "تسجيل VIP فقط",
+    "vipOnlyDesc": "يمكن للاعبي VIP فقط التسجيل الآن."
   },
   "standings": {
     "noTournaments": "لا توجد بطولات بعد.",
@@ -353,6 +357,10 @@
     "liveSummary": "لـ{date} · حتى {cap} لاعبين",
     "liveSummaryNoDate": "حتى {cap} لاعبين",
     "clearList": "مسح القائمة",
-    "clearing": "جارٍ المسح…"
+    "clearing": "جارٍ المسح…",
+    "openVipSignups": "فتح تسجيل VIP",
+    "openRegularSignups": "فتح التسجيل للجميع",
+    "statusVipOnly": "VIP فقط",
+    "liveVipLabel": "تسجيل VIP نشط"
   }
 }

@@ -117,7 +117,9 @@
     "adding": "Añadiendo…",
     "add": "Añadir jugador",
     "editPlayer": "Editar jugador",
-    "updatePlayer": "Actualizar jugador"
+    "updatePlayer": "Actualizar jugador",
+    "vipLabel": "VIP",
+    "vipToggle": "Jugador VIP"
   },
   "tournament": {
     "startNew": "Iniciar nuevo día de torneo",
@@ -305,7 +307,9 @@
     "activeLineup": "Alineación activa",
     "waitingRoom": "Sala de espera",
     "publicBannerCta": "Registro abierto — Haz clic aquí para inscribirte",
-    "registeredPlayers": "Jugadores inscritos"
+    "registeredPlayers": "Jugadores inscritos",
+    "vipOnly": "Solo inscripción VIP",
+    "vipOnlyDesc": "Solo los jugadores VIP pueden inscribirse ahora."
   },
   "standings": {
     "noTournaments": "No hay torneos aún.",
@@ -353,6 +357,10 @@
     "liveSummary": "Para {date} · Máx. {cap} jugadores",
     "liveSummaryNoDate": "Máx. {cap} jugadores",
     "clearList": "Limpiar lista",
-    "clearing": "Limpiando…"
+    "clearing": "Limpiando…",
+    "openVipSignups": "Abrir inscripción VIP",
+    "openRegularSignups": "Abrir inscripción para todos",
+    "statusVipOnly": "SOLO VIP",
+    "liveVipLabel": "Registro VIP activo"
   }
 }

@@ -117,7 +117,9 @@
     "adding": "添加中…",
     "add": "添加球员",
     "editPlayer": "编辑球员",
-    "updatePlayer": "更新球员"
+    "updatePlayer": "更新球员",
+    "vipLabel": "VIP",
+    "vipToggle": "VIP球员"
   },
   "tournament": {
     "startNew": "开始新的赛事日",
@@ -305,7 +307,9 @@
     "activeLineup": "首发名单",
     "waitingRoom": "候补区",
     "publicBannerCta": "报名开放 — 点击此处报名",
-    "registeredPlayers": "已报名球员"
+    "registeredPlayers": "已报名球员",
+    "vipOnly": "仅限VIP报名",
+    "vipOnlyDesc": "目前仅VIP球员可以报名。"
   },
   "standings": {
     "noTournaments": "暂无赛事。",
@@ -353,6 +357,10 @@
     "liveSummary": "{date} · 最多{cap}人",
     "liveSummaryNoDate": "最多{cap}人",
     "clearList": "清空名单",
-    "clearing": "清空中…"
+    "clearing": "清空中…",
+    "openVipSignups": "开放VIP报名",
+    "openRegularSignups": "开放全员报名",
+    "statusVipOnly": "仅VIP",
+    "liveVipLabel": "VIP报名进行中"
   }
 }
