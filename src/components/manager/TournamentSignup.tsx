@@ -214,7 +214,15 @@ export function TournamentSignup({
         setSelectedId('')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : tCommon('error'))
+      const pgCode = (err as { code?: string }).code
+      const pgMsg  = (err as { message?: string }).message ?? ''
+      if (pgCode === '23505') {
+        setError("You're already signed up for this session.")
+      } else if (pgMsg.includes('VIP_ONLY')) {
+        setError('Signup is currently restricted to VIP players only.')
+      } else {
+        setError(err instanceof Error ? pgMsg : tCommon('error'))
+      }
     } finally {
       setSubmitting(false)
     }
