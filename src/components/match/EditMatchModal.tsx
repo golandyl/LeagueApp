@@ -64,9 +64,13 @@ export function EditMatchModal({ match, homeTeam, awayTeam, onSave, onClose }: P
       .eq('id', match.id)
 
     if (err) {
-      // Rollback
-      onSave(match)
-      setError(err.message)
+      onSave(match)  // rollback optimistic update
+      const msg = err.message ?? ''
+      setError(
+        msg.includes('TOURNAMENT_LOCKED')
+          ? 'This tournament has been completed. Historical match data cannot be modified.'
+          : msg,
+      )
       setLoading(false)
       return
     }

@@ -69,6 +69,7 @@ export function MatchArena({
   const [showGoalModal, setShowGoalModal] = useState(false)
   const [endReason,     setEndReason]     = useState<EndReason | null>(null)
   const [saving,        setSaving]        = useState(false)
+  const [saveError,     setSaveError]     = useState<string | null>(null)
   const [nextMatchId,      setNextMatchId]      = useState<string | null>(null)
   const [nextMatchLoading, setNextMatchLoading] = useState(false)
 
@@ -271,6 +272,7 @@ export function MatchArena({
 
   async function handleGoalConfirm(sel: GoalSelection) {
     setShowGoalModal(false)
+    setSaveError(null)
 
     const isHome   = sel.scoringTeamId === homeTeam.id
     const nextHome = isHome ? homeScore + 1 : homeScore
@@ -295,10 +297,20 @@ export function MatchArena({
       })
     }
 
-    await Promise.all([
+    const [{ error: evErr }, { error: matchErr }] = await Promise.all([
       supabase.from('match_events').insert(events),
       supabase.from('matches').update({ home_score: nextHome, away_score: nextAway }).eq('id', match.id),
     ])
+
+    const firstErr = evErr ?? matchErr
+    if (firstErr) {
+      const msg = (firstErr as { message?: string }).message ?? ''
+      setSaveError(
+        msg.includes('TOURNAMENT_LOCKED')
+          ? 'Tournament is closed — goal could not be saved.'
+          : 'Failed to save goal. Please try again.',
+      )
+    }
   }
 
   // Pause: snapshot current time as paused_at
@@ -369,6 +381,7 @@ export function MatchArena({
     }
 
     setSaving(true)
+    setSaveError(null)
     try {
       // WC: create next match BEFORE setting matchStatus='ended'.
       // This ensures nextMatchId is already populated when the useEffect fires,
@@ -390,12 +403,23 @@ export function MatchArena({
         }
       }
 
-      await supabase.from('matches').update({
+      const { error: saveErr } = await supabase.from('matches').update({
         status:            'completed',
         home_score:        finalHome,
         away_score:        finalAway,
         victory_condition: vc,
       }).eq('id', match.id)
+
+      if (saveErr) {
+        const msg = (saveErr as { message?: string }).message ?? ''
+        setSaveError(
+          msg.includes('TOURNAMENT_LOCKED')
+            ? 'Tournament is already closed — match result could not be saved.'
+            : 'Failed to save match result. Please try again.',
+        )
+        return
+      }
+
       setFinalVC(vc)
       setMatchStatus('ended')
     } finally {
@@ -464,6 +488,12 @@ export function MatchArena({
         onToggle={!autoTimerStopped ? () => { void handleTogglePause() } : undefined}
         onWhistle={autoTimerStopped || !timerRunning ? undefined : handleWhistle}
       />
+
+      {saveError && (
+        <p className="rounded-lg bg-rose-950/60 px-4 py-3 text-sm font-semibold text-rose-400 ring-1 ring-rose-800/50">
+          {saveError}
+        </p>
+      )}
 
       {autoTimerStopped ? (
         homeScore !== awayScore ? (
