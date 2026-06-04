@@ -160,7 +160,7 @@ export function TournamentSignup({
       if (unlistedMode) {
         const trimmed = requestName.trim()
         if (!trimmed) return
-        const { error: dbErr } = await supabase
+        const { data: inserted, error: dbErr } = await supabase
           .from('tournament_signups')
           .insert({
             league_id:           leagueId,
@@ -171,14 +171,24 @@ export function TournamentSignup({
             player_id:           null,
             status:              'active',
           })
+          .select()
+          .single()
         if (dbErr) throw dbErr
         localStorage.setItem(storageKey(leagueId, signupCycle), 'true')
+        // Optimistically append — don't wait for the Realtime INSERT event.
+        setSignups(prev =>
+          prev.some(s => s.id === (inserted as Signup).id)
+            ? prev
+            : [...prev, inserted as Signup].sort(
+                (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+              ),
+        )
         setRequestSent(true)
       } else {
         if (!selectedId) return
         const player = players.find(p => p.id === selectedId)
         if (!player) return
-        const { error: dbErr } = await supabase
+        const { data: inserted, error: dbErr } = await supabase
           .from('tournament_signups')
           .insert({
             league_id:           leagueId,
@@ -188,8 +198,18 @@ export function TournamentSignup({
             is_unlisted_request: false,
             status,
           })
+          .select()
+          .single()
         if (dbErr) throw dbErr
         localStorage.setItem(storageKey(leagueId, signupCycle), 'true')
+        // Optimistically append — don't wait for the Realtime INSERT event.
+        setSignups(prev =>
+          prev.some(s => s.id === (inserted as Signup).id)
+            ? prev
+            : [...prev, inserted as Signup].sort(
+                (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+              ),
+        )
         setSignedUp(true)
         setSelectedId('')
       }
@@ -212,8 +232,16 @@ export function TournamentSignup({
       .from('tournament_signups').delete().eq('id', signup.id)
     if (delErr) return
 
+    setSignups(prev => prev.filter(s => s.id !== signup.id))
+
     if (firstWaiting) {
-      await supabase.from('tournament_signups').update({ status: 'active' }).eq('id', firstWaiting.id)
+      const { error: promoteErr } = await supabase
+        .from('tournament_signups').update({ status: 'active' }).eq('id', firstWaiting.id)
+      if (!promoteErr) {
+        setSignups(prev =>
+          prev.map(s => s.id === firstWaiting.id ? { ...s, status: 'active' as const } : s),
+        )
+      }
     }
   }
 

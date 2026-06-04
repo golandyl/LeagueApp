@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables, Enums } from '@/types/database'
@@ -24,6 +25,7 @@ interface Props {
 export function EditMatchModal({ match, homeTeam, awayTeam, onSave, onClose }: Props) {
   const t       = useTranslations('editMatch')
   const tCommon = useTranslations('common')
+  const router  = useRouter()
 
   const [homeScore, setHomeScore] = useState(String(match.home_score ?? 0))
   const [awayScore, setAwayScore] = useState(String(match.away_score ?? 0))
@@ -70,6 +72,7 @@ export function EditMatchModal({ match, homeTeam, awayTeam, onSave, onClose }: P
     }
 
     onClose()
+    router.refresh()
   }
 
   return (

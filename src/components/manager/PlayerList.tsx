@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i18n/navigation'
 import { EditPlayerModal } from './EditPlayerModal'
 import type { Tables } from '@/types/database'
 
@@ -15,7 +16,8 @@ interface Props {
 }
 
 export function PlayerList({ players: initialPlayers, isManager = false }: Props) {
-  const t = useTranslations('players')
+  const t      = useTranslations('players')
+  const router = useRouter()
 
   const [players, setPlayers] = useState<Player[]>(initialPlayers)
   const [editing, setEditing] = useState<Player | null>(null)
@@ -35,11 +37,15 @@ export function PlayerList({ players: initialPlayers, isManager = false }: Props
   function handleSave(updated: Player) {
     setPlayers(prev => prev.map(p => (p.id === updated.id ? updated : p)))
     setEditing(null)
+    // Sync the RSC so stale initialPlayers don't restore old data on tab remount.
+    router.refresh()
   }
 
   function handleDelete(id: string) {
     setPlayers(prev => prev.filter(p => p.id !== id))
     setEditing(null)
+    // Sync the RSC so the deleted player can't reappear when the tab remounts.
+    router.refresh()
   }
 
   return (

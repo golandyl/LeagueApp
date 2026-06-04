@@ -163,11 +163,22 @@ export function SignupControlPanel({
       return
     }
 
+    // Optimistic update: Realtime DELETE events are unreliable when the table's
+    // REPLICA IDENTITY is DEFAULT, because the league_id filter can't be matched
+    // against payload.old (which only contains the PK). Update local state directly.
+    setSignups(prev => prev.filter(s => s.id !== signup.id))
+
     if (firstWaiting) {
-      await supabase
+      const { error: promoteErr } = await supabase
         .from('tournament_signups')
         .update({ status: 'active' })
         .eq('id', firstWaiting.id)
+
+      if (!promoteErr) {
+        setSignups(prev =>
+          prev.map(s => s.id === firstWaiting.id ? { ...s, status: 'active' as const } : s),
+        )
+      }
     }
 
     setRemoving(null)
@@ -179,7 +190,13 @@ export function SignupControlPanel({
       .from('tournament_signups')
       .delete()
       .eq('id', signup.id)
-    if (error) console.error('Failed to decline request:', error)
+    if (error) {
+      console.error('Failed to decline request:', error)
+    } else {
+      // Same reason as removeSignup: optimistic update required because
+      // the realtime DELETE event is filtered out when REPLICA IDENTITY is DEFAULT.
+      setSignups(prev => prev.filter(s => s.id !== signup.id))
+    }
     setDeclining(null)
   }
 

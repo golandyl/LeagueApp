@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 
@@ -13,6 +14,7 @@ interface Props {
 export function FinishTournamentButton({ leagueId, tournamentId, onFinished }: Props) {
   const t       = useTranslations('dashboard')
   const tCommon = useTranslations('common')
+  const router  = useRouter()
 
   const [confirming, setConfirming] = useState(false)
   const [loading,    setLoading]    = useState(false)
@@ -45,6 +47,7 @@ export function FinishTournamentButton({ leagueId, tournamentId, onFinished }: P
     if (cycleErr) console.error('Reset failed details:', cycleErr)
 
     onFinished()
+    router.refresh()
   }
 
   if (!confirming) {
