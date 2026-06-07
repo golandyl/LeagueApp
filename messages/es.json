@@ -94,7 +94,11 @@
     "archiveRosters": "Plantillas",
     "archiveLoadError": "Error al cargar el historial.",
     "liveGameInProgress": "Hay un partido en vivo siendo anotado",
-    "viewLiveMatch": "Ver partido en vivo"
+    "viewLiveMatch": "Ver partido en vivo",
+    "deleteTournament": "Eliminar torneo",
+    "deleteTournamentDesc": "Elimina permanentemente este torneo y todos sus datos de partidos. Las estadísticas y clasificaciones se actualizarán automáticamente. Esta acción no se puede deshacer.",
+    "deleteTournamentConfirm": "Eliminar para siempre",
+    "tabStats": "Estadísticas"
   },
   "teams": {
     "avgRating": "Med",
@@ -163,7 +167,9 @@
     "modeRandomDesc": "Los jugadores se reparten al azar, ignorando las puntuaciones.",
     "modeChoosingRink": "Elección en campo",
     "modeChoosingRinkDesc": "Los capitanes eligen jugadores en vivo con enlaces compartidos.",
-    "formatHintLiveDraft": "Elige cómo se programarán los partidos tras el draft."
+    "formatHintLiveDraft": "Elige cómo se programarán los partidos tras el draft.",
+    "reviewTeams": "Revisar equipos",
+    "confirmAndStart": "Confirmar e iniciar"
   },
   "settings": {
     "title": "Configuración de la liga"

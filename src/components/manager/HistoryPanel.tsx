@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { TeamsPanel } from './TeamsPanel'
 import type { Tables } from '@/types/database'
@@ -85,7 +86,12 @@ export function HistoryPanel({ leagueId, players }: Props) {
         <p className="py-8 text-center text-sm text-slate-500">{t('noHistory')}</p>
       ) : (
         tournaments.map(tour => (
-          <ArchiveCard key={tour.id} tournament={tour} players={players} />
+          <ArchiveCard
+            key={tour.id}
+            tournament={tour}
+            players={players}
+            onDeleted={() => setTournaments(prev => prev.filter(t => t.id !== tour.id))}
+          />
         ))
       )}
     </div>
@@ -95,17 +101,24 @@ export function HistoryPanel({ leagueId, players }: Props) {
 function ArchiveCard({
   tournament,
   players,
+  onDeleted,
 }: {
   tournament: TournamentWithCount
   players:    Player[]
+  onDeleted:  () => void
 }) {
   const t       = useTranslations('dashboard')
   const tCommon = useTranslations('common')
+  const router  = useRouter()
+  const supabase = useMemo(() => createClient(), [])
 
-  const [expanded, setExpanded] = useState(false)
-  const [details,  setDetails]  = useState<ArchiveDetails | null>(null)
-  const [loading,  setLoading]  = useState(false)
-  const [error,    setError]    = useState<string | null>(null)
+  const [expanded,         setExpanded]         = useState(false)
+  const [details,          setDetails]          = useState<ArchiveDetails | null>(null)
+  const [loading,          setLoading]          = useState(false)
+  const [error,            setError]            = useState<string | null>(null)
+  const [deleteConfirming, setDeleteConfirming] = useState(false)
+  const [deleting,         setDeleting]         = useState(false)
+  const [deleteError,      setDeleteError]      = useState<string | null>(null)
 
   async function handleToggle() {
     if (expanded) { setExpanded(false); return }
@@ -113,7 +126,6 @@ function ArchiveCard({
     if (details) return
 
     setLoading(true)
-    const supabase = createClient()
     const [
       { data: teams, error: teamsErr },
       { data: tp },
@@ -130,6 +142,21 @@ function ArchiveCard({
       return
     }
     setDetails({ teams, teamPlayers: tp ?? [], matches: matches ?? [] })
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    setDeleteError(null)
+    const { error: rpcErr } = await supabase.rpc('admin_delete_tournament', {
+      p_tournament_id: tournament.id,
+    })
+    if (rpcErr) {
+      setDeleteError(rpcErr.message)
+      setDeleting(false)
+      return
+    }
+    onDeleted()
+    router.refresh()
   }
 
   const date = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(
@@ -192,6 +219,44 @@ function ArchiveCard({
                 </h3>
                 <ArchiveMatchList matches={details.matches} teams={details.teams} />
               </section>
+
+              {/* ── Delete tournament ──────────────────────────────────────── */}
+              <section className="border-t border-slate-700/40 pt-4">
+                {!deleteConfirming ? (
+                  <button
+                    onClick={() => { setDeleteConfirming(true); setDeleteError(null) }}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-900/50 py-2.5 text-sm font-bold text-rose-500 transition-all hover:bg-rose-950/30 hover:text-rose-400 active:scale-[0.98]"
+                  >
+                    <TrashIcon />
+                    {t('deleteTournament')}
+                  </button>
+                ) : (
+                  <div className="rounded-xl border border-rose-900/50 bg-rose-950/20 p-4 space-y-3">
+                    <p className="text-sm leading-snug text-zinc-300">
+                      {t('deleteTournamentDesc')}
+                    </p>
+                    {deleteError && (
+                      <p className="text-xs font-medium text-rose-400">{deleteError}</p>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => { setDeleteConfirming(false); setDeleteError(null) }}
+                        disabled={deleting}
+                        className="flex-1 rounded-lg bg-zinc-800 py-2.5 text-sm font-bold text-zinc-300 transition-colors hover:bg-zinc-700 disabled:opacity-50"
+                      >
+                        {tCommon('cancel')}
+                      </button>
+                      <button
+                        onClick={handleDelete}
+                        disabled={deleting}
+                        className="flex-1 rounded-lg bg-rose-700 py-2.5 text-sm font-bold text-white transition-colors hover:bg-rose-600 disabled:opacity-40"
+                      >
+                        {deleting ? t('finishing') : t('deleteTournamentConfirm')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </section>
             </>
           )}
         </div>
@@ -231,5 +296,20 @@ function ArchiveMatchList({ matches, teams }: { matches: Match[]; teams: Team[] 
         )
       })}
     </div>
+  )
+}
+
+function TrashIcon() {
+  return (
+    <svg
+      className="h-3.5 w-3.5 shrink-0"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
   )
 }

@@ -11,7 +11,7 @@ import type { Tables } from '@/types/database'
 type Player     = Tables<'players'>
 type Tournament = Tables<'tournaments'>
 type Match      = Tables<'matches'>
-type Step       = 'attendance' | 'method' | 'format'
+type Step       = 'attendance' | 'method' | 'format' | 'preview'
 type Format     = 'round_robin' | 'winner_continues' | 'cup'
 type Generation = 'balanced' | 'random' | 'live_draft'
 
@@ -21,7 +21,18 @@ interface Props {
   onCreated?: (tournament: Tournament, matches: Match[]) => void
 }
 
-const TEAM_COLORS      = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899']
+// Football bib colours — first three match the three most common sets (Red, Yellow, Blue).
+const BIB_COLORS: { hex: string; label: string }[] = [
+  { hex: '#EF4444', label: 'Red'    },
+  { hex: '#EAB308', label: 'Yellow' },
+  { hex: '#3B82F6', label: 'Blue'   },
+  { hex: '#22C55E', label: 'Green'  },
+  { hex: '#F5F5F5', label: 'White'  },
+  { hex: '#3F3F46', label: 'Black'  },
+  { hex: '#F97316', label: 'Orange' },
+  { hex: '#EC4899', label: 'Pink'   },
+]
+
 const CUP_VALID_COUNTS = [4, 8, 16]
 
 const POSITION_STYLE: Record<string, string> = {
@@ -31,9 +42,8 @@ const POSITION_STYLE: Record<string, string> = {
   FWD: 'bg-emerald-800/70 text-emerald-200',
 }
 
-// Minimal shape we need after either balanced or random generation
-type Slot    = { _id: string; isGhost?: boolean }
-type RawTeam = { players: Slot[] }
+type Slot = { _id: string; isGhost?: boolean }
+interface PreviewTeam { players: Slot[]; color: string }
 
 export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
   const t       = useTranslations('tournament')
@@ -42,15 +52,19 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
   const locale  = useLocale()
   const router  = useRouter()
 
-  const [open,       setOpen]       = useState(false)
-  const [step,       setStep]       = useState<Step>('attendance')
-  const [present,    setPresent]    = useState<Set<string>>(() => new Set())
-  const [numTeams,   setNumTeams]   = useState(2)
-  const [format,     setFormat]     = useState<Format>('round_robin')
-  const [generation, setGeneration] = useState<Generation>('balanced')
-  const [dayName,    setDayName]    = useState('')
-  const [loading,    setLoading]    = useState(false)
-  const [error,      setError]      = useState<string | null>(null)
+  const [open,         setOpen]         = useState(false)
+  const [step,         setStep]         = useState<Step>('attendance')
+  const [present,      setPresent]      = useState<Set<string>>(() => new Set())
+  const [numTeams,     setNumTeams]     = useState(2)
+  const [format,       setFormat]       = useState<Format>('round_robin')
+  const [generation,   setGeneration]   = useState<Generation>('balanced')
+  const [dayName,      setDayName]      = useState('')
+  const [previewTeams, setPreviewTeams] = useState<PreviewTeam[]>([])
+  const [loading,      setLoading]      = useState(false)
+  const [error,        setError]        = useState<string | null>(null)
+
+  // Used in the preview step to look up player data by id
+  const playerMap = useMemo(() => new Map(players.map(p => [p.id, p])), [players])
 
   const presentPlayers = useMemo(
     () => players.filter(p => present.has(p.id)),
@@ -68,7 +82,6 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
   // ── Handlers ──────────────────────────────────────────────────────────────
 
   async function handleOpen() {
-    // Open immediately with all players selected (fast default)
     setPresent(new Set(players.map(p => p.id)))
     setNumTeams(2)
     setFormat('round_robin')
@@ -80,8 +93,6 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
     setError(null)
     setOpen(true)
 
-    // Then quietly pre-check only the players who signed up.
-    // Falls back to all-selected if the fetch fails or returns nothing.
     try {
       const supabase = createClient()
       const { data: signups } = await supabase
@@ -93,12 +104,10 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
       if (signups && signups.length > 0) {
         const signupNames = new Set(signups.map(s => s.player_name.toLowerCase().trim()))
         const matched     = players.filter(p => signupNames.has(p.full_name.toLowerCase().trim()))
-        if (matched.length > 0) {
-          setPresent(new Set(matched.map(p => p.id)))
-        }
+        if (matched.length > 0) setPresent(new Set(matched.map(p => p.id)))
       }
     } catch {
-      // Silently ignore — wizard still works with the all-selected default
+      // fall back to all-selected
     }
   }
 
@@ -115,15 +124,78 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
     })
   }
 
-  async function handleGenerate() {
+  function updateTeamColor(index: number, color: string) {
+    setPreviewTeams(prev => prev.map((t, i) => i === index ? { ...t, color } : t))
+  }
+
+  // ── Step: format → preview ─────────────────────────────────────────────────
+  // Runs the team assignment algorithm locally (no DB writes) and advances
+  // to the preview step so the manager can adjust colours before committing.
+
+  function handlePreview() {
     if (format === 'cup' && !cupValid) return
+    setError(null)
+
+    const defaultColor = (i: number) => BIB_COLORS[i % BIB_COLORS.length].hex
+
+    if (generation === 'live_draft') {
+      // Teams are empty until players draft themselves — preview just shows colours.
+      setPreviewTeams(
+        Array.from({ length: safeNumTeams }, (_, i) => ({ players: [], color: defaultColor(i) })),
+      )
+      setStep('preview')
+      return
+    }
+
+    try {
+      const draftPlayers = presentPlayers.map(p => ({
+        _id:      p.id,
+        name:     p.full_name,
+        rating:   p.rating,
+        position: p.position as DraftPlayer['position'],
+        stamina:  p.stamina  as DraftPlayer['stamina'],
+        isGhost:  false as const,
+      }))
+
+      let generated: { players: Slot[] }[]
+
+      if (generation === 'random') {
+        const pool: Slot[] = draftPlayers.map(p => ({ _id: p._id }))
+        while (pool.length % safeNumTeams !== 0) pool.push({ _id: '', isGhost: true })
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[pool[i], pool[j]] = [pool[j], pool[i]]
+        }
+        const perTeam = pool.length / safeNumTeams
+        generated = Array.from({ length: safeNumTeams }, (_, i) => ({
+          players: pool.slice(i * perTeam, (i + 1) * perTeam),
+        }))
+      } else {
+        generated = generateTeams(
+          draftPlayers as unknown as DraftPlayer[],
+          safeNumTeams,
+        ) as unknown as { players: Slot[] }[]
+      }
+
+      setPreviewTeams(generated.map((team, i) => ({ players: team.players, color: defaultColor(i) })))
+      setStep('preview')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : tCommon('error'))
+    }
+  }
+
+  // ── Step: preview → DB ─────────────────────────────────────────────────────
+  // Takes the preview state (team assignments + selected colours) and persists
+  // everything to Supabase in one coordinated sequence.
+
+  async function handleSave() {
     setError(null)
     setLoading(true)
 
     try {
       const supabase = createClient()
 
-      // ── Path A: Live Draft (Choosing Rink) ────────────────────────────────
+      // ── Path A: Live Draft ────────────────────────────────────────────────
       if (generation === 'live_draft') {
         const { data: tournament, error: tErr } = await supabase
           .from('tournaments')
@@ -133,9 +205,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
             season:       new Date().getFullYear().toString(),
             status:       'active'  as const,
             draft_status: 'pending' as const,
-            // Store the chosen match format so the match engine knows what to
-            // schedule after the draft completes.
-            format:       format,
+            format,
           })
           .select('id')
           .single()
@@ -145,14 +215,13 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
         const { error: teamsErr } = await supabase
           .from('teams')
           .insert(
-            Array.from({ length: safeNumTeams }, (_, i) => ({
+            previewTeams.map((team, i) => ({
               league_id:     leagueId,
               tournament_id: tournament.id,
               name:          `Team ${String.fromCharCode(65 + i)}`,
-              color:         TEAM_COLORS[i % TEAM_COLORS.length],
+              color:         team.color,
             })),
           )
-
         if (teamsErr) throw new Error(teamsErr.message)
 
         setOpen(false)
@@ -163,8 +232,6 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
 
       // ── Path B: Balanced or Pure Random ───────────────────────────────────
 
-      // 1. Create tournament — select('*') so we can hand the full row back
-      //    to the dashboard via onCreated without a second fetch.
       console.info('[StartTournamentButton] Step 1: inserting tournament', { format, generation })
       const { data: tournament, error: tErr } = await supabase
         .from('tournaments')
@@ -174,7 +241,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
           season:       new Date().getFullYear().toString(),
           status:       'active'    as const,
           draft_status: 'completed' as const,
-          format:       format,
+          format,
         })
         .select('*')
         .single()
@@ -185,70 +252,31 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
       }
       console.info('[StartTournamentButton] Step 1 OK – tournament', tournament.id)
 
-      // 2. Build player slots, then generate teams
-      const draftPlayers = presentPlayers.map(p => ({
-        _id:      p.id,
-        name:     p.full_name,
-        rating:   p.rating,
-        position: p.position as DraftPlayer['position'],
-        stamina:  p.stamina  as DraftPlayer['stamina'],
-        isGhost:  false as const,
-      }))
-
-      let generated: RawTeam[]
-
-      if (generation === 'random') {
-        // Pad to a multiple of numTeams, then Fisher-Yates shuffle
-        const pool: Slot[] = draftPlayers.map(p => ({ _id: p._id }))
-        while (pool.length % safeNumTeams !== 0) {
-          pool.push({ _id: '', isGhost: true })
-        }
-        for (let i = pool.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1))
-          ;[pool[i], pool[j]] = [pool[j], pool[i]]
-        }
-        const perTeam = pool.length / safeNumTeams
-        generated = Array.from({ length: safeNumTeams }, (_, i) => ({
-          players: pool.slice(i * perTeam, (i + 1) * perTeam),
-        }))
-      } else {
-        // Balanced snake draft
-        generated = generateTeams(
-          draftPlayers as unknown as DraftPlayer[],
-          safeNumTeams,
-        ) as unknown as RawTeam[]
-      }
-
-      // 3. Insert teams
-      console.info('[StartTournamentButton] Step 3: inserting', safeNumTeams, 'teams')
+      // 2. Insert teams with manager-selected colours
+      console.info('[StartTournamentButton] Step 2: inserting', previewTeams.length, 'teams')
       const { data: insertedTeams, error: teamsErr } = await supabase
         .from('teams')
         .insert(
-          generated.map((_, i) => ({
+          previewTeams.map((team, i) => ({
             league_id:     leagueId,
             tournament_id: tournament.id,
             name:          `Team ${String.fromCharCode(65 + i)}`,
-            color:         TEAM_COLORS[i % TEAM_COLORS.length],
+            color:         team.color,
           })),
         )
         .select('id')
 
       if (teamsErr || !insertedTeams) {
-        console.error('[StartTournamentButton] Step 3 FAILED', teamsErr)
+        console.error('[StartTournamentButton] Step 2 FAILED', teamsErr)
         throw new Error(teamsErr?.message ?? tCommon('error'))
       }
-      // Guard: ensure every team row was acknowledged before we use the IDs.
-      // An empty or partial return here would cause undefined access in the
-      // match-building step below (especially for winner_continues which reads
-      // insertedTeams[0] and insertedTeams[1] directly).
-      if (insertedTeams.length < safeNumTeams) {
-        console.error('[StartTournamentButton] Step 3: DB returned', insertedTeams.length, 'rows, expected', safeNumTeams)
-        throw new Error(`Team creation incomplete (${insertedTeams.length}/${safeNumTeams})`)
+      if (insertedTeams.length < previewTeams.length) {
+        throw new Error(`Team creation incomplete (${insertedTeams.length}/${previewTeams.length})`)
       }
-      console.info('[StartTournamentButton] Step 3 OK – teams', insertedTeams.map(t => t.id))
+      console.info('[StartTournamentButton] Step 2 OK – teams', insertedTeams.map(t => t.id))
 
-      // 4. Insert team_players (non-ghost only)
-      const teamPlayerRows = generated.flatMap((team, i) =>
+      // 3. Insert team_players (non-ghost only)
+      const teamPlayerRows = previewTeams.flatMap((team, i) =>
         team.players
           .filter(p => !p.isGhost)
           .map(p => ({
@@ -263,7 +291,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
         if (tpErr) throw new Error(tpErr.message)
       }
 
-      // 5. Format-aware match schedule
+      // 4. Format-aware match schedule
       const now = new Date().toISOString()
       const matchRows: {
         league_id:     string
@@ -306,41 +334,38 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
 
       let insertedMatches: Match[] = []
       if (matchRows.length > 0) {
-        console.info('[StartTournamentButton] Step 5: inserting', matchRows.length, 'match(es) for format', format)
+        console.info('[StartTournamentButton] Step 4: inserting', matchRows.length, 'match(es) for format', format)
         const { data: mData, error: matchErr } = await supabase
           .from('matches')
           .insert(matchRows)
           .select('*')
         if (matchErr) {
-          console.error('[StartTournamentButton] Step 5 FAILED', matchErr)
+          console.error('[StartTournamentButton] Step 4 FAILED', matchErr)
           throw new Error(matchErr.message)
         }
         insertedMatches = mData ?? []
-        console.info('[StartTournamentButton] Step 5 OK – matches', insertedMatches.map(m => m.id))
+        console.info('[StartTournamentButton] Step 4 OK – matches', insertedMatches.map(m => m.id))
       }
 
       if (format === 'winner_continues') {
-        console.info('[StartTournamentButton] Step 5b: persisting wc_queue', wcInitialQueue)
+        console.info('[StartTournamentButton] Step 4b: persisting wc_queue', wcInitialQueue)
         const { error: queueErr } = await supabase
           .from('tournaments')
           .update({ wc_queue: wcInitialQueue })
           .eq('id', tournament.id)
         if (queueErr) {
-          console.error('[StartTournamentButton] Step 5b FAILED', queueErr)
+          console.error('[StartTournamentButton] Step 4b FAILED', queueErr)
           throw new Error(queueErr.message)
         }
       }
 
       setOpen(false)
       setLoading(false)
-      // Update the dashboard state immediately — don't wait for router.refresh().
-      // Without this, useState(tournament) keeps the old null value because React
-      // never re-runs useState initialisers when props change after mount.
       onCreated?.(tournament, insertedMatches)
       router.refresh()
 
     } catch (err) {
-      console.error('[StartTournamentButton] handleGenerate failed:', err)
+      console.error('[StartTournamentButton] handleSave failed:', err)
       setError(err instanceof Error ? err.message : tCommon('error'))
       setLoading(false)
     }
@@ -611,15 +636,102 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
     )
   }
 
-  // ── Step 3: Format ────────────────────────────────────────────────────────────
+  // ── Step 3: Format ─────────────────────────────────────────────────────────
 
-  const formats: { id: Format; icon: string; label: string; desc: string }[] = [
-    { id: 'round_robin',      icon: '⚽', label: t('roundRobin'),      desc: t('roundRobinDesc')      },
-    { id: 'winner_continues', icon: '👑', label: t('winnerContinues'), desc: t('winnerContinuesDesc') },
-    { id: 'cup',              icon: '🏆', label: t('cup'),             desc: t('cupDesc')             },
-  ]
+  if (step === 'format') {
+    const formats: { id: Format; icon: string; label: string; desc: string }[] = [
+      { id: 'round_robin',      icon: '⚽', label: t('roundRobin'),      desc: t('roundRobinDesc')      },
+      { id: 'winner_continues', icon: '👑', label: t('winnerContinues'), desc: t('winnerContinuesDesc') },
+      { id: 'cup',              icon: '🏆', label: t('cup'),             desc: t('cupDesc')             },
+    ]
 
-  const canGenerate = format !== 'cup' || cupValid
+    const canGenerate = format !== 'cup' || cupValid
+    const isLiveDraft = generation === 'live_draft'
+
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col bg-zinc-950">
+
+        {/* Header */}
+        <div className="shrink-0 bg-zinc-900 px-4 pb-4 pt-5 shadow-lg">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setStep('method'); setError(null) }}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white"
+              aria-label={tCommon('back')}
+            >
+              <svg className="h-5 w-5 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h2 className="flex-1 text-lg font-black text-white">{t('formatStep')}</h2>
+            <button onClick={handleClose} aria-label={tCommon('cancel')} className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white">
+              ✕
+            </button>
+          </div>
+          {isLiveDraft && (
+            <p className="mt-2 text-xs text-zinc-400">{t('modeChoosingRink')} · {t('formatHintLiveDraft')}</p>
+          )}
+        </div>
+
+        <div className="flex-1 space-y-3 overflow-y-auto px-4 py-6">
+          {formats.map(f => (
+            <button
+              key={f.id}
+              onClick={() => { setFormat(f.id); setError(null) }}
+              className={[
+                'w-full rounded-xl px-5 py-5 text-start transition-all active:scale-[0.98]',
+                format === f.id
+                  ? 'bg-zinc-800 ring-2 ring-emerald-500'
+                  : 'bg-zinc-900 hover:bg-zinc-800/50',
+              ].join(' ')}
+            >
+              <div className="flex items-start gap-4">
+                <span className="text-2xl leading-none">{f.icon}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-black text-white">{f.label}</p>
+                    {format === f.id && (
+                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-300">✓</span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-zinc-400">{f.desc}</p>
+                  {f.id === 'cup' && (
+                    <p className={`mt-1.5 text-[10px] font-bold ${cupValid ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      {t('cupValidCounts')} · {safeNumTeams} {t('numTeams').toLowerCase()}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </button>
+          ))}
+
+          {format === 'cup' && !cupValid && (
+            <p className="rounded-xl bg-amber-900/30 px-4 py-3 text-sm text-amber-300">
+              {t('cupTeamError')}
+            </p>
+          )}
+
+          {error && (
+            <p className="rounded-xl bg-red-900/40 px-4 py-3 text-sm text-red-300">{error}</p>
+          )}
+        </div>
+
+        {/* Footer — advances to the preview step (no DB writes yet) */}
+        <div className="shrink-0 border-t border-zinc-800 bg-zinc-950 px-4 py-4">
+          <button
+            onClick={handlePreview}
+            disabled={!canGenerate}
+            className="w-full rounded-lg bg-emerald-600 py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] active:bg-emerald-700 disabled:opacity-40"
+          >
+            {isLiveDraft ? tDraft('startDraft') : t('generateMatches')}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Step 4: Preview — review teams + pick colours ──────────────────────────
+
   const isLiveDraft = generation === 'live_draft'
 
   return (
@@ -629,7 +741,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
       <div className="shrink-0 bg-zinc-900 px-4 pb-4 pt-5 shadow-lg">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { setStep('method'); setError(null) }}
+            onClick={() => { setStep('format'); setError(null) }}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white"
             aria-label={tCommon('back')}
           >
@@ -637,77 +749,92 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="flex-1 text-lg font-black text-white">{t('formatStep')}</h2>
+          <h2 className="flex-1 text-lg font-black text-white">{t('reviewTeams')}</h2>
           <button onClick={handleClose} aria-label={tCommon('cancel')} className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-white">
             ✕
           </button>
         </div>
-        {/* Contextual sub-label when live draft is selected */}
-        {isLiveDraft && (
-          <p className="mt-2 text-xs text-zinc-400">{t('modeChoosingRink')} · {t('formatHintLiveDraft')}</p>
-        )}
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-6">
+      {/* Team cards */}
+      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-5">
+        {previewTeams.map((team, i) => {
+          const realPlayers = team.players.filter(s => !s.isGhost)
+          return (
+            <div key={i} className="rounded-xl bg-zinc-900 overflow-hidden">
 
-        {formats.map(f => (
-          <button
-            key={f.id}
-            onClick={() => { setFormat(f.id); setError(null) }}
-            className={[
-              'w-full rounded-xl px-5 py-5 text-start transition-all active:scale-[0.98]',
-              format === f.id
-                ? 'bg-zinc-800 ring-2 ring-emerald-500'
-                : 'bg-zinc-900 hover:bg-zinc-800/50',
-            ].join(' ')}
-          >
-            <div className="flex items-start gap-4">
-              <span className="text-2xl leading-none">{f.icon}</span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-black text-white">{f.label}</p>
-                  {format === f.id && (
-                    <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-300">✓</span>
-                  )}
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-zinc-400">{f.desc}</p>
-                {f.id === 'cup' && (
-                  <p className={`mt-1.5 text-[10px] font-bold ${cupValid ? 'text-emerald-400' : 'text-amber-400'}`}>
-                    {t('cupValidCounts')} · {safeNumTeams} {t('numTeams').toLowerCase()}
-                  </p>
-                )}
+              {/* Team header: colour dot + name + colour selector */}
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800">
+                <div
+                  className="h-6 w-6 shrink-0 rounded-full border-2 border-zinc-600"
+                  style={{ backgroundColor: team.color }}
+                />
+                <span className="flex-1 font-black text-white">
+                  Team {String.fromCharCode(65 + i)}
+                </span>
+                <select
+                  value={team.color}
+                  onChange={e => updateTeamColor(i, e.target.value)}
+                  className="rounded-lg bg-zinc-800 px-2 py-1.5 text-xs font-bold text-white outline-none focus:ring-2 focus:ring-emerald-500 [color-scheme:dark]"
+                >
+                  {BIB_COLORS.map(c => (
+                    <option key={c.hex} value={c.hex}>{c.label}</option>
+                  ))}
+                </select>
               </div>
-            </div>
-          </button>
-        ))}
 
-        {format === 'cup' && !cupValid && (
-          <p className="rounded-xl bg-amber-900/30 px-4 py-3 text-sm text-amber-300">
-            {t('cupTeamError')}
-          </p>
-        )}
+              {/* Player list (balanced/random) */}
+              {!isLiveDraft && realPlayers.length > 0 && (
+                <div className="divide-y divide-zinc-800/60">
+                  {realPlayers.map(slot => {
+                    const p = playerMap.get(slot._id)
+                    if (!p) return null
+                    return (
+                      <div key={slot._id} className="flex items-center gap-3 px-4 py-2.5">
+                        <span className="w-5 shrink-0 text-center text-xs font-black tabular-nums text-emerald-500">
+                          {p.rating}
+                        </span>
+                        <span className="flex-1 text-sm font-semibold text-white">{p.full_name}</span>
+                        <span
+                          className={`rounded px-1.5 py-0.5 text-[10px] font-black ${
+                            POSITION_STYLE[p.position] ?? 'bg-zinc-800 text-zinc-300'
+                          }`}
+                        >
+                          {p.position}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Live draft: no player list */}
+              {isLiveDraft && (
+                <p className="px-4 py-3 text-xs text-zinc-500 italic">
+                  {tDraft('title')} — {tDraft('openDraftRoom')}
+                </p>
+              )}
+            </div>
+          )
+        })}
 
         {error && (
           <p className="rounded-xl bg-red-900/40 px-4 py-3 text-sm text-red-300">{error}</p>
         )}
-
       </div>
 
       {/* Footer */}
       <div className="shrink-0 border-t border-zinc-800 bg-zinc-950 px-4 py-4">
         <button
-          onClick={handleGenerate}
-          disabled={loading || !canGenerate}
-          className={[
-            'w-full rounded-lg py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] disabled:opacity-40',
-            isLiveDraft ? 'bg-emerald-600 active:bg-emerald-700' : 'bg-emerald-600 active:bg-emerald-700',
-          ].join(' ')}
+          onClick={handleSave}
+          disabled={loading}
+          className="w-full rounded-lg bg-emerald-600 py-5 text-base font-black text-white tracking-wide transition-all active:scale-[0.97] active:bg-emerald-700 disabled:opacity-40"
         >
           {loading
             ? t('generating')
             : isLiveDraft
             ? tDraft('startDraft')
-            : t('generateMatches')}
+            : t('confirmAndStart')}
         </button>
       </div>
     </div>

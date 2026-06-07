@@ -94,7 +94,11 @@
     "archiveRosters": "队伍阵容",
     "archiveLoadError": "加载归档失败。",
     "liveGameInProgress": "当前有一场实时比赛正在计分",
-    "viewLiveMatch": "查看实时比赛"
+    "viewLiveMatch": "查看实时比赛",
+    "deleteTournament": "删除赛事",
+    "deleteTournamentDesc": "永久删除此赛事及其所有比赛数据。统计数据和积分榜将自动更新。此操作无法撤销。",
+    "deleteTournamentConfirm": "永久删除",
+    "tabStats": "统计"
   },
   "teams": {
     "avgRating": "均",
@@ -163,7 +167,9 @@
     "modeRandomDesc": "球员完全随机分组，不考虑评分。",
     "modeChoosingRink": "现场选人",
     "modeChoosingRinkDesc": "队长通过共享链接实时挑选球员。",
-    "formatHintLiveDraft": "选择选秀结束后的赛程安排方式。"
+    "formatHintLiveDraft": "选择选秀结束后的赛程安排方式。",
+    "reviewTeams": "查看队伍",
+    "confirmAndStart": "确认并开始"
   },
   "settings": {
     "title": "联赛设置"

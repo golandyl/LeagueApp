@@ -94,7 +94,11 @@
     "archiveRosters": "הרכבי קבוצות",
     "archiveLoadError": "שגיאה בטעינת הארכיב.",
     "liveGameInProgress": "משחק חי מתנהל כעת",
-    "viewLiveMatch": "צפה במשחק החי"
+    "viewLiveMatch": "צפה במשחק החי",
+    "deleteTournament": "מחק טורניר",
+    "deleteTournamentDesc": "מחיקה לצמיתות של הטורניר וכל נתוני המשחקים שלו. הסטטיסטיקות והדירוגים יעודכנו אוטומטית. לא ניתן לבטל פעולה זו.",
+    "deleteTournamentConfirm": "מחק לצמיתות",
+    "tabStats": "סטטיסטיקות"
   },
   "teams": {
     "avgRating": "ממוצע",
@@ -163,7 +167,9 @@
     "modeRandomDesc": "השחקנים מחולקים באקראי, ללא התחשבות בדירוג.",
     "modeChoosingRink": "בחירות",
     "modeChoosingRinkDesc": "הקפטנים בוחרים שחקנים בזמן אמת עם קישורים משותפים.",
-    "formatHintLiveDraft": "בחר כיצד המשחקים יתוזמנו לאחר הגיוס."
+    "formatHintLiveDraft": "בחר כיצד המשחקים יתוזמנו לאחר הגיוס.",
+    "reviewTeams": "סקירת קבוצות",
+    "confirmAndStart": "אשר והתחל"
   },
   "settings": {
     "title": "הגדרות ליגה"

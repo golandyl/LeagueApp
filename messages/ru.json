@@ -94,7 +94,11 @@
     "archiveRosters": "Составы команд",
     "archiveLoadError": "Не удалось загрузить архив.",
     "liveGameInProgress": "Идёт запись результатов живого матча",
-    "viewLiveMatch": "Смотреть живой матч"
+    "viewLiveMatch": "Смотреть живой матч",
+    "deleteTournament": "Удалить турнир",
+    "deleteTournamentDesc": "Навсегда удалить этот турнир и все данные матчей. Статистика и таблица обновятся автоматически. Отменить действие невозможно.",
+    "deleteTournamentConfirm": "Удалить навсегда",
+    "tabStats": "Статистика"
   },
   "teams": {
     "avgRating": "Ср.",
@@ -163,7 +167,9 @@
     "modeRandomDesc": "Игроки распределяются случайно, без учёта рейтинга.",
     "modeChoosingRink": "Выбор команды",
     "modeChoosingRinkDesc": "Капитаны выбирают игроков в реальном времени через общие ссылки.",
-    "formatHintLiveDraft": "Выберите, как будут расписаны матчи после драфта."
+    "formatHintLiveDraft": "Выберите, как будут расписаны матчи после драфта.",
+    "reviewTeams": "Обзор команд",
+    "confirmAndStart": "Подтвердить и начать"
   },
   "settings": {
     "title": "Настройки лиги"

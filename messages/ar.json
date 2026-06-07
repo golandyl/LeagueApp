@@ -94,7 +94,11 @@
     "archiveRosters": "تشكيلات الفرق",
     "archiveLoadError": "فشل تحميل الأرشيف.",
     "liveGameInProgress": "يُسجَّل مباراة مباشرة حالياً",
-    "viewLiveMatch": "مشاهدة المباراة المباشرة"
+    "viewLiveMatch": "مشاهدة المباراة المباشرة",
+    "deleteTournament": "حذف البطولة",
+    "deleteTournamentDesc": "حذف هذه البطولة وجميع بيانات مبارياتها نهائياً. سيتم تحديث الإحصائيات والترتيب تلقائياً. لا يمكن التراجع عن هذا الإجراء.",
+    "deleteTournamentConfirm": "حذف نهائياً",
+    "tabStats": "إحصائيات"
   },
   "teams": {
     "avgRating": "متوسط",
@@ -163,7 +167,9 @@
     "modeRandomDesc": "يتم توزيع اللاعبين عشوائياً، بصرف النظر عن التقييمات.",
     "modeChoosingRink": "اختيار الملعب",
     "modeChoosingRinkDesc": "يختار الكباتن اللاعبين مباشرةً عبر روابط مشتركة.",
-    "formatHintLiveDraft": "اختر كيفية جدولة المباريات بعد الاختيار."
+    "formatHintLiveDraft": "اختر كيفية جدولة المباريات بعد الاختيار.",
+    "reviewTeams": "مراجعة الفرق",
+    "confirmAndStart": "تأكيد والبدء"
   },
   "settings": {
     "title": "إعدادات الدوري"

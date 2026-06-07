@@ -107,7 +107,6 @@ export default async function ManagerDashboardPage({ params }: Props) {
       {/* ── Tabbed content — client component ── */}
       <DashboardTabs
         leagueId={leagueId}
-        leagueName={league.name}
         signupStatus={league.signup_status ?? 'closed'}
         signupDate={league.signup_date ?? null}
         maxCapacity={league.max_capacity ?? 16}

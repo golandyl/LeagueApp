@@ -9,8 +9,8 @@ import { AddPlayerForm }          from './AddPlayerForm'
 import { StartTournamentButton }  from './StartTournamentButton'
 import { FinishTournamentButton } from './FinishTournamentButton'
 import { TeamsPanel }             from './TeamsPanel'
-import { AdminPanel }             from './AdminPanel'
 import { HistoryPanel }           from './HistoryPanel'
+import { LeagueStatsPanel }       from './LeagueStatsPanel'
 import { EditMatchModal }          from '@/components/match/EditMatchModal'
 import { SignupControlPanel }      from './SignupControlPanel'
 import type { Tables } from '@/types/database'
@@ -22,11 +22,10 @@ type Tournament = Tables<'tournaments'>
 type Match      = Tables<'matches'>
 type Team       = Tables<'teams'>
 
-type TabId = 'matchday' | 'teams' | 'roster' | 'history' | 'admin'
+type TabId = 'matchday' | 'teams' | 'roster' | 'stats' | 'history'
 
 export interface DashboardTabsProps {
   leagueId:     string
-  leagueName:   string
   signupStatus: string
   signupDate:   string | null
   maxCapacity:  number
@@ -41,7 +40,6 @@ export interface DashboardTabsProps {
 
 export function DashboardTabs({
   leagueId,
-  leagueName,
   signupStatus,
   signupDate,
   maxCapacity,
@@ -52,8 +50,7 @@ export function DashboardTabs({
   teamPlayers,
   isManager,
 }: DashboardTabsProps) {
-  const t      = useTranslations('dashboard')
-  const tAdmin = useTranslations('admin')
+  const t = useTranslations('dashboard')
 
   const [active,            setActive]            = useState<TabId>('matchday')
   const [liveMatches,       setLiveMatches]       = useState<Match[]>(initialMatches)
@@ -112,10 +109,6 @@ export function DashboardTabs({
 
   function handleMatchUpdate(updated: Match) {
     setLiveMatches(prev => prev.map(m => m.id === updated.id ? updated : m))
-  }
-
-  function handleReset() {
-    setLiveMatches([])
   }
 
   function handleTournamentFinished() {
@@ -226,6 +219,22 @@ export function DashboardTabs({
           )}
         </button>
 
+        {/* ── Stats tab ── */}
+        <button
+          role="tab"
+          aria-selected={active === 'stats'}
+          aria-controls="panel-stats"
+          onClick={() => setActive('stats')}
+          className={[
+            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
+            active === 'stats'
+              ? '-mb-px border-b-2 border-emerald-500 text-white'
+              : 'text-zinc-500 hover:text-zinc-300',
+          ].join(' ')}
+        >
+          {t('tabStats')}
+        </button>
+
         {/* ── History tab ── */}
         <button
           role="tab"
@@ -241,24 +250,6 @@ export function DashboardTabs({
         >
           {t('tabHistory')}
         </button>
-
-        {/* ── Admin tab — manager-only, pushed to the end with ms-auto ── */}
-        {isManager && (
-          <button
-            role="tab"
-            aria-selected={active === 'admin'}
-            aria-controls="panel-admin"
-            onClick={() => setActive('admin')}
-            className={[
-              'ms-auto flex items-center gap-1.5 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
-              active === 'admin'
-                ? '-mb-px border-b-2 border-rose-500 text-rose-300'
-                : 'text-zinc-600 hover:text-zinc-400',
-            ].join(' ')}
-          >
-            {tAdmin('tabAdmin')}
-          </button>
-        )}
       </div>
 
       {/* ── Tab panels ────────────────────────────────────────────────────── */}
@@ -313,6 +304,16 @@ export function DashboardTabs({
         </div>
       )}
 
+      {active === 'stats' && (
+        <div
+          id="panel-stats"
+          role="tabpanel"
+          className="px-4 py-6"
+        >
+          <LeagueStatsPanel leagueId={leagueId} />
+        </div>
+      )}
+
       {active === 'history' && (
         <div
           id="panel-history"
@@ -320,16 +321,6 @@ export function DashboardTabs({
           className="px-4 py-6"
         >
           <HistoryPanel leagueId={leagueId} players={players} />
-        </div>
-      )}
-
-      {active === 'admin' && (
-        <div
-          id="panel-admin"
-          role="tabpanel"
-          className="px-4 py-6"
-        >
-          <AdminPanel leagueId={leagueId} leagueName={leagueName} onReset={handleReset} />
         </div>
       )}
     </div>
@@ -425,7 +416,6 @@ function MatchdayPanel({
 
               {tournament && (
                 <FinishTournamentButton
-                  leagueId={leagueId}
                   tournamentId={tournament.id}
                   onFinished={onTournamentFinished}
                 />
@@ -531,26 +521,6 @@ function MatchdayPanel({
           )}
         </section>
       )}
-
-      {/* Standings link */}
-      <div className="border-t border-zinc-800 pt-2 text-center">
-        <Link
-          href={`/league/${leagueId}/standings`}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-400 transition-colors hover:text-zinc-300"
-        >
-          {t('viewStandings')}
-          <svg
-            className="h-3.5 w-3.5 rtl:rotate-180"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
-          </svg>
-        </Link>
-      </div>
 
       {/* Edit match modal — manager only */}
       {editingMatch && isManager && (

@@ -94,7 +94,11 @@
     "archiveRosters": "Team Rosters",
     "archiveLoadError": "Failed to load archive.",
     "liveGameInProgress": "A live game is currently being scored",
-    "viewLiveMatch": "View Live Match"
+    "viewLiveMatch": "View Live Match",
+    "deleteTournament": "Delete Tournament",
+    "deleteTournamentDesc": "Permanently delete this tournament and all its match data. Stats and standings will update automatically. This cannot be undone.",
+    "deleteTournamentConfirm": "Delete Forever",
+    "tabStats": "Stats"
   },
   "teams": {
     "avgRating": "Avg",
@@ -163,7 +167,9 @@
     "modeRandomDesc": "Players are shuffled randomly, ignoring ratings entirely.",
     "modeChoosingRink": "Choosing Rink",
     "modeChoosingRinkDesc": "Captains draft players live using shared links.",
-    "formatHintLiveDraft": "Choose how matches will be scheduled after the draft."
+    "formatHintLiveDraft": "Choose how matches will be scheduled after the draft.",
+    "reviewTeams": "Review Teams",
+    "confirmAndStart": "Confirm & Start"
   },
   "settings": {
     "title": "League Settings"
