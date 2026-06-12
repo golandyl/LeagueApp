@@ -9,6 +9,7 @@ import { LiveTimer }    from '@/components/match/LiveTimer'
 import { Scoreboard }   from '@/components/match/Scoreboard'
 import { GoalModal, type GoalSelection } from '@/components/match/GoalModal'
 import { EndMatchModal, type EndReason, type EndDecision } from '@/components/match/EndMatchModal'
+import { OverrideMatchModal } from '@/components/match/OverrideMatchModal'
 
 type Match       = Tables<'matches'>
 type League      = Tables<'leagues'>
@@ -72,6 +73,7 @@ export function MatchArena({
   const [saveError,     setSaveError]     = useState<string | null>(null)
   const [nextMatchId,      setNextMatchId]      = useState<string | null>(null)
   const [nextMatchLoading, setNextMatchLoading] = useState(false)
+  const [overrideOpen,     setOverrideOpen]     = useState(false)
 
   // ── Timer ─────────────────────────────────────────────────────────────────────
   // Live: recalculate Date.now() - played_at every second. Refresh-proof and
@@ -427,6 +429,19 @@ export function MatchArena({
     }
   }
 
+  // ── Override save — refetch events + score after manual correction ───────────
+  async function handleOverrideSave(newHome: number, newAway: number) {
+    setHomeScore(newHome)
+    setAwayScore(newAway)
+    const { data: eventRows } = await supabase
+      .from('match_events')
+      .select('*')
+      .eq('match_id', match.id)
+      .order('minute', { ascending: true })
+    if (eventRows) setRawEvents(eventRows)
+    setOverrideOpen(false)
+  }
+
   // ── Screens ───────────────────────────────────────────────────────────────────
 
   if (matchStatus === 'pre') {
@@ -443,19 +458,34 @@ export function MatchArena({
 
   if (matchStatus === 'ended') {
     return (
-      <FinalScreen
-        homeTeam={homeTeam}
-        awayTeam={awayTeam}
-        homeScore={homeScore}
-        awayScore={awayScore}
-        goals={goals}
-        homePlayers={homePlayers}
-        awayPlayers={awayPlayers}
-        victoryCondition={finalVC}
-        leagueId={match.league_id}
-        nextMatchId={nextMatchId}
-        nextMatchLoading={nextMatchLoading}
-      />
+      <>
+        <FinalScreen
+          homeTeam={homeTeam}
+          awayTeam={awayTeam}
+          homeScore={homeScore}
+          awayScore={awayScore}
+          goals={goals}
+          homePlayers={homePlayers}
+          awayPlayers={awayPlayers}
+          victoryCondition={finalVC}
+          leagueId={match.league_id}
+          nextMatchId={nextMatchId}
+          nextMatchLoading={nextMatchLoading}
+          isManager={isManager}
+          onOpenOverride={() => setOverrideOpen(true)}
+        />
+        {overrideOpen && (
+          <OverrideMatchModal
+            match={match}
+            homeTeam={homeTeam}
+            awayTeam={awayTeam}
+            homePlayers={homePlayers}
+            awayPlayers={awayPlayers}
+            onSave={handleOverrideSave}
+            onClose={() => setOverrideOpen(false)}
+          />
+        )}
+      </>
     )
   }
 
@@ -640,6 +670,7 @@ function FinalScreen({
   homeTeam, awayTeam, homeScore, awayScore, goals,
   homePlayers, awayPlayers, victoryCondition,
   leagueId, nextMatchId, nextMatchLoading,
+  isManager, onOpenOverride,
 }: {
   homeTeam:         Team
   awayTeam:         Team
@@ -652,6 +683,8 @@ function FinalScreen({
   leagueId:         string
   nextMatchId:      string | null
   nextMatchLoading: boolean
+  isManager:        boolean
+  onOpenOverride:   () => void
 }) {
   const t = useTranslations('match')
 
@@ -693,6 +726,15 @@ function FinalScreen({
         >
           {t('endTournament')}
         </Link>
+      )}
+
+      {isManager && (
+        <button
+          onClick={onOpenOverride}
+          className="w-full rounded-xl border border-zinc-700 py-3 text-sm font-bold text-zinc-500 transition-all hover:border-amber-700/60 hover:bg-amber-950/20 hover:text-amber-400 active:scale-[0.98]"
+        >
+          {t('manualFix')}
+        </button>
       )}
 
       {goals.length > 0 ? (

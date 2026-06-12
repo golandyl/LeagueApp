@@ -98,7 +98,11 @@
     "deleteTournament": "Удалить турнир",
     "deleteTournamentDesc": "Навсегда удалить этот турнир и все данные матчей. Статистика и таблица обновятся автоматически. Отменить действие невозможно.",
     "deleteTournamentConfirm": "Удалить навсегда",
-    "tabStats": "Статистика"
+    "tabStats": "Статистика",
+    "archiveSuccess": "День турнира заархивирован!",
+    "whatsAppSummary": "Скопировать итоги WhatsApp",
+    "whatsAppCopied": "Скопировано!",
+    "close": "Закрыть"
   },
   "teams": {
     "avgRating": "Ср.",
@@ -127,7 +131,9 @@
     "deletePlayer": "Удалить игрока",
     "deleteConfirm": "Навсегда удалить {name}? Это действие нельзя отменить.",
     "deleteError": "Невозможно удалить игрока с историей матчей. Отредактируйте имя вместо этого.",
-    "deleting": "Удаление…"
+    "deleting": "Удаление…",
+    "duplicateWarning": "Игрок с именем {name} уже существует. Добавить всё равно?",
+    "duplicateAddAnyway": "Всё равно добавить"
   },
   "tournament": {
     "startNew": "Начать новый турнирный день",
@@ -228,7 +234,19 @@
     "penaltyWhichTeam": "Какая команда забила пенальти?",
     "backToHome": "Вернуться на главную",
     "nextGame": "Следующий матч",
-    "endTournament": "Конец турнира"
+    "endTournament": "Конец турнира",
+    "manualFix": "Ручное исправление",
+    "overrideTitle": "Редактировать данные матча",
+    "overrideAddGoal": "+ Добавить гол",
+    "overrideRemove": "Удалить",
+    "overrideVc": "Тип результата",
+    "overrideSave": "Сохранить изменения",
+    "overrideSaving": "Сохранение…",
+    "overrideLocked": "Турнир закрыт — изменения не удалось сохранить.",
+    "overrideScorer": "Бомбардир",
+    "overrideAssister": "Ассистент",
+    "overrideMinute": "Мин",
+    "overrideNoScorer": "Неизвестно"
   },
   "editMatch": {
     "title": "Редактировать результат матча",

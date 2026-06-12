@@ -98,7 +98,11 @@
     "deleteTournament": "Eliminar torneo",
     "deleteTournamentDesc": "Elimina permanentemente este torneo y todos sus datos de partidos. Las estadísticas y clasificaciones se actualizarán automáticamente. Esta acción no se puede deshacer.",
     "deleteTournamentConfirm": "Eliminar para siempre",
-    "tabStats": "Estadísticas"
+    "tabStats": "Estadísticas",
+    "archiveSuccess": "¡Día del torneo archivado!",
+    "whatsAppSummary": "Copiar Resumen de WhatsApp",
+    "whatsAppCopied": "¡Copiado!",
+    "close": "Cerrar"
   },
   "teams": {
     "avgRating": "Med",
@@ -127,7 +131,9 @@
     "deletePlayer": "Eliminar jugador",
     "deleteConfirm": "¿Eliminar permanentemente a {name}? Esta acción no se puede deshacer.",
     "deleteError": "No se puede eliminar un jugador con historial de partidos. Edita su nombre en su lugar.",
-    "deleting": "Eliminando…"
+    "deleting": "Eliminando…",
+    "duplicateWarning": "Ya existe un jugador llamado {name}. ¿Agregar de todos modos?",
+    "duplicateAddAnyway": "Agregar de todos modos"
   },
   "tournament": {
     "startNew": "Iniciar nuevo día de torneo",
@@ -228,7 +234,19 @@
     "penaltyWhichTeam": "¿Qué equipo marcó el penalti?",
     "backToHome": "Volver al inicio",
     "nextGame": "Siguiente partido",
-    "endTournament": "Fin del torneo"
+    "endTournament": "Fin del torneo",
+    "manualFix": "Corrección Manual",
+    "overrideTitle": "Editar Datos del Partido",
+    "overrideAddGoal": "+ Agregar Gol",
+    "overrideRemove": "Eliminar",
+    "overrideVc": "Tipo de Resultado",
+    "overrideSave": "Guardar Cambios",
+    "overrideSaving": "Guardando…",
+    "overrideLocked": "El torneo está cerrado — no se pudieron guardar los cambios.",
+    "overrideScorer": "Goleador",
+    "overrideAssister": "Asistente",
+    "overrideMinute": "Min",
+    "overrideNoScorer": "Desconocido"
   },
   "editMatch": {
     "title": "Editar resultado del partido",

@@ -55,12 +55,18 @@ export function DashboardTabs({
   const [active,            setActive]            = useState<TabId>('matchday')
   const [liveMatches,       setLiveMatches]       = useState<Match[]>(initialMatches)
   const [activeTournament,  setActiveTournament]  = useState<Tournament | null>(tournament)
+  // Lifted from TeamsPanel so swap changes persist across tab switches without
+  // requiring a full router.refresh(). Resets whenever the active tournament
+  // changes (new day started or tournament finished).
+  const [localTeamPlayers,  setLocalTeamPlayers]  = useState(teamPlayers)
 
   // Sync RSC prop updates into state after router.refresh().
   // useState only uses the initializer once, so without these effects
   // a freshly-created tournament would never appear on the dashboard.
   useEffect(() => { setActiveTournament(tournament) }, [tournament?.id])
   useEffect(() => { setLiveMatches(initialMatches)  }, [initialMatches])
+  // Reset team player assignments when a new tournament day begins or ends
+  useEffect(() => { setLocalTeamPlayers(teamPlayers) }, [tournament?.id])  // eslint-disable-line react-hooks/exhaustive-deps
 
   // Realtime subscription — keeps the dashboard in sync when an anonymous
   // scorekeeper updates match scores or status from their device.
@@ -265,7 +271,8 @@ export function DashboardTabs({
             tournament={activeTournament}
             teams={teams}
             players={players}
-            teamPlayers={teamPlayers}
+            teamPlayers={localTeamPlayers}
+            onTeamPlayersChange={setLocalTeamPlayers}
             readOnly={!isManager}
           />
         </div>
@@ -417,6 +424,7 @@ function MatchdayPanel({
               {tournament && (
                 <FinishTournamentButton
                   tournamentId={tournament.id}
+                  leagueId={leagueId}
                   onFinished={onTournamentFinished}
                 />
               )}

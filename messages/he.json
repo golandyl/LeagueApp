@@ -98,7 +98,11 @@
     "deleteTournament": "מחק טורניר",
     "deleteTournamentDesc": "מחיקה לצמיתות של הטורניר וכל נתוני המשחקים שלו. הסטטיסטיקות והדירוגים יעודכנו אוטומטית. לא ניתן לבטל פעולה זו.",
     "deleteTournamentConfirm": "מחק לצמיתות",
-    "tabStats": "סטטיסטיקות"
+    "tabStats": "סטטיסטיקות",
+    "archiveSuccess": "יום הטורניר הועבר לארכיון!",
+    "whatsAppSummary": "העתק סיכום WhatsApp",
+    "whatsAppCopied": "הועתק!",
+    "close": "סגור"
   },
   "teams": {
     "avgRating": "ממוצע",
@@ -127,7 +131,9 @@
     "deletePlayer": "מחק שחקן",
     "deleteConfirm": "למחוק לצמיתות את {name}? לא ניתן לבטל פעולה זו.",
     "deleteError": "לא ניתן למחוק שחקן עם היסטוריית משחקים. ערוך את שמו במקום.",
-    "deleting": "מוחק…"
+    "deleting": "מוחק…",
+    "duplicateWarning": "שחקן בשם {name} כבר קיים. להוסיף בכל זאת?",
+    "duplicateAddAnyway": "הוסף בכל זאת"
   },
   "tournament": {
     "startNew": "התחל יום טורניר חדש",
@@ -228,7 +234,19 @@
     "penaltyWhichTeam": "איזו קבוצה הבקיעה פנדל?",
     "backToHome": "חזרה לדף הבית",
     "nextGame": "המשחק הבא",
-    "endTournament": "סיום הטורניר"
+    "endTournament": "סיום הטורניר",
+    "manualFix": "תיקון ידני",
+    "overrideTitle": "עריכת נתוני משחק",
+    "overrideAddGoal": "+ הוסף שער",
+    "overrideRemove": "הסר",
+    "overrideVc": "סוג תוצאה",
+    "overrideSave": "שמור שינויים",
+    "overrideSaving": "שומר…",
+    "overrideLocked": "הטורניר סגור — לא ניתן לשמור שינויים.",
+    "overrideScorer": "מבקיע",
+    "overrideAssister": "מבשר",
+    "overrideMinute": "דקה",
+    "overrideNoScorer": "לא ידוע"
   },
   "editMatch": {
     "title": "עריכת תוצאת משחק",

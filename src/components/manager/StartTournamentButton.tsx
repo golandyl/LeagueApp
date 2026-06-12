@@ -95,15 +95,18 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
 
     try {
       const supabase = createClient()
+      // Match by player_id (not name) so renames don't break the pre-selection.
+      // Exclude unlisted requests that haven't been approved yet (player_id is null).
       const { data: signups } = await supabase
         .from('tournament_signups')
-        .select('player_name')
+        .select('player_id')
         .eq('league_id', leagueId)
         .eq('status', 'active')
+        .not('player_id', 'is', null)
 
       if (signups && signups.length > 0) {
-        const signupNames = new Set(signups.map(s => s.player_name.toLowerCase().trim()))
-        const matched     = players.filter(p => signupNames.has(p.full_name.toLowerCase().trim()))
+        const signupIds = new Set(signups.map(s => s.player_id!))
+        const matched   = players.filter(p => signupIds.has(p.id))
         if (matched.length > 0) setPresent(new Set(matched.map(p => p.id)))
       }
     } catch {

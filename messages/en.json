@@ -98,7 +98,11 @@
     "deleteTournament": "Delete Tournament",
     "deleteTournamentDesc": "Permanently delete this tournament and all its match data. Stats and standings will update automatically. This cannot be undone.",
     "deleteTournamentConfirm": "Delete Forever",
-    "tabStats": "Stats"
+    "tabStats": "Stats",
+    "archiveSuccess": "Tournament day archived!",
+    "whatsAppSummary": "Copy WhatsApp Summary",
+    "whatsAppCopied": "Copied!",
+    "close": "Close"
   },
   "teams": {
     "avgRating": "Avg",
@@ -127,7 +131,9 @@
     "deletePlayer": "Delete Player",
     "deleteConfirm": "Permanently delete {name}? This cannot be undone.",
     "deleteError": "Cannot delete a player with existing match history. Please edit their name instead.",
-    "deleting": "Deleting…"
+    "deleting": "Deleting…",
+    "duplicateWarning": "A player named {name} already exists. Add anyway?",
+    "duplicateAddAnyway": "Add Anyway"
   },
   "tournament": {
     "startNew": "Start New Tournament Day",
@@ -228,7 +234,19 @@
     "penaltyWhichTeam": "Which team scored the penalty?",
     "backToHome": "Back to Home",
     "nextGame": "Next Game",
-    "endTournament": "End Tournament"
+    "endTournament": "End Tournament",
+    "manualFix": "Manual Fix",
+    "overrideTitle": "Edit Match Data",
+    "overrideAddGoal": "+ Add Goal",
+    "overrideRemove": "Remove",
+    "overrideVc": "Result Type",
+    "overrideSave": "Save Changes",
+    "overrideSaving": "Saving…",
+    "overrideLocked": "Tournament is closed — changes could not be saved.",
+    "overrideScorer": "Scorer",
+    "overrideAssister": "Assist",
+    "overrideMinute": "Min",
+    "overrideNoScorer": "Unknown"
   },
   "editMatch": {
     "title": "Edit Match Result",

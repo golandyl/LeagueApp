@@ -14,11 +14,12 @@ type ViewMode   = 'pitch' | 'stats'
 interface TeamPlayerRow { player_id: string; team_id: string }
 
 interface Props {
-  tournament:  Tournament
-  teams:       Team[]
-  players:     Player[]
-  teamPlayers: TeamPlayerRow[]
-  readOnly?:   boolean
+  tournament:           Tournament
+  teams:                Team[]
+  players:              Player[]
+  teamPlayers:          TeamPlayerRow[]
+  readOnly?:            boolean
+  onTeamPlayersChange?: (updated: TeamPlayerRow[]) => void
 }
 
 // FWD at top (attacking end), GK at bottom (defending goal)
@@ -50,7 +51,7 @@ function groupByPos(roster: Player[]): Record<Position, Player[]> {
 
 // ── Root panel ─────────────────────────────────────────────────────────────────
 
-export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp, readOnly = false }: Props) {
+export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp, readOnly = false, onTeamPlayersChange }: Props) {
   const t       = useTranslations('teams')
   const tCommon = useTranslations('common')
   const supabase = createClient()
@@ -99,36 +100,44 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp,
 
     const targetTeamId = targetTp.team_id
 
-    // Optimistic update — instant feedback
-    setLocalTp(prev => prev.map(tp => {
+    // Compute the post-swap state once so we can use it for both the optimistic
+    // update and the parent callback without recalculating.
+    const nextTp = localTp.map(tp => {
       if (tp.player_id === sourceId)       return { ...tp, team_id: targetTeamId }
       if (tp.player_id === targetPlayerId) return { ...tp, team_id: sourceTeamId }
       return tp
-    }))
+    })
+
+    // Optimistic update — instant feedback
+    setLocalTp(nextTp)
     setSwapSource(null)
     setSwapError(null)
 
     setSwapLoading(true)
-    const [{ error: e1 }, { error: e2 }] = await Promise.all([
+    const [{ data: d1, error: e1 }, { data: d2, error: e2 }] = await Promise.all([
       supabase.from('team_players')
         .update({ team_id: targetTeamId })
         .eq('player_id', sourceId)
-        .eq('tournament_id', tournament.id),
+        .eq('tournament_id', tournament.id)
+        .select('id'),
       supabase.from('team_players')
         .update({ team_id: sourceTeamId })
         .eq('player_id', targetPlayerId)
-        .eq('tournament_id', tournament.id),
+        .eq('tournament_id', tournament.id)
+        .select('id'),
     ])
     setSwapLoading(false)
 
-    if (e1 || e2) {
-      // Revert on failure
-      setLocalTp(prev => prev.map(tp => {
-        if (tp.player_id === sourceId)       return { ...tp, team_id: sourceTeamId }
-        if (tp.player_id === targetPlayerId) return { ...tp, team_id: targetTeamId }
-        return tp
-      }))
+    // Treat 0-row updates (silent RLS failure) the same as an explicit error
+    const failed = e1 || e2 || (d1?.length ?? 0) === 0 || (d2?.length ?? 0) === 0
+
+    if (failed) {
+      // Revert optimistic update
+      setLocalTp(localTp)
       setSwapError(e1?.message ?? e2?.message ?? tCommon('error'))
+    } else {
+      // Propagate the confirmed state to the parent so it persists across tab switches
+      onTeamPlayersChange?.(nextTp)
     }
   }
 

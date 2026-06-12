@@ -98,7 +98,11 @@
     "deleteTournament": "删除赛事",
     "deleteTournamentDesc": "永久删除此赛事及其所有比赛数据。统计数据和积分榜将自动更新。此操作无法撤销。",
     "deleteTournamentConfirm": "永久删除",
-    "tabStats": "统计"
+    "tabStats": "统计",
+    "archiveSuccess": "锦标赛日已存档!",
+    "whatsAppSummary": "复制WhatsApp总结",
+    "whatsAppCopied": "已复制!",
+    "close": "关闭"
   },
   "teams": {
     "avgRating": "均",
@@ -127,7 +131,9 @@
     "deletePlayer": "删除球员",
     "deleteConfirm": "永久删除 {name}？此操作无法撤销。",
     "deleteError": "无法删除有比赛记录的球员，请改为编辑其姓名。",
-    "deleting": "删除中…"
+    "deleting": "删除中…",
+    "duplicateWarning": "名为{name}的球员已存在。仍要添加吗？",
+    "duplicateAddAnyway": "仍然添加"
   },
   "tournament": {
     "startNew": "开始新的赛事日",
@@ -228,7 +234,19 @@
     "penaltyWhichTeam": "哪支球队踢进了点球？",
     "backToHome": "返回主页",
     "nextGame": "下一场比赛",
-    "endTournament": "结束锦标赛"
+    "endTournament": "结束锦标赛",
+    "manualFix": "手动修正",
+    "overrideTitle": "编辑比赛数据",
+    "overrideAddGoal": "+ 添加进球",
+    "overrideRemove": "删除",
+    "overrideVc": "结果类型",
+    "overrideSave": "保存更改",
+    "overrideSaving": "保存中…",
+    "overrideLocked": "锦标赛已结束 — 无法保存更改。",
+    "overrideScorer": "射手",
+    "overrideAssister": "助攻",
+    "overrideMinute": "分",
+    "overrideNoScorer": "未知"
   },
   "editMatch": {
     "title": "编辑比赛结果",

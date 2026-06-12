@@ -13,27 +13,36 @@ type Stamina  = typeof STAMINAS[number]
 
 interface Props { leagueId: string }
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export function AddPlayerForm({ leagueId }: Props) {
-  const t      = useTranslations('players')
+  const t       = useTranslations('players')
   const tCommon = useTranslations('common')
-  const router = useRouter()
-  const [open,     setOpen]     = useState(false)
-  const [name,     setName]     = useState('')
-  const [rating,   setRating]   = useState(5)
-  const [position, setPosition] = useState<Position>('MID')
-  const [stamina,  setStamina]  = useState<Stamina>('Med')
-  const [isVip,    setIsVip]    = useState(false)
-  const [error,    setError]    = useState<string | null>(null)
-  const [loading,  setLoading]  = useState(false)
+  const router  = useRouter()
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setError(null)
+  const [open,        setOpen]        = useState(false)
+  const [name,        setName]        = useState('')
+  const [rating,      setRating]      = useState(5)
+  const [position,    setPosition]    = useState<Position>('MID')
+  const [stamina,     setStamina]     = useState<Stamina>('Med')
+  const [isVip,       setIsVip]       = useState(false)
+  const [error,       setError]       = useState<string | null>(null)
+  const [loading,     setLoading]     = useState(false)
+  // non-null when a duplicate was detected; holds the base name for suffix computation
+  const [duplicateOf, setDuplicateOf] = useState<string | null>(null)
+
+  function resetForm() {
+    setName(''); setRating(5); setPosition('MID'); setStamina('Med'); setIsVip(false)
+    setDuplicateOf(null); setError(null)
+  }
+
+  async function doInsert(finalName: string) {
     setLoading(true)
-
     const supabase = createClient()
     const { error: insertError } = await supabase.from('players').insert({
-      full_name: name.trim(),
+      full_name: finalName,
       rating,
       position,
       stamina,
@@ -41,17 +50,60 @@ export function AddPlayerForm({ leagueId }: Props) {
       is_ghost:  false,
       is_vip:    isVip,
     })
+    setLoading(false)
+    if (insertError) { setError(insertError.message); return }
+    resetForm()
+    setOpen(false)
+    router.refresh()
+  }
 
-    if (insertError) {
-      setError(insertError.message)
-      setLoading(false)
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    const trimmedName = name.trim()
+    const supabase    = createClient()
+
+    // Check for an exact case-insensitive duplicate in this league
+    const { data: existing } = await supabase
+      .from('players')
+      .select('id')
+      .eq('league_id', leagueId)
+      .ilike('full_name', trimmedName)
+      .limit(1)
+
+    if (existing && existing.length > 0) {
+      setDuplicateOf(trimmedName)
       return
     }
 
-    setName(''); setRating(5); setPosition('MID'); setStamina('Med'); setIsVip(false)
-    setLoading(false)
-    setOpen(false)
-    router.refresh()
+    await doInsert(trimmedName)
+  }
+
+  async function handleConfirmDuplicate() {
+    if (!duplicateOf) return
+    setError(null)
+    const supabase = createClient()
+
+    // Fetch all names that start with the base name to find the next free suffix
+    const { data: similar } = await supabase
+      .from('players')
+      .select('full_name')
+      .eq('league_id', leagueId)
+      .ilike('full_name', `${duplicateOf}%`)
+
+    // Collect which suffix numbers are already taken
+    // "John Doe" counts as 1, "John Doe 2" as 2, etc.
+    const basePattern = new RegExp(`^${escapeRegex(duplicateOf)}(?:\\s+(\\d+))?$`, 'i')
+    const taken = new Set<number>()
+    for (const row of similar ?? []) {
+      const m = row.full_name.match(basePattern)
+      if (m) taken.add(m[1] ? parseInt(m[1], 10) : 1)
+    }
+
+    let suffix = 2
+    while (taken.has(suffix)) suffix++
+
+    await doInsert(`${duplicateOf} ${suffix}`)
   }
 
   if (!open) {
@@ -72,7 +124,7 @@ export function AddPlayerForm({ leagueId }: Props) {
       <input
         type="text"
         value={name}
-        onChange={e => setName(e.target.value)}
+        onChange={e => { setName(e.target.value); setDuplicateOf(null) }}
         placeholder={t('fullName')}
         required
         className="w-full rounded-xl bg-slate-700 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-emerald-500"
@@ -132,24 +184,52 @@ export function AddPlayerForm({ leagueId }: Props) {
         </button>
       </div>
 
-      {error && <p className="rounded-xl bg-red-900/40 px-4 py-2 text-sm text-red-300">{error}</p>}
-
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => { setOpen(false); setError(null) }}
-          className="flex-1 rounded-xl bg-slate-700 py-3 text-sm font-bold text-slate-300 active:bg-slate-600"
-        >
-          {tCommon('cancel')}
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex-1 rounded-xl bg-emerald-500 py-3 text-sm font-black text-white transition-all active:bg-emerald-600 disabled:opacity-60"
-        >
-          {loading ? t('adding') : t('add')}
-        </button>
-      </div>
+      {/* Duplicate warning — replaces normal submit row */}
+      {duplicateOf ? (
+        <div className="space-y-3">
+          <p className="rounded-xl bg-amber-900/40 px-4 py-3 text-sm text-amber-300">
+            {t('duplicateWarning', { name: duplicateOf })}
+          </p>
+          {error && <p className="rounded-xl bg-red-900/40 px-4 py-2 text-sm text-red-300">{error}</p>}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setDuplicateOf(null)}
+              className="flex-1 rounded-xl bg-slate-700 py-3 text-sm font-bold text-slate-300 active:bg-slate-600"
+            >
+              {tCommon('cancel')}
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDuplicate}
+              disabled={loading}
+              className="flex-1 rounded-xl bg-amber-500 py-3 text-sm font-black text-white transition-all active:bg-amber-600 disabled:opacity-60"
+            >
+              {loading ? t('adding') : t('duplicateAddAnyway')}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {error && <p className="rounded-xl bg-red-900/40 px-4 py-2 text-sm text-red-300">{error}</p>}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => { setOpen(false); resetForm() }}
+              className="flex-1 rounded-xl bg-slate-700 py-3 text-sm font-bold text-slate-300 active:bg-slate-600"
+            >
+              {tCommon('cancel')}
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 rounded-xl bg-emerald-500 py-3 text-sm font-black text-white transition-all active:bg-emerald-600 disabled:opacity-60"
+            >
+              {loading ? t('adding') : t('add')}
+            </button>
+          </div>
+        </>
+      )}
     </form>
   )
 }

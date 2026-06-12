@@ -98,7 +98,11 @@
     "deleteTournament": "حذف البطولة",
     "deleteTournamentDesc": "حذف هذه البطولة وجميع بيانات مبارياتها نهائياً. سيتم تحديث الإحصائيات والترتيب تلقائياً. لا يمكن التراجع عن هذا الإجراء.",
     "deleteTournamentConfirm": "حذف نهائياً",
-    "tabStats": "إحصائيات"
+    "tabStats": "إحصائيات",
+    "archiveSuccess": "تمّت أرشفة يوم البطولة!",
+    "whatsAppSummary": "نسخ ملخص واتساب",
+    "whatsAppCopied": "تم النسخ!",
+    "close": "إغلاق"
   },
   "teams": {
     "avgRating": "متوسط",
@@ -127,7 +131,9 @@
     "deletePlayer": "حذف اللاعب",
     "deleteConfirm": "حذف {name} نهائيًا؟ لا يمكن التراجع عن هذا.",
     "deleteError": "لا يمكن حذف لاعب لديه سجل مباريات. يرجى تعديل اسمه بدلاً.",
-    "deleting": "جارٍ الحذف…"
+    "deleting": "جارٍ الحذف…",
+    "duplicateWarning": "يوجد لاعب باسم {name} بالفعل. هل تريد إضافته على أي حال؟",
+    "duplicateAddAnyway": "أضف على أي حال"
   },
   "tournament": {
     "startNew": "بدء يوم بطولة جديد",
@@ -228,7 +234,19 @@
     "penaltyWhichTeam": "أي فريق سجّل ركلة الترجيح؟",
     "backToHome": "العودة إلى الرئيسية",
     "nextGame": "المباراة التالية",
-    "endTournament": "إنهاء البطولة"
+    "endTournament": "إنهاء البطولة",
+    "manualFix": "تصحيح يدوي",
+    "overrideTitle": "تعديل بيانات المباراة",
+    "overrideAddGoal": "+ أضف هدف",
+    "overrideRemove": "إزالة",
+    "overrideVc": "نوع النتيجة",
+    "overrideSave": "حفظ التغييرات",
+    "overrideSaving": "جاري الحفظ…",
+    "overrideLocked": "البطولة مغلقة — تعذّر حفظ التغييرات.",
+    "overrideScorer": "المسجّل",
+    "overrideAssister": "صانع الهدف",
+    "overrideMinute": "الدقيقة",
+    "overrideNoScorer": "غير معروف"
   },
   "editMatch": {
     "title": "تعديل نتيجة المباراة",
