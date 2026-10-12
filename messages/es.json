@@ -102,7 +102,13 @@
     "archiveSuccess": "¡Día del torneo archivado!",
     "whatsAppSummary": "Copiar Resumen de WhatsApp",
     "whatsAppCopied": "¡Copiado!",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "accessCodeLabel": "Código de acceso a partidos",
+    "accessCodeCopy": "Copiar",
+    "accessCodeCopied": "¡Copiado!",
+    "accessCodeRegenerate": "Nuevo código",
+    "accessCodeRegenerateConfirm": "¿Crear un código nuevo? El anterior dejará de funcionar de inmediato.",
+    "accessCodeHelp": "Comparte este código con quien vaya a dirigir los partidos. Sin él solo se puede mirar."
   },
   "teams": {
     "avgRating": "Med",
@@ -133,7 +139,10 @@
     "deleteError": "No se puede eliminar un jugador con historial de partidos. Edita su nombre en su lugar.",
     "deleting": "Eliminando…",
     "duplicateWarning": "Ya existe un jugador llamado {name}. ¿Agregar de todos modos?",
-    "duplicateAddAnyway": "Agregar de todos modos"
+    "duplicateAddAnyway": "Agregar de todos modos",
+    "verifiedToggle": "Verificado (seguro firmado)",
+    "markVerified": "Marcar como verificado",
+    "unmarkVerified": "Quitar verificación"
   },
   "tournament": {
     "startNew": "Iniciar nuevo día de torneo",
@@ -246,7 +255,11 @@
     "overrideScorer": "Goleador",
     "overrideAssister": "Asistente",
     "overrideMinute": "Min",
-    "overrideNoScorer": "Desconocido"
+    "overrideNoScorer": "Desconocido",
+    "accessCodeTitle": "Introduce el código de acceso para dirigir este partido",
+    "accessCodeHint": "Pide el código del torneo al administrador de la liga. Puedes ver el marcador sin él.",
+    "accessCodeUnlock": "Desbloquear",
+    "accessCodeInvalid": "Código de acceso incorrecto o caducado."
   },
   "editMatch": {
     "title": "Editar resultado del partido",
@@ -337,7 +350,9 @@
     "publicBannerCta": "Registro abierto — Haz clic aquí para inscribirte",
     "registeredPlayers": "Jugadores inscritos",
     "vipOnly": "Solo inscripción VIP",
-    "vipOnlyDesc": "Solo los jugadores VIP pueden inscribirse ahora."
+    "vipOnlyDesc": "Solo los jugadores VIP pueden inscribirse ahora.",
+    "notVerified": "no verificado",
+    "notVerifiedError": "Debes firmar el formulario del seguro antes de inscribirte. Consulta al administrador."
   },
   "standings": {
     "noTournaments": "No hay torneos aún.",
@@ -393,6 +408,7 @@
     "removeSignup": "Eliminar",
     "createAndAdd": "Crear y agregar a la lista",
     "requestedAs": "Solicitado como",
-    "declineRequest": "Rechazar"
+    "declineRequest": "Rechazar",
+    "verifyToApprove": "Marca al jugador como verificado (seguro firmado) para aprobarlo."
   }
 }

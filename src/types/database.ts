@@ -275,6 +275,7 @@ export type Database = {
           id: string
           is_ghost: boolean
           is_vip: boolean
+          is_verified: boolean
           league_id: string
           manager_id: string | null
           position: Database["public"]["Enums"]["position_type"]
@@ -288,6 +289,7 @@ export type Database = {
           id?: string
           is_ghost?: boolean
           is_vip?: boolean
+          is_verified?: boolean
           league_id: string
           manager_id?: string | null
           position: Database["public"]["Enums"]["position_type"]
@@ -301,6 +303,7 @@ export type Database = {
           id?: string
           is_ghost?: boolean
           is_vip?: boolean
+          is_verified?: boolean
           league_id?: string
           manager_id?: string | null
           position?: Database["public"]["Enums"]["position_type"]
@@ -464,6 +467,32 @@ export type Database = {
           },
         ]
       }
+      tournament_access_codes: {
+        Row: {
+          tournament_id: string
+          code:          string
+          updated_at:    string
+        }
+        Insert: {
+          tournament_id: string
+          code:          string
+          updated_at?:   string
+        }
+        Update: {
+          tournament_id?: string
+          code?:          string
+          updated_at?:    string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_access_codes_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournaments: {
         Row: {
           created_at:    string
@@ -527,8 +556,11 @@ export type Database = {
     Functions: {
       is_league_manager:        { Args: { p_league_id: string }; Returns: boolean }
       league_is_public:         { Args: { p_league_id: string }; Returns: boolean }
-      advance_wc_tournament:    { Args: { p_winner_id: string; p_loser_id: string; p_tournament_id: string; p_league_id: string }; Returns: string | null }
+      league_is_visible:        { Args: { p_league_id: string }; Returns: boolean }
+      advance_wc_tournament:    { Args: { p_match_id: string; p_winner_id: string }; Returns: string | null }
       admin_delete_tournament:  { Args: { p_tournament_id: string }; Returns: void }
+      has_tournament_access:    { Args: { p_tournament_id: string }; Returns: boolean }
+      regenerate_tournament_access_code: { Args: { p_tournament_id: string }; Returns: string }
     }
     Enums: {
       draft_status: "pending" | "active" | "completed"

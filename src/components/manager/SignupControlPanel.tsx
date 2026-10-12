@@ -5,6 +5,7 @@ import { useTranslations, useLocale }   from 'next-intl'
 import { useParams }                    from 'next/navigation'
 import { createClient }                 from '@/lib/supabase/client'
 import type { Tables }                  from '@/types/database'
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 
 type Signup = Tables<'tournament_signups'>
 
@@ -519,6 +520,7 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
   const [position, setPosition] = useState<Position>('MID')
   const [stamina,  setStamina]  = useState<Stamina>('Med')
   const [isVip,    setIsVip]    = useState(false)
+  const [isVerified, setIsVerified] = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [error,    setError]    = useState<string | null>(null)
 
@@ -544,6 +546,7 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
         stamina,
         is_ghost: false,
         is_vip:   isVip,
+        is_verified: isVerified,
       })
       .select('id')
       .single()
@@ -672,6 +675,33 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
             </button>
           </div>
 
+          {/* Verified toggle (insurance form signed) */}
+          <div className="flex items-center justify-between rounded-xl bg-zinc-800 px-4 py-3">
+            <span className="flex items-center gap-1.5 text-sm font-bold text-zinc-300">
+              <VerifiedBadge />
+              {t('verifiedToggle')}
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsVerified(v => !v)}
+              role="switch"
+              aria-checked={isVerified}
+              className={[
+                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
+                isVerified ? 'bg-sky-500' : 'bg-zinc-600',
+              ].join(' ')}
+            >
+              <span className={[
+                'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform',
+                isVerified ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0',
+              ].join(' ')} />
+            </button>
+          </div>
+
+          {!isVerified && (
+            <p className="text-xs text-zinc-500">{tSCP('verifyToApprove')}</p>
+          )}
+
           {error && (
             <p className="rounded-xl bg-red-900/40 px-4 py-2 text-sm text-red-300">{error}</p>
           )}
@@ -686,7 +716,7 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || !isVerified}
               className="flex-1 rounded-xl bg-emerald-600 py-3 text-sm font-black text-white transition-all active:bg-emerald-700 disabled:opacity-60"
             >
               {saving ? tCommon('saving') : tSCP('createAndAdd')}

@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
 
 type Signup    = Tables<'tournament_signups'>
-type PlayerRef = { id: string; full_name: string; is_vip: boolean }
+type PlayerRef = { id: string; full_name: string; is_vip: boolean; is_verified: boolean }
 
 interface Props {
   leagueId:     string
@@ -220,6 +220,16 @@ export function TournamentSignup({
         setError("You're already signed up for this session.")
       } else if (pgMsg.includes('VIP_ONLY')) {
         setError('Signup is currently restricted to VIP players only.')
+      } else if (pgMsg.includes('NOT_VERIFIED')) {
+        setError(t('notVerifiedError'))
+      } else if (pgMsg.includes('SIGNUP_CLOSED')) {
+        setError('Signup is currently closed.')
+      } else if (pgMsg.includes('DUPLICATE_NAME')) {
+        setError('That name is already on the list.')
+      } else if (pgMsg.includes('NAME_TOO_LONG')) {
+        setError('Names are limited to 60 characters.')
+      } else if (pgMsg.includes('SIGNUP_FULL')) {
+        setError('The signup list is full.')
       } else {
         setError(err instanceof Error ? pgMsg : tCommon('error'))
       }
@@ -359,7 +369,9 @@ export function TournamentSignup({
                   {availablePlayers.length === 0 ? t('noPlayersAvailable') : t('selectPlaceholder')}
                 </option>
                 {availablePlayers.map(p => (
-                  <option key={p.id} value={p.id}>{p.full_name}</option>
+                  <option key={p.id} value={p.id} disabled={!p.is_verified}>
+                    {p.is_verified ? `${p.full_name} ✓` : `${p.full_name} — ${t('notVerified')}`}
+                  </option>
                 ))}
               </select>
               <button

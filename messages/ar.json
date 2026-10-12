@@ -102,7 +102,13 @@
     "archiveSuccess": "تمّت أرشفة يوم البطولة!",
     "whatsAppSummary": "نسخ ملخص واتساب",
     "whatsAppCopied": "تم النسخ!",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "accessCodeLabel": "رمز الوصول للمباريات",
+    "accessCodeCopy": "نسخ",
+    "accessCodeCopied": "تم النسخ!",
+    "accessCodeRegenerate": "رمز جديد",
+    "accessCodeRegenerateConfirm": "إنشاء رمز جديد؟ سيتوقف الرمز القديم عن العمل فورًا.",
+    "accessCodeHelp": "شارك هذا الرمز مع من سيدير المباريات. من لا يملكه يمكنه المشاهدة فقط."
   },
   "teams": {
     "avgRating": "متوسط",
@@ -133,7 +139,10 @@
     "deleteError": "لا يمكن حذف لاعب لديه سجل مباريات. يرجى تعديل اسمه بدلاً.",
     "deleting": "جارٍ الحذف…",
     "duplicateWarning": "يوجد لاعب باسم {name} بالفعل. هل تريد إضافته على أي حال؟",
-    "duplicateAddAnyway": "أضف على أي حال"
+    "duplicateAddAnyway": "أضف على أي حال",
+    "verifiedToggle": "موثّق (وقّع التأمين)",
+    "markVerified": "تعيين كموثّق",
+    "unmarkVerified": "إزالة التوثيق"
   },
   "tournament": {
     "startNew": "بدء يوم بطولة جديد",
@@ -246,7 +255,11 @@
     "overrideScorer": "المسجّل",
     "overrideAssister": "صانع الهدف",
     "overrideMinute": "الدقيقة",
-    "overrideNoScorer": "غير معروف"
+    "overrideNoScorer": "غير معروف",
+    "accessCodeTitle": "أدخل رمز الوصول لإدارة هذه المباراة",
+    "accessCodeHint": "اطلب رمز البطولة من مدير الدوري. يمكنك متابعة النتيجة بدونه.",
+    "accessCodeUnlock": "فتح",
+    "accessCodeInvalid": "رمز الوصول غير صحيح أو منتهي الصلاحية."
   },
   "editMatch": {
     "title": "تعديل نتيجة المباراة",
@@ -337,7 +350,9 @@
     "publicBannerCta": "التسجيل مفتوح — انقر هنا للتسجيل",
     "registeredPlayers": "اللاعبون المسجلون",
     "vipOnly": "تسجيل VIP فقط",
-    "vipOnlyDesc": "يمكن للاعبي VIP فقط التسجيل الآن."
+    "vipOnlyDesc": "يمكن للاعبي VIP فقط التسجيل الآن.",
+    "notVerified": "غير موثّق",
+    "notVerifiedError": "يجب توقيع نموذج التأمين قبل التسجيل. تواصل مع المدير."
   },
   "standings": {
     "noTournaments": "لا توجد بطولات بعد.",
@@ -393,6 +408,7 @@
     "removeSignup": "إزالة",
     "createAndAdd": "أنشئ وأضف للقائمة",
     "requestedAs": "طلب باسم",
-    "declineRequest": "رفض"
+    "declineRequest": "رفض",
+    "verifyToApprove": "عيّن اللاعب كموثّق (وقّع التأمين) للموافقة."
   }
 }

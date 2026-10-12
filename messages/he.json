@@ -102,7 +102,13 @@
     "archiveSuccess": "יום הטורניר הועבר לארכיון!",
     "whatsAppSummary": "העתק סיכום WhatsApp",
     "whatsAppCopied": "הועתק!",
-    "close": "סגור"
+    "close": "סגור",
+    "accessCodeLabel": "קוד גישה למשחקים",
+    "accessCodeCopy": "העתקה",
+    "accessCodeCopied": "הועתק!",
+    "accessCodeRegenerate": "קוד חדש",
+    "accessCodeRegenerateConfirm": "ליצור קוד חדש? הקוד הישן יפסיק לעבוד מיד.",
+    "accessCodeHelp": "שתפו את הקוד עם מי שינהל את המשחקים. מי שאין לו את הקוד יוכל רק לצפות."
   },
   "teams": {
     "avgRating": "ממוצע",
@@ -133,7 +139,10 @@
     "deleteError": "לא ניתן למחוק שחקן עם היסטוריית משחקים. ערוך את שמו במקום.",
     "deleting": "מוחק…",
     "duplicateWarning": "שחקן בשם {name} כבר קיים. להוסיף בכל זאת?",
-    "duplicateAddAnyway": "הוסף בכל זאת"
+    "duplicateAddAnyway": "הוסף בכל זאת",
+    "verifiedToggle": "מאומת (חתם על ביטוח)",
+    "markVerified": "סמן כמאומת",
+    "unmarkVerified": "הסר אימות"
   },
   "tournament": {
     "startNew": "התחל יום טורניר חדש",
@@ -246,7 +255,11 @@
     "overrideScorer": "מבקיע",
     "overrideAssister": "מבשר",
     "overrideMinute": "דקה",
-    "overrideNoScorer": "לא ידוע"
+    "overrideNoScorer": "לא ידוע",
+    "accessCodeTitle": "הזינו קוד גישה כדי לנהל את המשחק",
+    "accessCodeHint": "בקשו את קוד הטורניר ממנהל הליגה. אפשר לצפות בתוצאה גם בלעדיו.",
+    "accessCodeUnlock": "פתיחה",
+    "accessCodeInvalid": "קוד גישה שגוי או שפג תוקפו."
   },
   "editMatch": {
     "title": "עריכת תוצאת משחק",
@@ -337,7 +350,9 @@
     "publicBannerCta": "הרשמה פתוחה - לחץ כאן להרשמה",
     "registeredPlayers": "שחקנים שנרשמו",
     "vipOnly": "הרשמת VIP בלבד",
-    "vipOnlyDesc": "רק שחקני VIP יכולים להירשם כרגע."
+    "vipOnlyDesc": "רק שחקני VIP יכולים להירשם כרגע.",
+    "notVerified": "לא מאומת",
+    "notVerifiedError": "יש לחתום על טופס הביטוח לפני ההרשמה. פנו למנהל."
   },
   "standings": {
     "noTournaments": "אין טורנירים עדיין.",
@@ -393,6 +408,7 @@
     "removeSignup": "הסר",
     "createAndAdd": "צור והוסף לרשימה",
     "requestedAs": "ביקש בשם",
-    "declineRequest": "דחה"
+    "declineRequest": "דחה",
+    "verifyToApprove": "סמנו את השחקן כמאומת (חתם על ביטוח) כדי לאשר."
   }
 }

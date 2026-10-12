@@ -75,7 +75,9 @@ export async function proxy(request: NextRequest) {
   if (user) {
     const role = user.user_metadata?.role as string | undefined
 
-    if (MANAGER_PREFIXES.some(p => path.startsWith(p)) && role !== 'manager') {
+    // Public routes (e.g. a shared /manager-dashboard link) stay viewable by
+    // logged-in players too; the page hides manager-only controls itself.
+    if (!isPublic && MANAGER_PREFIXES.some(p => path.startsWith(p)) && role !== 'manager') {
       return NextResponse.redirect(new URL(`/${locale}/player-dashboard`, request.url))
     }
 

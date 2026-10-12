@@ -102,7 +102,13 @@
     "archiveSuccess": "День турнира заархивирован!",
     "whatsAppSummary": "Скопировать итоги WhatsApp",
     "whatsAppCopied": "Скопировано!",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "accessCodeLabel": "Код доступа к матчам",
+    "accessCodeCopy": "Копировать",
+    "accessCodeCopied": "Скопировано!",
+    "accessCodeRegenerate": "Новый код",
+    "accessCodeRegenerateConfirm": "Создать новый код? Старый сразу перестанет работать.",
+    "accessCodeHelp": "Поделитесь кодом с теми, кто будет вести матчи. Без кода можно только смотреть."
   },
   "teams": {
     "avgRating": "Ср.",
@@ -133,7 +139,10 @@
     "deleteError": "Невозможно удалить игрока с историей матчей. Отредактируйте имя вместо этого.",
     "deleting": "Удаление…",
     "duplicateWarning": "Игрок с именем {name} уже существует. Добавить всё равно?",
-    "duplicateAddAnyway": "Всё равно добавить"
+    "duplicateAddAnyway": "Всё равно добавить",
+    "verifiedToggle": "Подтверждён (страховка подписана)",
+    "markVerified": "Отметить как подтверждённого",
+    "unmarkVerified": "Снять подтверждение"
   },
   "tournament": {
     "startNew": "Начать новый турнирный день",
@@ -246,7 +255,11 @@
     "overrideScorer": "Бомбардир",
     "overrideAssister": "Ассистент",
     "overrideMinute": "Мин",
-    "overrideNoScorer": "Неизвестно"
+    "overrideNoScorer": "Неизвестно",
+    "accessCodeTitle": "Введите код доступа, чтобы вести матч",
+    "accessCodeHint": "Попросите код турнира у менеджера лиги. Смотреть счёт можно и без него.",
+    "accessCodeUnlock": "Открыть",
+    "accessCodeInvalid": "Неверный или устаревший код доступа."
   },
   "editMatch": {
     "title": "Редактировать результат матча",
@@ -337,7 +350,9 @@
     "publicBannerCta": "Запись открыта — нажмите здесь для регистрации",
     "registeredPlayers": "Зарегистрированные игроки",
     "vipOnly": "Только VIP-запись",
-    "vipOnlyDesc": "Сейчас могут регистрироваться только VIP-игроки."
+    "vipOnlyDesc": "Сейчас могут регистрироваться только VIP-игроки.",
+    "notVerified": "не подтверждён",
+    "notVerifiedError": "Перед записью нужно подписать страховую форму. Обратитесь к менеджеру."
   },
   "standings": {
     "noTournaments": "Турниров пока нет.",
@@ -393,6 +408,7 @@
     "removeSignup": "Удалить",
     "createAndAdd": "Создать и добавить в список",
     "requestedAs": "Запрошен как",
-    "declineRequest": "Отклонить"
+    "declineRequest": "Отклонить",
+    "verifyToApprove": "Отметьте игрока как подтверждённого (страховка подписана), чтобы одобрить."
   }
 }

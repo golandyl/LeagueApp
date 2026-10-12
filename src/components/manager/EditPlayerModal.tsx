@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 
 type Player = Tables<'players'>
 
@@ -28,6 +29,7 @@ export function EditPlayerModal({ player, onSave, onDelete, onClose }: Props) {
   const [position, setPosition] = useState<Position>(player.position as Position)
   const [stamina,  setStamina]  = useState<Stamina>(player.stamina as Stamina)
   const [isVip,        setIsVip]        = useState(player.is_vip ?? false)
+  const [isVerified,   setIsVerified]   = useState(player.is_verified ?? false)
   const [saving,       setSaving]       = useState(false)
   const [deleting,     setDeleting]     = useState(false)
   const [error,        setError]        = useState<string | null>(null)
@@ -47,7 +49,7 @@ export function EditPlayerModal({ player, onSave, onDelete, onClose }: Props) {
     const supabase = createClient()
     const { error: updateError } = await supabase
       .from('players')
-      .update({ full_name: name.trim(), rating, position, stamina, is_vip: isVip })
+      .update({ full_name: name.trim(), rating, position, stamina, is_vip: isVip, is_verified: isVerified })
       .eq('id', player.id)
 
     setSaving(false)
@@ -56,7 +58,7 @@ export function EditPlayerModal({ player, onSave, onDelete, onClose }: Props) {
       return
     }
 
-    onSave({ ...player, full_name: name.trim(), rating, position, stamina, is_vip: isVip })
+    onSave({ ...player, full_name: name.trim(), rating, position, stamina, is_vip: isVip, is_verified: isVerified })
   }
 
   async function handleDelete() {
@@ -169,6 +171,29 @@ export function EditPlayerModal({ player, onSave, onDelete, onClose }: Props) {
               <span className={[
                 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform',
                 isVip ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0',
+              ].join(' ')} />
+            </button>
+          </div>
+
+          {/* Verified toggle (insurance form signed) */}
+          <div className="flex items-center justify-between rounded-xl bg-slate-700/60 px-4 py-3">
+            <span className="flex items-center gap-1.5 text-sm font-bold text-slate-300">
+              <VerifiedBadge />
+              {t('verifiedToggle')}
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsVerified(v => !v)}
+              role="switch"
+              aria-checked={isVerified}
+              className={[
+                'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
+                isVerified ? 'bg-sky-500' : 'bg-slate-600',
+              ].join(' ')}
+            >
+              <span className={[
+                'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform',
+                isVerified ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0',
               ].join(' ')} />
             </button>
           </div>

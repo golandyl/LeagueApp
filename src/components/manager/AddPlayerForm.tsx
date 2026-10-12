@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
 
 const POSITIONS = ['GK', 'DEF', 'MID', 'FWD'] as const
 const STAMINAS  = ['Low', 'Med', 'High'] as const
@@ -28,13 +29,14 @@ export function AddPlayerForm({ leagueId }: Props) {
   const [position,    setPosition]    = useState<Position>('MID')
   const [stamina,     setStamina]     = useState<Stamina>('Med')
   const [isVip,       setIsVip]       = useState(false)
+  const [isVerified,  setIsVerified]  = useState(false)
   const [error,       setError]       = useState<string | null>(null)
   const [loading,     setLoading]     = useState(false)
   // non-null when a duplicate was detected; holds the base name for suffix computation
   const [duplicateOf, setDuplicateOf] = useState<string | null>(null)
 
   function resetForm() {
-    setName(''); setRating(5); setPosition('MID'); setStamina('Med'); setIsVip(false)
+    setName(''); setRating(5); setPosition('MID'); setStamina('Med'); setIsVip(false); setIsVerified(false)
     setDuplicateOf(null); setError(null)
   }
 
@@ -49,6 +51,7 @@ export function AddPlayerForm({ leagueId }: Props) {
       league_id: leagueId,
       is_ghost:  false,
       is_vip:    isVip,
+      is_verified: isVerified,
     })
     setLoading(false)
     if (insertError) { setError(insertError.message); return }
@@ -180,6 +183,29 @@ export function AddPlayerForm({ leagueId }: Props) {
           <span className={[
             'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform',
             isVip ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0',
+          ].join(' ')} />
+        </button>
+      </div>
+
+      {/* Verified toggle (insurance form signed) */}
+      <div className="flex items-center justify-between rounded-xl bg-slate-700/60 px-4 py-3">
+        <span className="flex items-center gap-1.5 text-sm font-bold text-slate-300">
+          <VerifiedBadge />
+          {t('verifiedToggle')}
+        </span>
+        <button
+          type="button"
+          onClick={() => setIsVerified(v => !v)}
+          role="switch"
+          aria-checked={isVerified}
+          className={[
+            'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
+            isVerified ? 'bg-sky-500' : 'bg-slate-600',
+          ].join(' ')}
+        >
+          <span className={[
+            'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform',
+            isVerified ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0',
           ].join(' ')} />
         </button>
       </div>

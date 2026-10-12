@@ -102,7 +102,13 @@
     "archiveSuccess": "锦标赛日已存档!",
     "whatsAppSummary": "复制WhatsApp总结",
     "whatsAppCopied": "已复制!",
-    "close": "关闭"
+    "close": "关闭",
+    "accessCodeLabel": "比赛访问码",
+    "accessCodeCopy": "复制",
+    "accessCodeCopied": "已复制！",
+    "accessCodeRegenerate": "新访问码",
+    "accessCodeRegenerateConfirm": "生成新访问码？旧访问码将立即失效。",
+    "accessCodeHelp": "将此访问码分享给负责主持比赛的人。没有访问码的人只能观看。"
   },
   "teams": {
     "avgRating": "均",
@@ -133,7 +139,10 @@
     "deleteError": "无法删除有比赛记录的球员，请改为编辑其姓名。",
     "deleting": "删除中…",
     "duplicateWarning": "名为{name}的球员已存在。仍要添加吗？",
-    "duplicateAddAnyway": "仍然添加"
+    "duplicateAddAnyway": "仍然添加",
+    "verifiedToggle": "已认证（已签保险）",
+    "markVerified": "标记为已认证",
+    "unmarkVerified": "取消认证"
   },
   "tournament": {
     "startNew": "开始新的赛事日",
@@ -246,7 +255,11 @@
     "overrideScorer": "射手",
     "overrideAssister": "助攻",
     "overrideMinute": "分",
-    "overrideNoScorer": "未知"
+    "overrideNoScorer": "未知",
+    "accessCodeTitle": "输入访问码以主持本场比赛",
+    "accessCodeHint": "请向联赛管理员索取赛事访问码。没有访问码也可以观看比分。",
+    "accessCodeUnlock": "解锁",
+    "accessCodeInvalid": "访问码错误或已失效。"
   },
   "editMatch": {
     "title": "编辑比赛结果",
@@ -337,7 +350,9 @@
     "publicBannerCta": "报名开放 — 点击此处报名",
     "registeredPlayers": "已报名球员",
     "vipOnly": "仅限VIP报名",
-    "vipOnlyDesc": "目前仅VIP球员可以报名。"
+    "vipOnlyDesc": "目前仅VIP球员可以报名。",
+    "notVerified": "未认证",
+    "notVerifiedError": "报名前需先签署保险表格，请联系管理员。"
   },
   "standings": {
     "noTournaments": "暂无赛事。",
@@ -393,6 +408,7 @@
     "removeSignup": "移除",
     "createAndAdd": "创建并添加到列表",
     "requestedAs": "请求名称",
-    "declineRequest": "拒绝"
+    "declineRequest": "拒绝",
+    "verifyToApprove": "需先将球员标记为已认证（已签保险）才能批准。"
   }
 }

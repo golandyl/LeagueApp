@@ -102,7 +102,13 @@
     "archiveSuccess": "Tournament day archived!",
     "whatsAppSummary": "Copy WhatsApp Summary",
     "whatsAppCopied": "Copied!",
-    "close": "Close"
+    "close": "Close",
+    "accessCodeLabel": "Game access code",
+    "accessCodeCopy": "Copy",
+    "accessCodeCopied": "Copied!",
+    "accessCodeRegenerate": "New code",
+    "accessCodeRegenerateConfirm": "Create a new code? The old one stops working immediately.",
+    "accessCodeHelp": "Share this code with whoever should run matches. Anyone without it can only watch."
   },
   "teams": {
     "avgRating": "Avg",
@@ -133,7 +139,10 @@
     "deleteError": "Cannot delete a player with existing match history. Please edit their name instead.",
     "deleting": "Deleting…",
     "duplicateWarning": "A player named {name} already exists. Add anyway?",
-    "duplicateAddAnyway": "Add Anyway"
+    "duplicateAddAnyway": "Add Anyway",
+    "verifiedToggle": "Verified (insurance signed)",
+    "markVerified": "Mark as verified",
+    "unmarkVerified": "Remove verified"
   },
   "tournament": {
     "startNew": "Start New Tournament Day",
@@ -246,7 +255,11 @@
     "overrideScorer": "Scorer",
     "overrideAssister": "Assist",
     "overrideMinute": "Min",
-    "overrideNoScorer": "Unknown"
+    "overrideNoScorer": "Unknown",
+    "accessCodeTitle": "Enter access code to run this game",
+    "accessCodeHint": "Ask the league manager for the tournament code. You can watch the score without it.",
+    "accessCodeUnlock": "Unlock",
+    "accessCodeInvalid": "Wrong or expired access code."
   },
   "editMatch": {
     "title": "Edit Match Result",
@@ -337,7 +350,9 @@
     "publicBannerCta": "Registration Open — Click Here to Sign Up",
     "registeredPlayers": "Registered Players",
     "vipOnly": "VIP Sign-Up Only",
-    "vipOnlyDesc": "Only VIP players can register right now."
+    "vipOnlyDesc": "Only VIP players can register right now.",
+    "notVerified": "not verified",
+    "notVerifiedError": "You need to sign the insurance form before you can sign up. Ask the manager."
   },
   "signupControl": {
     "sectionTitle": "Signup Window",
@@ -367,7 +382,8 @@
     "removeSignup": "Remove",
     "createAndAdd": "Create & Add to List",
     "requestedAs": "Requested as",
-    "declineRequest": "Decline"
+    "declineRequest": "Decline",
+    "verifyToApprove": "Mark the player as verified (insurance signed) to approve."
   },
   "standings": {
     "noTournaments": "No tournaments yet.",

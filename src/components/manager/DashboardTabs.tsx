@@ -12,6 +12,7 @@ import { TeamsPanel }             from './TeamsPanel'
 import { HistoryPanel }           from './HistoryPanel'
 import { LeagueStatsPanel }       from './LeagueStatsPanel'
 import { EditMatchModal }          from '@/components/match/EditMatchModal'
+import { AccessCodeCard }          from '@/components/manager/AccessCodeCard'
 import { SignupControlPanel }      from './SignupControlPanel'
 import type { Tables } from '@/types/database'
 
@@ -393,6 +394,10 @@ function MatchdayPanel({
       {isManager && (
         <section className="space-y-3">
           <PanelHeader>{t('tournamentControl')}</PanelHeader>
+
+          {tournament && tournament.status === 'active' && (
+            <AccessCodeCard tournamentId={tournament.id} />
+          )}
 
           {activeLiveMatch ? (
             /* Live guard: hide create/finish controls while a player is actively scoring */

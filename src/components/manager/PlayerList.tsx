@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { EditPlayerModal } from './EditPlayerModal'
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge'
+import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
 
 type Player = Tables<'players'>
@@ -41,6 +43,21 @@ export function PlayerList({ players: initialPlayers, isManager = false }: Props
     router.refresh()
   }
 
+  // One-tap verify / unverify from the roster.
+  async function handleToggleVerified(player: Player) {
+    const next = !player.is_verified
+    setPlayers(prev => prev.map(p => (p.id === player.id ? { ...p, is_verified: next } : p)))
+    const { error } = await createClient()
+      .from('players')
+      .update({ is_verified: next })
+      .eq('id', player.id)
+    if (error) {
+      setPlayers(prev => prev.map(p => (p.id === player.id ? { ...p, is_verified: !next } : p)))
+      return
+    }
+    router.refresh()
+  }
+
   function handleDelete(id: string) {
     setPlayers(prev => prev.filter(p => p.id !== id))
     setEditing(null)
@@ -61,6 +78,18 @@ export function PlayerList({ players: initialPlayers, isManager = false }: Props
 
             <div className="min-w-0 flex-1 flex items-center gap-1.5">
               <p className="truncate text-sm font-bold text-white">{p.full_name}</p>
+              {isManager ? (
+                <button
+                  onClick={() => { void handleToggleVerified(p) }}
+                  aria-label={p.is_verified ? t('unmarkVerified') : t('markVerified')}
+                  title={p.is_verified ? t('unmarkVerified') : t('markVerified')}
+                  className="shrink-0 rounded-full transition-transform active:scale-90"
+                >
+                  <VerifiedBadge muted={!p.is_verified} />
+                </button>
+              ) : p.is_verified && (
+                <VerifiedBadge />
+              )}
               {p.is_vip && (
                 <span className="shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-black tracking-wide text-amber-400">
                   VIP

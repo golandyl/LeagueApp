@@ -10,6 +10,8 @@ import { Scoreboard }   from '@/components/match/Scoreboard'
 import { GoalModal, type GoalSelection } from '@/components/match/GoalModal'
 import { EndMatchModal, type EndReason, type EndDecision } from '@/components/match/EndMatchModal'
 import { OverrideMatchModal } from '@/components/match/OverrideMatchModal'
+import { AccessCodeGate } from '@/components/match/AccessCodeGate'
+import { getAccessCode, saveAccessCode, removeAccessCode } from '@/lib/access-codes'
 
 type Match       = Tables<'matches'>
 type League      = Tables<'leagues'>
@@ -74,6 +76,10 @@ export function MatchArena({
   const [nextMatchId,      setNextMatchId]      = useState<string | null>(null)
   const [nextMatchLoading, setNextMatchLoading] = useState(false)
   const [overrideOpen,     setOverrideOpen]     = useState(false)
+
+  // ── Access code — non-managers need the tournament code to run the match ─────
+  const [hasCode, setHasCode] = useState(false)
+  const canControl = isManager || hasCode
 
   // ── Timer ─────────────────────────────────────────────────────────────────────
   // Live: recalculate Date.now() - played_at every second. Refresh-proof and
@@ -189,6 +195,31 @@ export function MatchArena({
     })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match.id])
+
+  // ── Re-check a previously entered access code ───────────────────────────────
+  useEffect(() => {
+    const tournamentId = match.tournament_id
+    if (isManager || !tournamentId || !getAccessCode(tournamentId)) return
+    void (async () => {
+      const { data: ok } = await supabase.rpc('has_tournament_access', { p_tournament_id: tournamentId })
+      if (ok) setHasCode(true)
+      else removeAccessCode(tournamentId)
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [match.tournament_id, isManager])
+
+  async function handleAccessCode(code: string): Promise<boolean> {
+    const tournamentId = match.tournament_id
+    if (!tournamentId) return false
+    saveAccessCode(tournamentId, code)
+    const { data: ok } = await supabase.rpc('has_tournament_access', { p_tournament_id: tournamentId })
+    if (ok) {
+      setHasCode(true)
+      return true
+    }
+    removeAccessCode(tournamentId)
+    return false
+  }
 
   // ── Next scheduled match query (runs when match ends) ────────────────────────
   useEffect(() => {
@@ -310,7 +341,9 @@ export function MatchArena({
       setSaveError(
         msg.includes('TOURNAMENT_LOCKED')
           ? 'Tournament is closed — goal could not be saved.'
-          : 'Failed to save goal. Please try again.',
+          : msg.includes('row-level security')
+            ? t('accessCodeInvalid')
+            : 'Failed to save goal. Please try again.',
       )
     }
   }
@@ -391,13 +424,10 @@ export function MatchArena({
       // "End Tournament" while the INSERT is still in flight.
       if (wcWinnerId && match.tournament_id) {
         setNextMatchLoading(true)
-        const wcLoserId = wcWinnerId === homeTeam.id ? awayTeam.id : homeTeam.id
         try {
           const { data: nextId } = await supabase.rpc('advance_wc_tournament', {
-            p_winner_id:     wcWinnerId,
-            p_loser_id:      wcLoserId,
-            p_tournament_id: match.tournament_id,
-            p_league_id:     match.league_id,
+            p_match_id:  match.id,
+            p_winner_id: wcWinnerId,
           })
           setNextMatchId(nextId)
         } finally {
@@ -451,7 +481,8 @@ export function MatchArena({
         awayTeam={awayTeam}
         league={league}
         leagueId={match.league_id}
-        onKickOff={handleKickOff}
+        onKickOff={canControl ? handleKickOff : undefined}
+        accessGate={canControl ? null : <AccessCodeGate onSubmit={handleAccessCode} />}
       />
     )
   }
@@ -515,8 +546,8 @@ export function MatchArena({
         phase={phase === 'penalties' ? 'overtime' : phase}
         running={timerRunning}
         isStoppageTime={isStoppageTime}
-        onToggle={!autoTimerStopped ? () => { void handleTogglePause() } : undefined}
-        onWhistle={autoTimerStopped || !timerRunning ? undefined : handleWhistle}
+        onToggle={canControl && !autoTimerStopped ? () => { void handleTogglePause() } : undefined}
+        onWhistle={!canControl || autoTimerStopped || !timerRunning ? undefined : handleWhistle}
       />
 
       {saveError && (
@@ -525,7 +556,9 @@ export function MatchArena({
         </p>
       )}
 
-      {autoTimerStopped ? (
+      {!canControl ? (
+        <AccessCodeGate onSubmit={handleAccessCode} />
+      ) : autoTimerStopped ? (
         homeScore !== awayScore ? (
           <button
             onClick={() => { void handleEndMatch() }}
@@ -580,7 +613,7 @@ export function MatchArena({
         />
       )}
 
-      {showGoalModal && timerRunning && !autoTimerStopped && (
+      {showGoalModal && canControl && timerRunning && !autoTimerStopped && (
         <GoalModal
           homeTeam={homeTeam}
           awayTeam={awayTeam}
@@ -591,7 +624,7 @@ export function MatchArena({
         />
       )}
 
-      {endReason && (
+      {endReason && canControl && (
         <EndMatchModal
           reason={endReason}
           homeTeam={homeTeam}
@@ -611,13 +644,14 @@ export function MatchArena({
 // ── Sub-views ─────────────────────────────────────────────────────────────────
 
 function PreMatch({
-  homeTeam, awayTeam, league, leagueId, onKickOff,
+  homeTeam, awayTeam, league, leagueId, onKickOff, accessGate,
 }: {
-  homeTeam:  Team
-  awayTeam:  Team
-  league:    League
-  leagueId:  string
-  onKickOff: () => void
+  homeTeam:   Team
+  awayTeam:   Team
+  league:     League
+  leagueId:   string
+  onKickOff?: () => void
+  accessGate: React.ReactNode
 }) {
   const t = useTranslations('match')
 
@@ -655,12 +689,14 @@ function PreMatch({
           <Row label={t('penalties')}  value={league.penalties_enabled ? t('enabled') : t('off')} />
         </div>
 
-        <button
-          onClick={onKickOff}
-          className="w-full rounded-xl bg-emerald-600 py-7 text-3xl font-black text-white transition-all active:scale-[0.97] active:bg-emerald-700"
-        >
-          ⚽  {t('kickOff')}
-        </button>
+        {onKickOff ? (
+          <button
+            onClick={onKickOff}
+            className="w-full rounded-xl bg-emerald-600 py-7 text-3xl font-black text-white transition-all active:scale-[0.97] active:bg-emerald-700"
+          >
+            ⚽  {t('kickOff')}
+          </button>
+        ) : accessGate}
       </div>
     </div>
   )
