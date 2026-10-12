@@ -44,7 +44,7 @@ export default function RegisterPage() {
 
   if (checkEmail) {
     return (
-      <main className="min-h-screen bg-slate-900 flex items-center justify-center px-6 py-12">
+      <main className="flex-1 bg-slate-900 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm text-center space-y-4">
           <div className="text-5xl">📧</div>
           <h2 className="text-xl font-black text-white">{t('checkEmailTitle')}</h2>
@@ -59,7 +59,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-900 flex items-center justify-center px-6 py-12">
+    <main className="flex-1 bg-slate-900 flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
 
         <div className="mb-8 text-center">

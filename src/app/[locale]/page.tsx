@@ -30,7 +30,7 @@ export default async function HomePage({
   const tNav = await getTranslations('nav')
 
   return (
-    <main className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6 py-16">
+    <main className="flex-1 bg-zinc-950 flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm space-y-10 text-center">
 
         <div>

@@ -524,7 +524,7 @@ export function MatchArena({
   const timerRunning = matchStatus === 'live'
 
   return (
-    <div className="flex min-h-dvh flex-col bg-zinc-950 px-4 pt-4 pb-10 gap-5">
+    <div className="flex flex-1 flex-col bg-zinc-950 px-4 pt-4 pb-10 gap-5">
 
       <Link
         href={`/league/${match.league_id}`}
@@ -656,7 +656,7 @@ function PreMatch({
   const t = useTranslations('match')
 
   return (
-    <div className="flex min-h-dvh flex-col bg-zinc-950 px-5">
+    <div className="flex flex-1 flex-col bg-zinc-950 px-5">
       <div className="pt-4 pb-0">
         <Link
           href={`/league/${leagueId}`}
@@ -729,7 +729,7 @@ function FinalScreen({
     victoryCondition === 'PENALTIES' ? t('wonOnPenalties')  : null
 
   return (
-    <div className="flex min-h-dvh flex-col bg-zinc-950 px-4 py-8 gap-6">
+    <div className="flex flex-1 flex-col bg-zinc-950 px-4 py-8 gap-6">
       <h1 className="text-center text-2xl font-black text-white">{t('fullTime')}</h1>
 
       <div className="flex items-center justify-center gap-6">

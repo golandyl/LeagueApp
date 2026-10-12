@@ -60,7 +60,7 @@ export default async function PublicLeaguePage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="flex-1 bg-zinc-950 text-white">
 
       {/* ── ABSOLUTE TOP: signup banner ─────────────────────────────────
           Rendered first in the return — above the page header, statistics,

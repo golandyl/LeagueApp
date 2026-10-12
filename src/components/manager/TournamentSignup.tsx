@@ -124,9 +124,17 @@ export function TournamentSignup({
             setSignups(prev =>
               prev.map(s => s.id === (payload.new as Signup).id ? payload.new as Signup : s),
             )
-          } else if (payload.eventType === 'DELETE') {
-            setSignups(prev => prev.filter(s => s.id !== (payload.old as Signup).id))
           }
+        },
+      )
+      // DELETE payloads only carry the primary key, so a league_id filter can
+      // never match them — listen unfiltered and drop ids we have on screen.
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'tournament_signups' },
+        (payload) => {
+          const id = (payload.old as { id?: string }).id
+          if (id) setSignups(prev => prev.filter(s => s.id !== id))
         },
       )
       .subscribe()

@@ -95,9 +95,17 @@ export function SignupControlPanel({
             setSignups(prev => prev.map(s =>
               s.id === (payload.new as Signup).id ? payload.new as Signup : s,
             ))
-          } else if (payload.eventType === 'DELETE') {
-            setSignups(prev => prev.filter(s => s.id !== (payload.old as Signup).id))
           }
+        },
+      )
+      // DELETE payloads only carry the primary key, so a league_id filter can
+      // never match them — listen unfiltered and drop ids we have on screen.
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'tournament_signups' },
+        (payload) => {
+          const id = (payload.old as { id?: string }).id
+          if (id) setSignups(prev => prev.filter(s => s.id !== id))
         },
       )
       .subscribe()
@@ -215,6 +223,8 @@ export function SignupControlPanel({
       setClearing(false)
       return
     }
+
+    setSignups([])
 
     // Rotate the signup_cycle so all players' localStorage keys go stale.
     const { error: cycleErr } = await supabase

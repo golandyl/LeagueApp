@@ -131,133 +131,63 @@ export function DashboardTabs({
   const hasLive  = liveMatches.some(m => m.status === 'live')
   const hasTeams = activeTournament !== null && teams.length > 0
 
-  return (
-    <div className="mx-auto max-w-2xl">
+  const tabs: { id: TabId; label: string; count?: number; dot?: boolean }[] = [
+    { id: 'matchday', label: t('tabMatchday'), dot: hasLive },
+    ...(hasTeams ? [{ id: 'teams' as const, label: t('tabTeams'), count: teams.length }] : []),
+    { id: 'roster',   label: t('tabRoster'), count: players.length > 0 ? players.length : undefined },
+    { id: 'stats',    label: t('tabStats') },
+    { id: 'history',  label: t('tabHistory') },
+  ]
 
-      {/* ── Tab bar ───────────────────────────────────────────────────────── */}
+  return (
+    <div className="mx-auto max-w-2xl pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
+
+      {/* ── Bottom tab bar ─────────────────────────────────────────────────── */}
       {/*
-        `flex` on the container + `dir` on <html> means the tabs automatically
-        reverse order in Hebrew/Arabic — no extra rtl: classes needed here.
-        The `border-b border-zinc-800` line is the "rail" that all tabs sit on.
-        The active tab uses `-mb-px border-b-2 border-emerald-500` to draw its
-        coloured indicator ON TOP of that rail (overlap trick).
+        Fixed to the bottom like a native app so all tabs always fit on a
+        phone: equal-width slots, icon above a short label. `dir` on <html>
+        reverses the order automatically in Hebrew/Arabic.
       */}
-      <div
-        className="flex border-b border-zinc-800 px-2"
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-800 bg-zinc-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
         role="tablist"
         aria-label={t('header')}
       >
-        {/* ── Matchday tab ── */}
-        <button
-          role="tab"
-          aria-selected={active === 'matchday'}
-          aria-controls="panel-matchday"
-          onClick={() => setActive('matchday')}
-          className={[
-            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
-            active === 'matchday'
-              ? '-mb-px border-b-2 border-emerald-500 text-white'
-              : 'text-zinc-500 hover:text-zinc-300',
-          ].join(' ')}
-        >
-          {t('tabMatchday')}
-          {/* Pulsing dot when a live match is running */}
-          {hasLive && (
-            <span
-              className="h-2 w-2 animate-pulse rounded-full bg-emerald-400"
-              aria-hidden="true"
-            />
-          )}
-        </button>
-
-        {/* ── Teams tab — only visible when a tournament with teams exists ── */}
-        {hasTeams && (
-          <button
-            role="tab"
-            aria-selected={active === 'teams'}
-            aria-controls="panel-teams"
-            onClick={() => setActive('teams')}
-            className={[
-              'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
-              active === 'teams'
-                ? '-mb-px border-b-2 border-emerald-500 text-white'
-                : 'text-zinc-500 hover:text-zinc-300',
-            ].join(' ')}
-          >
-            {t('tabTeams')}
-            <span
-              className={[
-                'rounded-full px-1.5 py-px text-[10px] font-black tabular-nums transition-colors',
-                active === 'teams'
-                  ? 'bg-emerald-500/20 text-emerald-300'
-                  : 'bg-zinc-800 text-zinc-400',
-              ].join(' ')}
-            >
-              {teams.length}
-            </span>
-          </button>
-        )}
-
-        {/* ── Roster tab ── */}
-        <button
-          role="tab"
-          aria-selected={active === 'roster'}
-          aria-controls="panel-roster"
-          onClick={() => setActive('roster')}
-          className={[
-            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
-            active === 'roster'
-              ? '-mb-px border-b-2 border-emerald-500 text-white'
-              : 'text-zinc-500 hover:text-zinc-300',
-          ].join(' ')}
-        >
-          {t('tabRoster')}
-          {players.length > 0 && (
-            <span
-              className={[
-                'rounded-full px-1.5 py-px text-[10px] font-black tabular-nums transition-colors',
-                active === 'roster'
-                  ? 'bg-emerald-500/20 text-emerald-300'
-                  : 'bg-zinc-800 text-zinc-400',
-              ].join(' ')}
-            >
-              {players.length}
-            </span>
-          )}
-        </button>
-
-        {/* ── Stats tab ── */}
-        <button
-          role="tab"
-          aria-selected={active === 'stats'}
-          aria-controls="panel-stats"
-          onClick={() => setActive('stats')}
-          className={[
-            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
-            active === 'stats'
-              ? '-mb-px border-b-2 border-emerald-500 text-white'
-              : 'text-zinc-500 hover:text-zinc-300',
-          ].join(' ')}
-        >
-          {t('tabStats')}
-        </button>
-
-        {/* ── History tab ── */}
-        <button
-          role="tab"
-          aria-selected={active === 'history'}
-          aria-controls="panel-history"
-          onClick={() => setActive('history')}
-          className={[
-            'flex items-center gap-2 px-4 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
-            active === 'history'
-              ? '-mb-px border-b-2 border-emerald-500 text-white'
-              : 'text-zinc-500 hover:text-zinc-300',
-          ].join(' ')}
-        >
-          {t('tabHistory')}
-        </button>
-      </div>
+        <div className="mx-auto flex max-w-2xl">
+          {tabs.map(tab => {
+            const selected = active === tab.id
+            return (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={selected}
+                aria-controls={`panel-${tab.id}`}
+                onClick={() => setActive(tab.id)}
+                className={[
+                  'relative flex min-w-0 flex-1 flex-col items-center gap-1 pt-2.5 pb-2 text-[11px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500',
+                  selected ? 'text-emerald-400' : 'text-zinc-500 active:text-zinc-300',
+                ].join(' ')}
+              >
+                {selected && (
+                  <span className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                )}
+                <span className="relative">
+                  <TabIcon id={tab.id} />
+                  {tab.dot && (
+                    <span className="absolute -top-0.5 -end-1 h-2 w-2 animate-pulse rounded-full bg-emerald-400 ring-2 ring-zinc-950" aria-hidden="true" />
+                  )}
+                  {tab.count !== undefined && (
+                    <span className="absolute -top-1.5 start-4 min-w-4 rounded-full bg-zinc-800 px-1 text-center text-[9px] font-black leading-4 tabular-nums text-zinc-300 ring-2 ring-zinc-950">
+                      {tab.count}
+                    </span>
+                  )}
+                </span>
+                <span className="max-w-full truncate px-1">{tab.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </nav>
 
       {/* ── Tab panels ────────────────────────────────────────────────────── */}
 
@@ -638,5 +568,37 @@ function MatchBadge({
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
       </svg>
     </span>
+  )
+}
+
+// ── Tab icons (24px outline) ─────────────────────────────────────────────────
+
+const TAB_ICON_PATHS: Record<TabId, string> = {
+  // whistle / play
+  matchday: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-1.5-12.75 5.25 3.75-5.25 3.75v-7.5Z',
+  // shield
+  teams:    'M12 3 4.5 6v5.25c0 4.5 3.2 8.4 7.5 9.75 4.3-1.35 7.5-5.25 7.5-9.75V6L12 3Z',
+  // people
+  roster:   'M15 19.5v-1.125A3.375 3.375 0 0 0 11.625 15h-4.5a3.375 3.375 0 0 0-3.375 3.375V19.5M9.375 11.25a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM20.25 19.5v-1.125a3.375 3.375 0 0 0-2.531-3.268M15.75 5.4a3 3 0 0 1 0 5.7',
+  // bar chart
+  stats:    'M4.5 19.5h15M7.5 16.5v-5.25M12 16.5V7.5M16.5 16.5v-3',
+  // clock
+  history:  'M12 7.5V12l3 2.25M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+}
+
+function TabIcon({ id }: { id: TabId }) {
+  return (
+    <svg
+      className="h-6 w-6"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={TAB_ICON_PATHS[id]} />
+    </svg>
   )
 }

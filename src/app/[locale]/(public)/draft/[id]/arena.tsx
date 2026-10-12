@@ -58,7 +58,7 @@ export function DraftArena({ tournamentId, initData, myTeamId, myName, isManager
   // ── Pending: show lobby ──────────────────────────────────────────────────────
   if (draftStatus === 'pending') {
     return (
-      <div className="flex min-h-screen flex-col bg-slate-900">
+      <div className="flex flex-1 flex-col bg-slate-900">
         {isManager && <DraftLink tournamentId={tournamentId} teams={teams} />}
         <ReadyLobby
           teams={teams}
@@ -74,7 +74,7 @@ export function DraftArena({ tournamentId, initData, myTeamId, myName, isManager
 
   // ── Active / Completed: full arena ───────────────────────────────────────────
   return (
-    <div className="flex min-h-screen flex-col bg-slate-900">
+    <div className="flex flex-1 flex-col bg-slate-900">
       {/* Top bar */}
       {isManager && <DraftLink tournamentId={tournamentId} teams={teams} />}
       <TurnBanner

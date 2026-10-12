@@ -42,7 +42,7 @@ export default async function LeagueSignupPage({ params }: Props) {
   const t       = await getTranslations('signup')
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="flex-1 bg-zinc-950 text-white">
 
       {/* Header */}
       <div className="bg-zinc-900 px-5 py-5 shadow-lg">

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { NextIntlClientProvider } from 'next-intl'
@@ -14,6 +14,15 @@ const RTL_LOCALES: readonly string[] = ['he', 'ar']
 export const metadata: Metadata = {
   title: 'Sunday League',
   description: 'Organize your local football league with live scoring, drafts, and standings.',
+}
+
+// viewportFit 'cover' exposes env(safe-area-inset-*) so fixed bars clear the
+// iPhone home indicator; themeColor tints the mobile browser chrome.
+export const viewport: Viewport = {
+  width:        'device-width',
+  initialScale: 1,
+  viewportFit:  'cover',
+  themeColor:   '#0f172a',
 }
 
 export function generateStaticParams() {
@@ -44,7 +53,7 @@ export default async function LocaleLayout({
       dir={dir}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col bg-zinc-950 text-white">
         <NextIntlClientProvider messages={messages}>
           {/* Sticky nav — hidden on login/register (handled inside TopNavbar) */}
           <TopNavbar />

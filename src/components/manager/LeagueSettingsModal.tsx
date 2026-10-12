@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from '@/i18n/navigation'
 import type { Tables } from '@/types/database'
 
 type League = Tables<'leagues'>
@@ -13,6 +14,7 @@ interface Props {
 
 export function LeagueSettingsModal({ league }: Props) {
   const t       = useTranslations('settings')
+  const router = useRouter()
   const tCreate = useTranslations('createLeague')
   const tCommon = useTranslations('common')
 
@@ -62,6 +64,8 @@ export function LeagueSettingsModal({ league }: Props) {
       setStatus('error')
     } else {
       setStatus('saved')
+      // Re-render the server page so the dashboard header shows the new rules.
+      router.refresh()
       setTimeout(close, 900)
     }
   }

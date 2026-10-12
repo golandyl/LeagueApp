@@ -70,7 +70,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
     : tCreate('overtimeTypeClassic')
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="flex-1 bg-zinc-950 text-white">
 
       {/* ── Page header ── */}
       <div className="bg-zinc-900 px-5 py-5 shadow-lg">

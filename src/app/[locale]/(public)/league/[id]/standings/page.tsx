@@ -171,7 +171,7 @@ export default async function StandingsPage({ params }: Props) {
 
   if (!tournament) {
     return (
-      <main className="min-h-screen bg-zinc-950 text-white">
+      <main className="flex-1 bg-zinc-950 text-white">
         {signupOpen && (
           <SignupBanner
             leagueId={leagueId}
@@ -221,7 +221,7 @@ export default async function StandingsPage({ params }: Props) {
   const wins      = topWins(resolvedTeamPlayers, resolvedMatches, playersMap)
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="flex-1 bg-zinc-950 text-white">
       {signupOpen && (
         <SignupBanner
           leagueId={leagueId}
@@ -262,7 +262,7 @@ export default async function StandingsPage({ params }: Props) {
             <p className="text-center text-sm text-zinc-500">{t('noMatches')}</p>
           ) : (
             <div className="overflow-x-auto rounded-xl bg-zinc-900 shadow-lg">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm tabular-nums">
                 <thead>
                   <tr className="border-b border-zinc-700 text-xs uppercase tracking-wider text-zinc-400">
                     <th className="px-4 py-3 text-start">#</th>
@@ -271,8 +271,8 @@ export default async function StandingsPage({ params }: Props) {
                     <th className="px-3 py-3 text-center">{t('colW')}</th>
                     <th className="px-3 py-3 text-center">{t('colD')}</th>
                     <th className="px-3 py-3 text-center">{t('colL')}</th>
-                    <th className="px-3 py-3 text-center">{t('colGF')}</th>
-                    <th className="px-3 py-3 text-center">{t('colGA')}</th>
+                    <th className="hidden px-3 py-3 text-center sm:table-cell">{t('colGF')}</th>
+                    <th className="hidden px-3 py-3 text-center sm:table-cell">{t('colGA')}</th>
                     <th className="px-3 py-3 text-center">{t('colGD')}</th>
                     <th className="px-3 py-3 text-center font-black text-white">{t('colPts')}</th>
                   </tr>
@@ -294,15 +294,15 @@ export default async function StandingsPage({ params }: Props) {
                               style={{ backgroundColor: row.team.color }}
                             />
                           )}
-                          <span className="font-bold text-white">{row.team.name}</span>
+                          <span className="whitespace-nowrap font-bold text-white">{row.team.name}</span>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 text-center text-zinc-300">{row.gp}</td>
                       <td className="px-3 py-3.5 text-center text-emerald-400">{row.w}</td>
                       <td className="px-3 py-3.5 text-center text-zinc-400">{row.d}</td>
                       <td className="px-3 py-3.5 text-center text-red-400">{row.l}</td>
-                      <td className="px-3 py-3.5 text-center text-zinc-300">{row.gf}</td>
-                      <td className="px-3 py-3.5 text-center text-zinc-300">{row.ga}</td>
+                      <td className="hidden px-3 py-3.5 text-center text-zinc-300 sm:table-cell">{row.gf}</td>
+                      <td className="hidden px-3 py-3.5 text-center text-zinc-300 sm:table-cell">{row.ga}</td>
                       <td className={`px-3 py-3.5 text-center font-semibold ${
                         row.gd > 0 ? 'text-emerald-400' :
                         row.gd < 0 ? 'text-red-400' : 'text-zinc-400'
