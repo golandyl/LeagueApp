@@ -162,7 +162,7 @@ export function DashboardTabs({
     { id: 'matchday', label: t('tabMatchday'), dot: hasLive },
     { id: 'signup',   label: t('tabSignup'), dot: signupStatus !== 'closed' && !hasLive },
     ...(hasTeams ? [{ id: 'teams' as const, label: t('tabTeams'), count: teams.length }] : []),
-    { id: 'roster',   label: t('tabRoster'), count: players.length > 0 ? players.length : undefined },
+    ...(isManager ? [{ id: 'roster' as const, label: t('tabRoster'), count: players.length > 0 ? players.length : undefined }] : []),
     { id: 'stats',    label: t('tabStats') },
     { id: 'history',  label: t('tabHistory') },
   ]
@@ -288,7 +288,7 @@ export function DashboardTabs({
         </div>
       )}
 
-      {active === 'roster' && (
+      {active === 'roster' && isManager && (
         <div
           id="panel-roster"
           role="tabpanel"

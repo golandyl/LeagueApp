@@ -19,7 +19,7 @@ interface Props {
 export default async function ManagerDashboardPage({ params, searchParams }: Props) {
   const { locale, id: leagueId } = await params
   const { tab } = await searchParams
-  const initialTab = (TAB_IDS as readonly string[]).includes(tab ?? '') ? tab as TabId : 'matchday'
+  const requestedTab = (TAB_IDS as readonly string[]).includes(tab ?? '') ? tab as TabId : 'matchday'
   setRequestLocale(locale)
 
   const supabase = await createClient()
@@ -64,7 +64,16 @@ export default async function ManagerDashboardPage({ params, searchParams }: Pro
     teamPlayers = rawTp      ?? []
   }
 
-  const resolvedPlayers = players ?? []
+  // Ratings are for the manager's eyes only: visitors get players sorted by
+  // name with the rating blanked, so neither the numbers nor the order leak.
+  const resolvedPlayers = isManager
+    ? (players ?? [])
+    : (players ?? [])
+        .map(p => ({ ...p, rating: 0 }))
+        .sort((a, b) => a.full_name.localeCompare(b.full_name, locale))
+
+  // The Roster tab is manager-only.
+  const initialTab: TabId = requestedTab === 'roster' && !isManager ? 'matchday' : requestedTab
 
   const t      = await getTranslations('dashboard')
   const tCreate = await getTranslations('createLeague')
