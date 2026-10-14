@@ -38,6 +38,7 @@ export function TournamentSignup({
 }: Props) {
   const t       = useTranslations('signup')
   const tCommon = useTranslations('common')
+  const tErr    = useTranslations('errors')
 
   const supabase = useMemo(() => createClient(), [])
 
@@ -55,14 +56,20 @@ export function TournamentSignup({
   const [requestSent,  setRequestSent]  = useState(false)
   const [error,        setError]        = useState<string | null>(null)
 
-  // Sync RSC-provided props on hydration
-  useEffect(() => { setLiveStatus(initStatus) }, [initStatus])
-  useEffect(() => { setLiveDate(initDate)     }, [initDate])
-  useEffect(() => { setLiveCap(initCap)       }, [initCap])
+  // Sync when the server passes new props
+  const [seenProps, setSeenProps] = useState({ initStatus, initDate, initCap })
+  if (seenProps.initStatus !== initStatus || seenProps.initDate !== initDate || seenProps.initCap !== initCap) {
+    setSeenProps({ initStatus, initDate, initCap })
+    setLiveStatus(initStatus)
+    setLiveDate(initDate)
+    setLiveCap(initCap)
+  }
 
   // Check localStorage for current cycle; prune stale keys
   useEffect(() => {
     const currentKey = storageKey(leagueId, signupCycle)
+    // localStorage only exists after hydration, so this must run in an effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSignedUp(!!localStorage.getItem(currentKey))
     const staleKeys = Object.keys(localStorage).filter(
       k => k.startsWith(`has_signed_up_${leagueId}_`) && k !== currentKey,
@@ -225,19 +232,19 @@ export function TournamentSignup({
       const pgCode = (err as { code?: string }).code
       const pgMsg  = (err as { message?: string }).message ?? ''
       if (pgCode === '23505') {
-        setError("You're already signed up for this session.")
+        setError(tErr('alreadySignedUp'))
       } else if (pgMsg.includes('VIP_ONLY')) {
-        setError('Signup is currently restricted to VIP players only.')
+        setError(tErr('vipOnly'))
       } else if (pgMsg.includes('NOT_VERIFIED')) {
         setError(t('notVerifiedError'))
       } else if (pgMsg.includes('SIGNUP_CLOSED')) {
-        setError('Signup is currently closed.')
+        setError(tErr('signupClosed'))
       } else if (pgMsg.includes('DUPLICATE_NAME')) {
-        setError('That name is already on the list.')
+        setError(tErr('duplicateName'))
       } else if (pgMsg.includes('NAME_TOO_LONG')) {
-        setError('Names are limited to 60 characters.')
+        setError(tErr('nameTooLong'))
       } else if (pgMsg.includes('SIGNUP_FULL')) {
-        setError('The signup list is full.')
+        setError(tErr('signupFull'))
       } else {
         setError(err instanceof Error ? pgMsg : tCommon('error'))
       }
@@ -408,7 +415,6 @@ export function TournamentSignup({
                 placeholder={t('requestNamePlaceholder')}
                 maxLength={64}
                 autoComplete="name"
-                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
                 className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white outline-none placeholder:text-zinc-600 focus:ring-2 focus:ring-emerald-500"
               />

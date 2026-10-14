@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { EditPlayerModal } from './EditPlayerModal'
@@ -24,9 +24,12 @@ export function PlayerList({ players: initialPlayers, isManager = false }: Props
   const [players, setPlayers] = useState<Player[]>(initialPlayers)
   const [editing, setEditing] = useState<Player | null>(null)
 
-  useEffect(() => {
+  // Take fresh server data after router.refresh()
+  const [seenInitial, setSeenInitial] = useState(initialPlayers)
+  if (initialPlayers !== seenInitial) {
+    setSeenInitial(initialPlayers)
     setPlayers(initialPlayers)
-  }, [initialPlayers])
+  }
 
   const sorted = players
     .slice()

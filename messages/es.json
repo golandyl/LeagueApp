@@ -108,7 +108,13 @@
     "accessCodeCopied": "¡Copiado!",
     "accessCodeRegenerate": "Nuevo código",
     "accessCodeRegenerateConfirm": "¿Crear un código nuevo? El anterior dejará de funcionar de inmediato.",
-    "accessCodeHelp": "Comparte este código con quien vaya a dirigir los partidos. Sin él solo se puede mirar."
+    "accessCodeHelp": "Comparte este código con quien vaya a dirigir los partidos. Sin él solo se puede mirar.",
+    "tabSignup": "Inscripción",
+    "leagueHeader": "Liga",
+    "emptyMatchdayTitle": "No hay partidos ahora",
+    "emptyMatchdayBody": "Cuando empiece la jornada, aquí aparecerán los partidos en vivo y los resultados.",
+    "emptyMatchdaySignupCta": "Inscríbete en la próxima jornada",
+    "emptyMatchdayStatsCta": "Ver estadísticas y tabla"
   },
   "teams": {
     "avgRating": "Med",
@@ -352,7 +358,10 @@
     "vipOnly": "Solo inscripción VIP",
     "vipOnlyDesc": "Solo los jugadores VIP pueden inscribirse ahora.",
     "notVerified": "no verificado",
-    "notVerifiedError": "Debes firmar el formulario del seguro antes de inscribirte. Consulta al administrador."
+    "notVerifiedError": "Debes firmar el formulario del seguro antes de inscribirte. Consulta al administrador.",
+    "insuranceTitle": "Formulario de seguro obligatorio",
+    "insuranceBody": "Todos los jugadores deben firmar el formulario del seguro antes de inscribirse. Cuando el administrador lo confirme, tu nombre tendrá una ✓ azul y podrás inscribirte.",
+    "insuranceCta": "Rellenar el formulario del seguro"
   },
   "standings": {
     "noTournaments": "No hay torneos aún.",
@@ -378,7 +387,8 @@
     "winUnit": "{count, plural, one {victoria} other {victorias}}",
     "signupBannerLive": "Registro abierto para {date}",
     "signupBannerLiveNoDate": "El registro está abierto",
-    "signupBannerCta": "Inscribirse →"
+    "signupBannerCta": "Inscribirse →",
+    "recentResults": "Resultados recientes"
   },
   "signupControl": {
     "sectionTitle": "Ventana de inscripción",
@@ -410,5 +420,24 @@
     "requestedAs": "Solicitado como",
     "declineRequest": "Rechazar",
     "verifyToApprove": "Marca al jugador como verificado (seguro firmado) para aprobarlo."
+  },
+  "errors": {
+    "notSignedIn": "Debes iniciar sesión. Actualiza la página e inténtalo de nuevo.",
+    "createLeagueFailed": "No se pudo crear la liga.",
+    "goalLocked": "El torneo está cerrado — no se pudo guardar el gol.",
+    "goalFailed": "No se pudo guardar el gol. Inténtalo de nuevo.",
+    "resultLocked": "El torneo ya está cerrado — no se pudo guardar el resultado.",
+    "resultFailed": "No se pudo guardar el resultado. Inténtalo de nuevo.",
+    "overrideUnauthorized": "No tienes permiso para corregir este partido.",
+    "matchNotFound": "Partido no encontrado.",
+    "matchLocked": "Este torneo ha finalizado. Los datos de partidos anteriores no se pueden modificar.",
+    "clearListConfirm": "¿Seguro que quieres vaciar la lista de inscripción actual?",
+    "createPlayerFailed": "No se pudo crear el jugador.",
+    "alreadySignedUp": "Ya estás inscrito en esta sesión.",
+    "vipOnly": "La inscripción está abierta solo para jugadores VIP.",
+    "signupClosed": "La inscripción está cerrada.",
+    "duplicateName": "Ese nombre ya está en la lista.",
+    "nameTooLong": "Los nombres tienen un máximo de 60 caracteres.",
+    "signupFull": "La lista de inscripción está completa."
   }
 }

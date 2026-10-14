@@ -34,7 +34,6 @@ export function LeagueSettingsModal({ league }: Props) {
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') close() }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   function close() {

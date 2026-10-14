@@ -108,7 +108,13 @@
     "accessCodeCopied": "تم النسخ!",
     "accessCodeRegenerate": "رمز جديد",
     "accessCodeRegenerateConfirm": "إنشاء رمز جديد؟ سيتوقف الرمز القديم عن العمل فورًا.",
-    "accessCodeHelp": "شارك هذا الرمز مع من سيدير المباريات. من لا يملكه يمكنه المشاهدة فقط."
+    "accessCodeHelp": "شارك هذا الرمز مع من سيدير المباريات. من لا يملكه يمكنه المشاهدة فقط.",
+    "tabSignup": "التسجيل",
+    "leagueHeader": "الدوري",
+    "emptyMatchdayTitle": "لا توجد مباريات حاليًا",
+    "emptyMatchdayBody": "عند بدء يوم المباريات ستظهر هنا المباريات المباشرة والنتائج.",
+    "emptyMatchdaySignupCta": "سجّل ليوم المباريات القادم",
+    "emptyMatchdayStatsCta": "الإحصائيات والترتيب"
   },
   "teams": {
     "avgRating": "متوسط",
@@ -352,7 +358,10 @@
     "vipOnly": "تسجيل VIP فقط",
     "vipOnlyDesc": "يمكن للاعبي VIP فقط التسجيل الآن.",
     "notVerified": "غير موثّق",
-    "notVerifiedError": "يجب توقيع نموذج التأمين قبل التسجيل. تواصل مع المدير."
+    "notVerifiedError": "يجب توقيع نموذج التأمين قبل التسجيل. تواصل مع المدير.",
+    "insuranceTitle": "نموذج التأمين مطلوب",
+    "insuranceBody": "يجب على كل لاعب توقيع نموذج التأمين قبل التسجيل. بعد تأكيد المدير ستظهر علامة ✓ زرقاء بجانب اسمك ويمكنك التسجيل.",
+    "insuranceCta": "املأ نموذج التأمين"
   },
   "standings": {
     "noTournaments": "لا توجد بطولات بعد.",
@@ -378,7 +387,8 @@
     "winUnit": "{count, plural, one {انتصار} two {انتصاران} few {انتصارات} other {انتصارات}}",
     "signupBannerLive": "التسجيل مفتوح لـ {date}",
     "signupBannerLiveNoDate": "التسجيل مفتوح الآن",
-    "signupBannerCta": "سجل الآن ←"
+    "signupBannerCta": "سجل الآن ←",
+    "recentResults": "أحدث النتائج"
   },
   "signupControl": {
     "sectionTitle": "نافذة التسجيل",
@@ -410,5 +420,24 @@
     "requestedAs": "طلب باسم",
     "declineRequest": "رفض",
     "verifyToApprove": "عيّن اللاعب كموثّق (وقّع التأمين) للموافقة."
+  },
+  "errors": {
+    "notSignedIn": "يجب تسجيل الدخول. حدّث الصفحة وحاول مرة أخرى.",
+    "createLeagueFailed": "فشل إنشاء الدوري.",
+    "goalLocked": "البطولة مغلقة — تعذّر حفظ الهدف.",
+    "goalFailed": "فشل حفظ الهدف. حاول مرة أخرى.",
+    "resultLocked": "البطولة مغلقة بالفعل — تعذّر حفظ نتيجة المباراة.",
+    "resultFailed": "فشل حفظ نتيجة المباراة. حاول مرة أخرى.",
+    "overrideUnauthorized": "غير مصرّح لك بتعديل هذه المباراة.",
+    "matchNotFound": "المباراة غير موجودة.",
+    "matchLocked": "انتهت هذه البطولة. لا يمكن تعديل بيانات المباريات السابقة.",
+    "clearListConfirm": "هل أنت متأكد أنك تريد مسح قائمة التسجيل الحالية؟",
+    "createPlayerFailed": "فشل إنشاء اللاعب.",
+    "alreadySignedUp": "أنت مسجّل بالفعل في هذه الجلسة.",
+    "vipOnly": "التسجيل متاح حاليًا للاعبي VIP فقط.",
+    "signupClosed": "التسجيل مغلق حاليًا.",
+    "duplicateName": "هذا الاسم موجود بالفعل في القائمة.",
+    "nameTooLong": "الأسماء محدودة بـ 60 حرفًا.",
+    "signupFull": "قائمة التسجيل ممتلئة."
   }
 }

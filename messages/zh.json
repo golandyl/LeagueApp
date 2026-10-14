@@ -108,7 +108,13 @@
     "accessCodeCopied": "已复制！",
     "accessCodeRegenerate": "新访问码",
     "accessCodeRegenerateConfirm": "生成新访问码？旧访问码将立即失效。",
-    "accessCodeHelp": "将此访问码分享给负责主持比赛的人。没有访问码的人只能观看。"
+    "accessCodeHelp": "将此访问码分享给负责主持比赛的人。没有访问码的人只能观看。",
+    "tabSignup": "报名",
+    "leagueHeader": "联赛",
+    "emptyMatchdayTitle": "目前没有比赛",
+    "emptyMatchdayBody": "比赛日开始后，这里会显示直播比赛和结果。",
+    "emptyMatchdaySignupCta": "报名下一个比赛日",
+    "emptyMatchdayStatsCta": "查看统计和积分榜"
   },
   "teams": {
     "avgRating": "均",
@@ -352,7 +358,10 @@
     "vipOnly": "仅限VIP报名",
     "vipOnlyDesc": "目前仅VIP球员可以报名。",
     "notVerified": "未认证",
-    "notVerifiedError": "报名前需先签署保险表格，请联系管理员。"
+    "notVerifiedError": "报名前需先签署保险表格，请联系管理员。",
+    "insuranceTitle": "需填写保险表格",
+    "insuranceBody": "每位球员报名前都必须签署保险表格。管理员确认后，你的名字旁会出现蓝色 ✓，即可报名。",
+    "insuranceCta": "填写保险表格"
   },
   "standings": {
     "noTournaments": "暂无赛事。",
@@ -378,7 +387,8 @@
     "winUnit": "{count, plural, other {{count} 胜}}",
     "signupBannerLive": "{date} 报名开放中",
     "signupBannerLiveNoDate": "报名正在进行中",
-    "signupBannerCta": "立即报名 →"
+    "signupBannerCta": "立即报名 →",
+    "recentResults": "最近赛果"
   },
   "signupControl": {
     "sectionTitle": "报名窗口",
@@ -410,5 +420,24 @@
     "requestedAs": "请求名称",
     "declineRequest": "拒绝",
     "verifyToApprove": "需先将球员标记为已认证（已签保险）才能批准。"
+  },
+  "errors": {
+    "notSignedIn": "请先登录，刷新页面后重试。",
+    "createLeagueFailed": "创建联赛失败。",
+    "goalLocked": "赛事已关闭 — 无法保存进球。",
+    "goalFailed": "保存进球失败，请重试。",
+    "resultLocked": "赛事已关闭 — 无法保存比赛结果。",
+    "resultFailed": "保存比赛结果失败，请重试。",
+    "overrideUnauthorized": "无权修改这场比赛。",
+    "matchNotFound": "未找到比赛。",
+    "matchLocked": "该赛事已结束，历史比赛数据无法修改。",
+    "clearListConfirm": "确定要清空当前报名名单吗？",
+    "createPlayerFailed": "创建球员失败。",
+    "alreadySignedUp": "你已报名本次比赛。",
+    "vipOnly": "目前仅限VIP球员报名。",
+    "signupClosed": "报名目前已关闭。",
+    "duplicateName": "该名字已在名单中。",
+    "nameTooLong": "名字不能超过60个字符。",
+    "signupFull": "报名名单已满。"
   }
 }

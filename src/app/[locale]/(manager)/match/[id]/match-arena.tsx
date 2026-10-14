@@ -47,6 +47,7 @@ export function MatchArena({
   match, league, homeTeam, awayTeam, homePlayers, awayPlayers, tournamentFormat, isManager,
 }: Props) {
   const t        = useTranslations('match')
+  const tErr     = useTranslations('errors')
   const supabase = createClient()
 
   const isWinnerContinues = tournamentFormat === 'winner_continues'
@@ -112,6 +113,7 @@ export function MatchArena({
       intervalRef.current = setInterval(tick, 1000)
     } else if (matchStatus === 'paused' && pausedAt && playedAt) {
       // Frozen display — elapsed playing time at the moment of pause
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSecondsElapsed(Math.max(0, Math.floor(
         (new Date(pausedAt).getTime() - new Date(playedAt).getTime()) / 1000
       )))
@@ -225,6 +227,8 @@ export function MatchArena({
   useEffect(() => {
     if (matchStatus !== 'ended' || !match.tournament_id) return
     if (nextMatchId !== null) return  // WC fast path already set it
+    // Loading flag for the network lookup below.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNextMatchLoading(true)
     void (async () => {
       try {
@@ -340,10 +344,10 @@ export function MatchArena({
       const msg = (firstErr as { message?: string }).message ?? ''
       setSaveError(
         msg.includes('TOURNAMENT_LOCKED')
-          ? 'Tournament is closed — goal could not be saved.'
+          ? tErr('goalLocked')
           : msg.includes('row-level security')
             ? t('accessCodeInvalid')
-            : 'Failed to save goal. Please try again.',
+            : tErr('goalFailed'),
       )
     }
   }
@@ -446,8 +450,8 @@ export function MatchArena({
         const msg = (saveErr as { message?: string }).message ?? ''
         setSaveError(
           msg.includes('TOURNAMENT_LOCKED')
-            ? 'Tournament is already closed — match result could not be saved.'
-            : 'Failed to save match result. Please try again.',
+            ? tErr('resultLocked')
+            : tErr('resultFailed'),
         )
         return
       }

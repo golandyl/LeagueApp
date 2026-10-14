@@ -194,7 +194,6 @@ export function AdminPanel({ leagueId, leagueName, onReset }: Props) {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 placeholder={leagueName}
-                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
                 className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:ring-2 focus:ring-rose-500"
               />

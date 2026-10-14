@@ -108,7 +108,13 @@
     "accessCodeCopied": "הועתק!",
     "accessCodeRegenerate": "קוד חדש",
     "accessCodeRegenerateConfirm": "ליצור קוד חדש? הקוד הישן יפסיק לעבוד מיד.",
-    "accessCodeHelp": "שתפו את הקוד עם מי שינהל את המשחקים. מי שאין לו את הקוד יוכל רק לצפות."
+    "accessCodeHelp": "שתפו את הקוד עם מי שינהל את המשחקים. מי שאין לו את הקוד יוכל רק לצפות.",
+    "tabSignup": "הרשמה",
+    "leagueHeader": "ליגה",
+    "emptyMatchdayTitle": "אין משחקים כרגע",
+    "emptyMatchdayBody": "כשיום משחק יתחיל, משחקים חיים ותוצאות יופיעו כאן.",
+    "emptyMatchdaySignupCta": "להרשמה ליום המשחק הבא",
+    "emptyMatchdayStatsCta": "לסטטיסטיקות וטבלה"
   },
   "teams": {
     "avgRating": "ממוצע",
@@ -352,7 +358,10 @@
     "vipOnly": "הרשמת VIP בלבד",
     "vipOnlyDesc": "רק שחקני VIP יכולים להירשם כרגע.",
     "notVerified": "לא מאומת",
-    "notVerifiedError": "יש לחתום על טופס הביטוח לפני ההרשמה. פנו למנהל."
+    "notVerifiedError": "יש לחתום על טופס הביטוח לפני ההרשמה. פנו למנהל.",
+    "insuranceTitle": "נדרש טופס ביטוח",
+    "insuranceBody": "כל שחקן חייב לחתום על טופס הביטוח לפני ההרשמה. אחרי שהמנהל יאשר, יופיע ליד השם שלך ✓ כחול ותוכל להירשם.",
+    "insuranceCta": "למילוי טופס הביטוח"
   },
   "standings": {
     "noTournaments": "אין טורנירים עדיין.",
@@ -378,7 +387,8 @@
     "winUnit": "{count, plural, one {ניצחון} other {ניצחונות}}",
     "signupBannerLive": "ההרשמה פתוחה ל{date}",
     "signupBannerLiveNoDate": "ההרשמה פתוחה עכשיו",
-    "signupBannerCta": "הרשמה עכשיו ←"
+    "signupBannerCta": "הרשמה עכשיו ←",
+    "recentResults": "תוצאות אחרונות"
   },
   "signupControl": {
     "sectionTitle": "חלון הרשמה",
@@ -410,5 +420,24 @@
     "requestedAs": "ביקש בשם",
     "declineRequest": "דחה",
     "verifyToApprove": "סמנו את השחקן כמאומת (חתם על ביטוח) כדי לאשר."
+  },
+  "errors": {
+    "notSignedIn": "יש להתחבר. רעננו את הדף ונסו שוב.",
+    "createLeagueFailed": "יצירת הליגה נכשלה.",
+    "goalLocked": "הטורניר נסגר — לא ניתן לשמור את השער.",
+    "goalFailed": "שמירת השער נכשלה. נסו שוב.",
+    "resultLocked": "הטורניר כבר נסגר — לא ניתן לשמור את תוצאת המשחק.",
+    "resultFailed": "שמירת תוצאת המשחק נכשלה. נסו שוב.",
+    "overrideUnauthorized": "אין הרשאה לתקן את המשחק הזה.",
+    "matchNotFound": "המשחק לא נמצא.",
+    "matchLocked": "הטורניר הסתיים. לא ניתן לשנות נתוני משחקים היסטוריים.",
+    "clearListConfirm": "האם אתה בטוח שברצונך לנקות את רשימת ההרשמה הקיימת?",
+    "createPlayerFailed": "יצירת השחקן נכשלה.",
+    "alreadySignedUp": "כבר נרשמת למפגש הזה.",
+    "vipOnly": "ההרשמה פתוחה כרגע לשחקני VIP בלבד.",
+    "signupClosed": "ההרשמה סגורה כרגע.",
+    "duplicateName": "השם הזה כבר ברשימה.",
+    "nameTooLong": "שמות מוגבלים ל-60 תווים.",
+    "signupFull": "רשימת ההרשמה מלאה."
   }
 }

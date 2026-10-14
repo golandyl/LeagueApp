@@ -34,6 +34,7 @@ export function OverrideMatchModal({
   const t       = useTranslations('match')
   const tEdit   = useTranslations('editMatch')
   const tCommon = useTranslations('common')
+  const tErr    = useTranslations('errors')
   const supabase = createClient()
 
   const [goals,   setGoals]   = useState<DraftGoal[]>([])
@@ -137,8 +138,8 @@ export function OverrideMatchModal({
     if (rpcErr) {
       const msg = rpcErr.message ?? ''
       setError(
-        msg.includes('UNAUTHORIZED')    ? 'Not authorized to override this match.' :
-        msg.includes('MATCH_NOT_FOUND') ? 'Match not found.' :
+        msg.includes('UNAUTHORIZED')    ? tErr('overrideUnauthorized') :
+        msg.includes('MATCH_NOT_FOUND') ? tErr('matchNotFound') :
         msg,
       )
       setSaving(false)

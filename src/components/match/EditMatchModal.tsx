@@ -25,6 +25,7 @@ interface Props {
 export function EditMatchModal({ match, homeTeam, awayTeam, onSave, onClose }: Props) {
   const t       = useTranslations('editMatch')
   const tCommon = useTranslations('common')
+  const tErr    = useTranslations('errors')
   const router  = useRouter()
 
   const [homeScore, setHomeScore] = useState(String(match.home_score ?? 0))
@@ -68,7 +69,7 @@ export function EditMatchModal({ match, homeTeam, awayTeam, onSave, onClose }: P
       const msg = err.message ?? ''
       setError(
         msg.includes('TOURNAMENT_LOCKED')
-          ? 'This tournament has been completed. Historical match data cannot be modified.'
+          ? tErr('matchLocked')
           : msg,
       )
       setLoading(false)

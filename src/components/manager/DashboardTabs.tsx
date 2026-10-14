@@ -14,21 +14,22 @@ import { LeagueStatsPanel }       from './LeagueStatsPanel'
 import { EditMatchModal }          from '@/components/match/EditMatchModal'
 import { AccessCodeCard }          from '@/components/manager/AccessCodeCard'
 import { SignupControlPanel }      from './SignupControlPanel'
+import { TournamentSignup }        from './TournamentSignup'
+import { InsuranceFormCard }       from './InsuranceFormCard'
 import type { Tables } from '@/types/database'
-
-type Signup = Tables<'tournament_signups'>
+import type { TabId } from '@/types/dashboard'
 
 type Player     = Tables<'players'>
 type Tournament = Tables<'tournaments'>
 type Match      = Tables<'matches'>
 type Team       = Tables<'teams'>
 
-type TabId = 'matchday' | 'teams' | 'roster' | 'stats' | 'history'
 
 export interface DashboardTabsProps {
   leagueId:     string
   signupStatus: string
   signupDate:   string | null
+  signupCycle:  string
   maxCapacity:  number
   players:      Player[]
   tournament:   Tournament | null
@@ -37,12 +38,14 @@ export interface DashboardTabsProps {
   teams:        Team[]
   teamPlayers:  { player_id: string; team_id: string }[]
   isManager:    boolean
+  initialTab?:  TabId
 }
 
 export function DashboardTabs({
   leagueId,
   signupStatus,
   signupDate,
+  signupCycle,
   maxCapacity,
   players,
   tournament,
@@ -50,10 +53,11 @@ export function DashboardTabs({
   teams,
   teamPlayers,
   isManager,
+  initialTab = 'matchday',
 }: DashboardTabsProps) {
   const t = useTranslations('dashboard')
 
-  const [active,            setActive]            = useState<TabId>('matchday')
+  const [active,            setActiveState]       = useState<TabId>(initialTab)
   const [liveMatches,       setLiveMatches]       = useState<Match[]>(initialMatches)
   const [activeTournament,  setActiveTournament]  = useState<Tournament | null>(tournament)
   // Lifted from TeamsPanel so swap changes persist across tab switches without
@@ -61,13 +65,21 @@ export function DashboardTabs({
   // changes (new day started or tournament finished).
   const [localTeamPlayers,  setLocalTeamPlayers]  = useState(teamPlayers)
 
-  // Sync RSC prop updates into state after router.refresh().
-  // useState only uses the initializer once, so without these effects
-  // a freshly-created tournament would never appear on the dashboard.
-  useEffect(() => { setActiveTournament(tournament) }, [tournament?.id])
-  useEffect(() => { setLiveMatches(initialMatches)  }, [initialMatches])
-  // Reset team player assignments when a new tournament day begins or ends
-  useEffect(() => { setLocalTeamPlayers(teamPlayers) }, [tournament?.id])  // eslint-disable-line react-hooks/exhaustive-deps
+  // Sync RSC prop updates into state after router.refresh(). useState only
+  // uses its initializer once, so compare against the last-seen props during
+  // render (React's "adjust state when a prop changes" pattern).
+  const [seenTournamentId, setSeenTournamentId] = useState(tournament?.id)
+  if (tournament?.id !== seenTournamentId) {
+    setSeenTournamentId(tournament?.id)
+    setActiveTournament(tournament)
+    // New tournament day began or ended — reset team player assignments
+    setLocalTeamPlayers(teamPlayers)
+  }
+  const [seenMatches, setSeenMatches] = useState(initialMatches)
+  if (initialMatches !== seenMatches) {
+    setSeenMatches(initialMatches)
+    setLiveMatches(initialMatches)
+  }
 
   // Realtime subscription — keeps the dashboard in sync when an anonymous
   // scorekeeper updates match scores or status from their device.
@@ -128,11 +140,27 @@ export function DashboardTabs({
     setLiveMatches(matches)
   }
 
+  // Mirror the tab in ?tab= so a refresh or a shared link reopens it.
+  function setActive(tab: TabId) {
+    setActiveState(tab)
+    const url = new URL(window.location.href)
+    if (tab === 'matchday') url.searchParams.delete('tab')
+    else url.searchParams.set('tab', tab)
+    window.history.replaceState(window.history.state, '', url)
+    window.scrollTo({ top: 0 })
+  }
+
+  const signupPlayers = useMemo(
+    () => players.slice().sort((a, b) => a.full_name.localeCompare(b.full_name)),
+    [players],
+  )
+
   const hasLive  = liveMatches.some(m => m.status === 'live')
   const hasTeams = activeTournament !== null && teams.length > 0
 
   const tabs: { id: TabId; label: string; count?: number; dot?: boolean }[] = [
     { id: 'matchday', label: t('tabMatchday'), dot: hasLive },
+    { id: 'signup',   label: t('tabSignup'), dot: signupStatus !== 'closed' && !hasLive },
     ...(hasTeams ? [{ id: 'teams' as const, label: t('tabTeams'), count: teams.length }] : []),
     { id: 'roster',   label: t('tabRoster'), count: players.length > 0 ? players.length : undefined },
     { id: 'stats',    label: t('tabStats') },
@@ -218,8 +246,6 @@ export function DashboardTabs({
           <MatchdayPanel
             leagueId={leagueId}
             signupStatus={signupStatus}
-            signupDate={signupDate}
-            maxCapacity={maxCapacity}
             players={players}
             tournament={activeTournament}
             matches={liveMatches}
@@ -228,7 +254,37 @@ export function DashboardTabs({
             onMatchUpdate={handleMatchUpdate}
             onTournamentFinished={handleTournamentFinished}
             onTournamentCreated={handleTournamentCreated}
+            onGoTo={setActive}
           />
+        </div>
+      )}
+
+      {active === 'signup' && (
+        <div
+          id="panel-signup"
+          role="tabpanel"
+          className="space-y-6 px-4 py-6"
+        >
+          <InsuranceFormCard />
+          {isManager ? (
+            <SignupControlPanel
+              leagueId={leagueId}
+              signupStatus={signupStatus}
+              signupDate={signupDate}
+              maxCapacity={maxCapacity}
+            />
+          ) : (
+            <TournamentSignup
+              leagueId={leagueId}
+              signupCycle={signupCycle}
+              signupStatus={signupStatus}
+              signupDate={signupDate}
+              maxCapacity={maxCapacity}
+              tournament={activeTournament ? { id: activeTournament.id } : null}
+              players={signupPlayers}
+              isManager={false}
+            />
+          )}
         </div>
       )}
 
@@ -270,8 +326,6 @@ export function DashboardTabs({
 interface MatchdayPanelProps {
   leagueId:               string
   signupStatus:           string
-  signupDate:             string | null
-  maxCapacity:            number
   players:                Player[]
   tournament:             Tournament | null
   matches:                Match[]
@@ -280,13 +334,12 @@ interface MatchdayPanelProps {
   onMatchUpdate:          (updated: Match) => void
   onTournamentFinished:   () => void
   onTournamentCreated:    (tournament: Tournament, matches: Match[]) => void
+  onGoTo:                 (tab: TabId) => void
 }
 
 function MatchdayPanel({
   leagueId,
   signupStatus,
-  signupDate,
-  maxCapacity,
   players,
   tournament,
   matches,
@@ -295,6 +348,7 @@ function MatchdayPanel({
   onMatchUpdate,
   onTournamentFinished,
   onTournamentCreated,
+  onGoTo,
 }: MatchdayPanelProps) {
   const t      = useTranslations('dashboard')
   const tDraft = useTranslations('draft')
@@ -310,14 +364,9 @@ function MatchdayPanel({
   return (
     <div className="space-y-8">
 
-      {/* Manager-only: signup window controls + approval banner */}
-      {isManager && (
-        <SignupControlPanel
-          leagueId={leagueId}
-          signupStatus={signupStatus}
-          signupDate={signupDate}
-          maxCapacity={maxCapacity}
-        />
+      {/* Nothing running — point visitors at signup and stats instead of a blank screen */}
+      {!isManager && !tournament && matches.length === 0 && (
+        <EmptyMatchday signupOpen={signupStatus !== 'closed'} onGoTo={onGoTo} />
       )}
 
       {/* Tournament control — only visible to the manager */}
@@ -504,6 +553,38 @@ function RosterPanel({ leagueId, players, isManager }: RosterPanelProps) {
   )
 }
 
+// ── Empty matchday ─────────────────────────────────────────────────────────────
+
+function EmptyMatchday({ signupOpen, onGoTo }: { signupOpen: boolean; onGoTo: (tab: TabId) => void }) {
+  const t = useTranslations('dashboard')
+
+  return (
+    <section className="flex flex-col items-center gap-4 rounded-2xl bg-zinc-900 px-6 py-10 text-center ring-1 ring-zinc-800">
+      <span className="text-5xl" aria-hidden="true">⚽</span>
+      <div className="space-y-1.5">
+        <h2 className="text-lg font-black text-white">{t('emptyMatchdayTitle')}</h2>
+        <p className="text-sm leading-relaxed text-zinc-400">{t('emptyMatchdayBody')}</p>
+      </div>
+      <div className="flex w-full flex-col gap-2 pt-2">
+        {signupOpen && (
+          <button
+            onClick={() => onGoTo('signup')}
+            className="w-full rounded-xl bg-emerald-600 py-3.5 text-sm font-black text-white transition-all active:scale-[0.98] active:bg-emerald-700"
+          >
+            {t('emptyMatchdaySignupCta')}
+          </button>
+        )}
+        <button
+          onClick={() => onGoTo('stats')}
+          className="w-full rounded-xl bg-zinc-800 py-3.5 text-sm font-bold text-zinc-200 transition-all active:scale-[0.98] active:bg-zinc-700"
+        >
+          {t('emptyMatchdayStatsCta')}
+        </button>
+      </div>
+    </section>
+  )
+}
+
 // ── Shared micro-components ────────────────────────────────────────────────────
 
 function PanelHeader({ children }: { children: React.ReactNode }) {
@@ -576,6 +657,8 @@ function MatchBadge({
 const TAB_ICON_PATHS: Record<TabId, string> = {
   // whistle / play
   matchday: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-1.5-12.75 5.25 3.75-5.25 3.75v-7.5Z',
+  // clipboard with check
+  signup:   'M9 4.5h6M9 4.5a1.5 1.5 0 0 0-1.5 1.5v0H6a1.5 1.5 0 0 0-1.5 1.5v12A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 18 6h-1.5a1.5 1.5 0 0 0-1.5-1.5M9 4.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 4.5M8.25 13.5l2.25 2.25 5.25-5.25',
   // shield
   teams:    'M12 3 4.5 6v5.25c0 4.5 3.2 8.4 7.5 9.75 4.3-1.35 7.5-5.25 7.5-9.75V6L12 3Z',
   // people

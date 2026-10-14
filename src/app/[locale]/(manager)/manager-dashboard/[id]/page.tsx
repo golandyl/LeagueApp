@@ -5,17 +5,21 @@ import { createClient }           from '@/lib/supabase/server'
 import { LeagueSettingsModal }    from '@/components/manager/LeagueSettingsModal'
 import { SignOutButton }          from '@/components/manager/SignOutButton'
 import { DashboardTabs }          from '@/components/manager/DashboardTabs'
+import { TAB_IDS, type TabId }    from '@/types/dashboard'
 import type { Tables } from '@/types/database'
 
 type Match = Tables<'matches'>
 type Team  = Tables<'teams'>
 
 interface Props {
-  params: Promise<{ locale: string; id: string }>
+  params:       Promise<{ locale: string; id: string }>
+  searchParams: Promise<{ tab?: string }>
 }
 
-export default async function ManagerDashboardPage({ params }: Props) {
+export default async function ManagerDashboardPage({ params, searchParams }: Props) {
   const { locale, id: leagueId } = await params
+  const { tab } = await searchParams
+  const initialTab = (TAB_IDS as readonly string[]).includes(tab ?? '') ? tab as TabId : 'matchday'
   setRequestLocale(locale)
 
   const supabase = await createClient()
@@ -77,7 +81,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
         <div className="mx-auto flex max-w-2xl items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-tight text-zinc-400">
-              {t('header')}
+              {isManager ? t('header') : t('leagueHeader')}
             </p>
             <div className="mt-0.5 flex items-center gap-2">
               <h1 className="truncate text-2xl font-black">{league.name}</h1>
@@ -109,6 +113,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
         leagueId={leagueId}
         signupStatus={league.signup_status ?? 'closed'}
         signupDate={league.signup_date ?? null}
+        signupCycle={league.signup_cycle ?? ''}
         maxCapacity={league.max_capacity ?? 16}
         players={resolvedPlayers}
         tournament={tournament ?? null}
@@ -116,6 +121,7 @@ export default async function ManagerDashboardPage({ params }: Props) {
         teams={teams}
         teamPlayers={teamPlayers}
         isManager={isManager}
+        initialTab={initialTab}
       />
 
     </main>

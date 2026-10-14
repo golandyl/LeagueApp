@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [profile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 

@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 export default function CreateLeaguePage() {
   const t      = useTranslations('createLeague')
   const tCommon = useTranslations('common')
+  const tErr    = useTranslations('errors')
   const router = useRouter()
 
   const [name,         setName]         = useState('')
@@ -27,7 +28,7 @@ export default function CreateLeaguePage() {
     const { data: { user }, error: userError } = await supabase.auth.getUser()
 
     if (userError || !user) {
-      setError('You must be signed in. Please refresh and try again.')
+      setError(tErr('notSignedIn'))
       setLoading(false)
       return
     }
@@ -48,7 +49,7 @@ export default function CreateLeaguePage() {
       .single()
 
     if (insertError || !league) {
-      setError(insertError?.message ?? 'Failed to create league.')
+      setError(insertError?.message ?? tErr('createLeagueFailed'))
       setLoading(false)
       return
     }

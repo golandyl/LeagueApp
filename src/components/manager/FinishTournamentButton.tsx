@@ -10,7 +10,6 @@ type Match      = Tables<'matches'>
 type Team       = Tables<'teams'>
 type MatchEvent = Tables<'match_events'>
 type Player     = Tables<'players'>
-type TeamPlayer = Tables<'team_players'>
 
 interface Props {
   tournamentId: string
@@ -85,11 +84,10 @@ export function FinishTournamentButton({ tournamentId, leagueId, onFinished }: P
     const resolvedMatches = (matches ?? []) as Match[]
     const matchIds = resolvedMatches.map(m => m.id)
 
-    const [eventsResult, teamPlayersResult, playersResult] = await Promise.all([
+    const [eventsResult, playersResult] = await Promise.all([
       matchIds.length > 0
         ? supabase.from('match_events').select('*').in('match_id', matchIds)
         : Promise.resolve({ data: [] as MatchEvent[] }),
-      supabase.from('team_players').select('*').eq('tournament_id', tournamentId),
       supabase.from('players').select('*').eq('league_id', leagueId),
     ])
 

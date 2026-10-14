@@ -28,6 +28,7 @@ export function SignupControlPanel({
   maxCapacity:  initCap,
 }: SignupControlPanelProps) {
   const t      = useTranslations('signupControl')
+  const tErr   = useTranslations('errors')
   const locale = useLocale()
   const params = useParams()
   const supabase = useMemo(() => createClient(), [])
@@ -45,9 +46,13 @@ export function SignupControlPanel({
   const [signups,         setSignups]         = useState<Signup[]>([])
 
   // Sync when the RSC page refreshes and passes new props
-  useEffect(() => { setStatus(initStatus)       }, [initStatus])
-  useEffect(() => { setDate(initDate ?? '')      }, [initDate])
-  useEffect(() => { setCapacity(String(initCap)) }, [initCap])
+  const [seenProps, setSeenProps] = useState({ initStatus, initDate, initCap })
+  if (seenProps.initStatus !== initStatus || seenProps.initDate !== initDate || seenProps.initCap !== initCap) {
+    setSeenProps({ initStatus, initDate, initCap })
+    setStatus(initStatus)
+    setDate(initDate ?? '')
+    setCapacity(String(initCap))
+  }
 
   // ── Real-time: league row ────────────────────────────────────────────────────
   useEffect(() => {
@@ -148,7 +153,7 @@ export function SignupControlPanel({
 
   function copySignupLink() {
     const urlLocale    = (params?.locale as string | undefined) ?? locale
-    const generatedUrl = `${window.location.origin}/${urlLocale}/league/${leagueId}/signup`
+    const generatedUrl = `${window.location.origin}/${urlLocale}/manager-dashboard/${leagueId}?tab=signup`
     navigator.clipboard.writeText(generatedUrl)
       .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2500) })
       .catch(() => {})
@@ -210,7 +215,7 @@ export function SignupControlPanel({
   }
 
   async function clearSignups() {
-    if (!window.confirm('האם אתה בטוח שברצונך לנקות את רשימת ההרשמה הקיימת?')) return
+    if (!window.confirm(tErr('clearListConfirm'))) return
     setClearing(true)
 
     const { error: delErr } = await supabase
@@ -521,6 +526,7 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
   const t       = useTranslations('players')
   const tSCP    = useTranslations('signupControl')
   const tCommon = useTranslations('common')
+  const tErr    = useTranslations('errors')
   const supabase = useMemo(() => createClient(), [])
 
   const requestedName = (signup.requested_name ?? signup.player_name).trim()
@@ -562,7 +568,7 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
       .single()
 
     if (playerErr || !newPlayer) {
-      setError(playerErr?.message ?? 'Failed to create player')
+      setError(playerErr?.message ?? tErr('createPlayerFailed'))
       setSaving(false)
       return
     }

@@ -78,7 +78,7 @@ export default async function PublicLeaguePage({ params }: Props) {
               </p>
             </div>
             <Link
-              href={`/league/${leagueId}/signup`}
+              href={`/manager-dashboard/${leagueId}?tab=signup`}
               className="ms-3 shrink-0 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-black text-white transition-all hover:bg-emerald-500 active:scale-95"
             >
               {t('publicBannerCta')}
@@ -108,7 +108,7 @@ export default async function PublicLeaguePage({ params }: Props) {
         {recentMatches.length > 0 && (
           <section>
             <h2 className="mb-3 text-xs font-black uppercase tracking-tight text-zinc-500">
-              {tS('standingsTitle')}
+              {tS('recentResults')}
             </h2>
             <div className="divide-y divide-zinc-800/60 overflow-hidden rounded-xl bg-zinc-900">
               {recentMatches.map(m => {
@@ -165,7 +165,7 @@ export default async function PublicLeaguePage({ params }: Props) {
 
           {signupOpen && (
             <Link
-              href={`/league/${leagueId}/signup`}
+              href={`/manager-dashboard/${leagueId}?tab=signup`}
               className="flex items-center justify-between rounded-xl bg-emerald-950/30 px-4 py-4 ring-1 ring-emerald-700/50 transition-colors hover:bg-emerald-950/50 active:scale-[0.98]"
             >
               <span className="text-sm font-bold text-emerald-400">{t('pageTitle')}</span>

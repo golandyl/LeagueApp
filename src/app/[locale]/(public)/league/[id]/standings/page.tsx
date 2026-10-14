@@ -347,7 +347,7 @@ function SignupBanner({
           <p className="text-sm font-black text-emerald-400">{liveLabel}</p>
         </div>
         <Link
-          href={`/league/${leagueId}/signup`}
+          href={`/manager-dashboard/${leagueId}?tab=signup`}
           className="shrink-0 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-black text-white transition-all hover:bg-emerald-500 active:scale-95"
         >
           {ctaLabel}

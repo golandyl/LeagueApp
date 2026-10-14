@@ -108,7 +108,13 @@
     "accessCodeCopied": "Copied!",
     "accessCodeRegenerate": "New code",
     "accessCodeRegenerateConfirm": "Create a new code? The old one stops working immediately.",
-    "accessCodeHelp": "Share this code with whoever should run matches. Anyone without it can only watch."
+    "accessCodeHelp": "Share this code with whoever should run matches. Anyone without it can only watch.",
+    "tabSignup": "Sign up",
+    "leagueHeader": "League",
+    "emptyMatchdayTitle": "No games right now",
+    "emptyMatchdayBody": "When a matchday starts, live games and results will appear here.",
+    "emptyMatchdaySignupCta": "Sign up for the next matchday",
+    "emptyMatchdayStatsCta": "See stats & standings"
   },
   "teams": {
     "avgRating": "Avg",
@@ -352,7 +358,10 @@
     "vipOnly": "VIP Sign-Up Only",
     "vipOnlyDesc": "Only VIP players can register right now.",
     "notVerified": "not verified",
-    "notVerifiedError": "You need to sign the insurance form before you can sign up. Ask the manager."
+    "notVerifiedError": "You need to sign the insurance form before you can sign up. Ask the manager.",
+    "insuranceTitle": "Insurance form required",
+    "insuranceBody": "Every player must sign the insurance form before signing up. Once the manager confirms it, your name gets a blue ✓ and you can sign up.",
+    "insuranceCta": "Fill in the insurance form"
   },
   "signupControl": {
     "sectionTitle": "Signup Window",
@@ -409,6 +418,26 @@
     "winUnit": "{count, plural, one {win} other {wins}}",
     "signupBannerLive": "Registration is Live for {date}",
     "signupBannerLiveNoDate": "Registration is Now Live",
-    "signupBannerCta": "Sign Up Now →"
+    "signupBannerCta": "Sign Up Now →",
+    "recentResults": "Recent results"
+  },
+  "errors": {
+    "notSignedIn": "You must be signed in. Please refresh and try again.",
+    "createLeagueFailed": "Failed to create league.",
+    "goalLocked": "Tournament is closed — goal could not be saved.",
+    "goalFailed": "Failed to save goal. Please try again.",
+    "resultLocked": "Tournament is already closed — match result could not be saved.",
+    "resultFailed": "Failed to save match result. Please try again.",
+    "overrideUnauthorized": "Not authorized to override this match.",
+    "matchNotFound": "Match not found.",
+    "matchLocked": "This tournament has been completed. Historical match data cannot be modified.",
+    "clearListConfirm": "Are you sure you want to clear the current signup list?",
+    "createPlayerFailed": "Failed to create player.",
+    "alreadySignedUp": "You're already signed up for this session.",
+    "vipOnly": "Signup is currently restricted to VIP players only.",
+    "signupClosed": "Signup is currently closed.",
+    "duplicateName": "That name is already on the list.",
+    "nameTooLong": "Names are limited to 60 characters.",
+    "signupFull": "The signup list is full."
   }
 }
