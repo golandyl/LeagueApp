@@ -2,9 +2,8 @@ import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { MatchArena } from './match-arena'
-import type { Tables } from '@/types/database'
+import { PUBLIC_PLAYER_COLUMNS, withHiddenRatings, type PublicPlayer } from '@/lib/players'
 
-type Player = Tables<'players'>
 
 interface Props {
   params: Promise<{ locale: string; id: string }>
@@ -51,11 +50,11 @@ export default async function MatchPage({ params }: Props) {
 
   const [{ data: homePlayers }, { data: awayPlayers }] = await Promise.all([
     homeIds.length > 0
-      ? supabase.from('players').select('*').in('id', homeIds).eq('is_ghost', false)
-      : Promise.resolve({ data: [] as Player[] }),
+      ? supabase.from('players').select(PUBLIC_PLAYER_COLUMNS).in('id', homeIds).eq('is_ghost', false)
+      : Promise.resolve({ data: [] as PublicPlayer[] }),
     awayIds.length > 0
-      ? supabase.from('players').select('*').in('id', awayIds).eq('is_ghost', false)
-      : Promise.resolve({ data: [] as Player[] }),
+      ? supabase.from('players').select(PUBLIC_PLAYER_COLUMNS).in('id', awayIds).eq('is_ghost', false)
+      : Promise.resolve({ data: [] as PublicPlayer[] }),
   ])
 
   return (
@@ -64,8 +63,8 @@ export default async function MatchPage({ params }: Props) {
       league={league}
       homeTeam={homeTeam}
       awayTeam={awayTeam}
-      homePlayers={homePlayers ?? []}
-      awayPlayers={awayPlayers ?? []}
+      homePlayers={withHiddenRatings(homePlayers)}
+      awayPlayers={withHiddenRatings(awayPlayers)}
       tournamentFormat={tournament?.format ?? 'round_robin'}
       isManager={isManager}
     />

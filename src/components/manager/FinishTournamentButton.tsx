@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
+import { PUBLIC_PLAYER_COLUMNS, withHiddenRatings } from '@/lib/players'
 
 type Match      = Tables<'matches'>
 type Team       = Tables<'teams'>
 type MatchEvent = Tables<'match_events'>
-type Player     = Tables<'players'>
 
 interface Props {
   tournamentId: string
@@ -88,11 +88,11 @@ export function FinishTournamentButton({ tournamentId, leagueId, onFinished }: P
       matchIds.length > 0
         ? supabase.from('match_events').select('*').in('match_id', matchIds)
         : Promise.resolve({ data: [] as MatchEvent[] }),
-      supabase.from('players').select('*').eq('league_id', leagueId),
+      supabase.from('players').select(PUBLIC_PLAYER_COLUMNS).eq('league_id', leagueId),
     ])
 
     const resolvedEvents      = (eventsResult.data      ?? []) as MatchEvent[]
-    const resolvedPlayers     = (playersResult.data     ?? []) as Player[]
+    const resolvedPlayers     = withHiddenRatings(playersResult.data)
 
     // Champion: team with most wins (by regular score, not counting penalty extras)
     const winCount = new Map<string, number>()

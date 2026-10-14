@@ -2,6 +2,7 @@ import { notFound }                from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link }                   from '@/i18n/navigation'
 import { createClient }           from '@/lib/supabase/server'
+import { PUBLIC_PLAYER_COLUMNS, withHiddenRatings } from '@/lib/players'
 import { LeagueSettingsModal }    from '@/components/manager/LeagueSettingsModal'
 import { SignOutButton }          from '@/components/manager/SignOutButton'
 import { DashboardTabs }          from '@/components/manager/DashboardTabs'
@@ -26,19 +27,25 @@ export default async function ManagerDashboardPage({ params, searchParams }: Pro
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [{ data: league }, { data: players }] = await Promise.all([
-    supabase.from('leagues').select('*').eq('id', leagueId).single(),
-    supabase
-      .from('players')
-      .select('*')
-      .eq('league_id', leagueId)
-      .eq('is_ghost', false)
-      .order('rating', { ascending: false }),
-  ])
+  const { data: league } = await supabase.from('leagues').select('*').eq('id', leagueId).single()
 
   if (!league) notFound()
 
   const isManager = !!user && user.id === league.manager_id
+
+  // Ratings and stamina are only readable by the manager (via RPC); everyone
+  // else gets the public columns, sorted by name so the order reveals nothing.
+  const players = isManager
+    ? (await supabase
+        .rpc('get_league_players', { p_league_id: leagueId })
+        .eq('is_ghost', false)
+        .order('rating', { ascending: false })).data ?? []
+    : withHiddenRatings((await supabase
+        .from('players')
+        .select(PUBLIC_PLAYER_COLUMNS)
+        .eq('league_id', leagueId)
+        .eq('is_ghost', false)
+        .order('full_name')).data)
 
   const { data: tournament } = await supabase
     .from('tournaments')
@@ -64,13 +71,9 @@ export default async function ManagerDashboardPage({ params, searchParams }: Pro
     teamPlayers = rawTp      ?? []
   }
 
-  // Ratings are for the manager's eyes only: visitors get players sorted by
-  // name with the rating blanked, so neither the numbers nor the order leak.
   const resolvedPlayers = isManager
-    ? (players ?? [])
-    : (players ?? [])
-        .map(p => ({ ...p, rating: 0 }))
-        .sort((a, b) => a.full_name.localeCompare(b.full_name, locale))
+    ? players
+    : players.slice().sort((a, b) => a.full_name.localeCompare(b.full_name, locale))
 
   // The Roster tab is manager-only.
   const initialTab: TabId = requestedTab === 'roster' && !isManager ? 'matchday' : requestedTab

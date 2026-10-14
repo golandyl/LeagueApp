@@ -4,10 +4,11 @@ import { useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
+import { PUBLIC_PLAYER_COLUMNS, type PublicPlayer } from '@/lib/players'
 
 type Match      = Tables<'matches'>
 type Team       = Tables<'teams'>
-type Player     = Tables<'players'>
+type Player      = PublicPlayer  // leaderboards only need names/positions
 type MatchEvent = Tables<'match_events'>
 type TeamPlayer = Tables<'team_players'>
 
@@ -162,7 +163,7 @@ export function LeagueStatsPanel({ leagueId }: Props) {
         supabase.from('teams').select('*').eq('tournament_id', tournament.id).order('name'),
         supabase.from('matches').select('*').eq('tournament_id', tournament.id),
         supabase.from('team_players').select('*').eq('tournament_id', tournament.id),
-        supabase.from('players').select('*').eq('league_id', leagueId),
+        supabase.from('players').select(PUBLIC_PLAYER_COLUMNS).eq('league_id', leagueId),
       ])
 
       if (cancelled) return

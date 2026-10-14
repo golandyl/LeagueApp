@@ -561,6 +561,11 @@ export type Database = {
       admin_delete_tournament:  { Args: { p_tournament_id: string }; Returns: void }
       has_tournament_access:    { Args: { p_tournament_id: string }; Returns: boolean }
       regenerate_tournament_access_code: { Args: { p_tournament_id: string }; Returns: string }
+      get_league_players: {
+        Args: { p_league_id: string }
+        Returns: Database["public"]["Tables"]["players"]["Row"][]
+        SetofOptions: { from: "*"; to: "players"; isOneToOne: false; isSetofReturn: true }
+      }
     }
     Enums: {
       draft_status: "pending" | "active" | "completed"

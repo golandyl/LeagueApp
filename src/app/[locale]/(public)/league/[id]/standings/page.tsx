@@ -3,10 +3,11 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Link } from '@/i18n/navigation'
 import type { Tables } from '@/types/database'
+import { PUBLIC_PLAYER_COLUMNS, type PublicPlayer } from '@/lib/players'
 
 type Match       = Tables<'matches'>
 type Team        = Tables<'teams'>
-type Player      = Tables<'players'>
+type Player      = PublicPlayer  // leaderboards only need names/positions
 type MatchEvent  = Tables<'match_events'>
 type TeamPlayer  = Tables<'team_players'>
 
@@ -199,7 +200,7 @@ export default async function StandingsPage({ params }: Props) {
     supabase.from('teams').select('*').eq('tournament_id', tournament.id).order('name'),
     supabase.from('matches').select('*').eq('tournament_id', tournament.id),
     supabase.from('team_players').select('*').eq('tournament_id', tournament.id),
-    supabase.from('players').select('*').eq('league_id', leagueId),
+    supabase.from('players').select(PUBLIC_PLAYER_COLUMNS).eq('league_id', leagueId),
   ])
 
   const resolvedMatches     = matches     ?? []

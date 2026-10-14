@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import { PUBLIC_PLAYER_COLUMNS } from '@/lib/players'
 import {
   useDraftArenaStore,
   type Player,
@@ -168,7 +169,7 @@ export function useDraftArena(
     const shortTeams = teams.filter(t => (rosters[t.id]?.length ?? 0) < maxLen)
 
     for (const team of shortTeams) {
-      const { data: ghost } = await supabase
+      const { data: ghostRow } = await supabase
         .from('players')
         .insert({
           league_id: tournament.league_id,
@@ -178,8 +179,12 @@ export function useDraftArena(
           stamina: 'Med',
           is_ghost: true,
         })
-        .select()
+        .select(PUBLIC_PLAYER_COLUMNS)
         .single()
+
+      // rating/stamina aren't readable back (manager-only columns) — re-add
+      // the values we just inserted.
+      const ghost = ghostRow ? { ...ghostRow, rating: 5, stamina: 'Med' as const } : null
 
       if (ghost) {
         // Persist the team assignment

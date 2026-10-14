@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DraftArena } from './arena'
 import type { InitData } from '@/hooks/useDraftArena'
+import { PUBLIC_PLAYER_COLUMNS, withHiddenRatings } from '@/lib/players'
 
 interface Props {
   params:       Promise<{ locale: string; id: string }>
@@ -27,17 +28,28 @@ export default async function DraftPage({ params, searchParams }: Props) {
     { data: { user } },
     { data: league },
     { data: teams },
-    { data: players },
     { data: teamPlayers },
   ] = await Promise.all([
     supabase.auth.getUser(),
     supabase.from('leagues').select('manager_id').eq('id', tournament.league_id).single(),
     supabase.from('teams').select('*').eq('tournament_id', tournamentId).order('name'),
-    supabase.from('players').select('*').eq('league_id', tournament.league_id).eq('is_ghost', false).order('rating', { ascending: false }),
     supabase.from('team_players').select('*').eq('tournament_id', tournamentId).order('drafted_at'),
   ])
 
   const isManager = !!(user && league && user.id === league.manager_id)
+
+  // Ratings/stamina are manager-only; others get public columns by name.
+  const players = isManager
+    ? (await supabase
+        .rpc('get_league_players', { p_league_id: tournament.league_id })
+        .eq('is_ghost', false)
+        .order('rating', { ascending: false })).data ?? []
+    : withHiddenRatings((await supabase
+        .from('players')
+        .select(PUBLIC_PLAYER_COLUMNS)
+        .eq('league_id', tournament.league_id)
+        .eq('is_ghost', false)
+        .order('full_name')).data)
 
   const resolvedTeams       = teams       ?? []
   const resolvedPlayers     = players     ?? []
