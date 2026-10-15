@@ -125,7 +125,8 @@
     "swapPlayer": "تبديل لاعب",
     "swapWith": "تبديل مع",
     "swapHint": "مرر للأسفل لاختيار من تريد التبديل معه",
-    "noSwapOptions": "لا يوجد لاعبون متاحون للتبديل."
+    "noSwapOptions": "لا يوجد لاعبون متاحون للتبديل.",
+    "shareBibsNote": "ارتدِ لون فريقك!"
   },
   "players": {
     "addPlayer": "+ إضافة لاعب",
@@ -148,7 +149,8 @@
     "duplicateAddAnyway": "أضف على أي حال",
     "verifiedToggle": "موثّق (وقّع التأمين)",
     "markVerified": "تعيين كموثّق",
-    "unmarkVerified": "إزالة التوثيق"
+    "unmarkVerified": "إزالة التوثيق",
+    "gkHint": "حارس مرمى ثابت — يلعب في المرمى فقط. يُحسب بتقييم 5 / لياقة متوسطة عند موازنة الفرق."
   },
   "tournament": {
     "startNew": "بدء يوم بطولة جديد",
@@ -419,7 +421,17 @@
     "createAndAdd": "أنشئ وأضف للقائمة",
     "requestedAs": "طلب باسم",
     "declineRequest": "رفض",
-    "verifyToApprove": "عيّن اللاعب كموثّق (وقّع التأمين) للموافقة."
+    "verifyToApprove": "عيّن اللاعب كموثّق (وقّع التأمين) للموافقة.",
+    "shareWhatsApp": "مشاركة عبر واتساب",
+    "inviteHeader": "⚽ *{league}* — التسجيل مفتوح ليوم {date}!",
+    "inviteHeaderNoDate": "⚽ *{league}* — التسجيل مفتوح!",
+    "inviteHeaderVip": "⭐ *{league}* — تسجيل VIP مفتوح ليوم {date}!",
+    "inviteHeaderVipNoDate": "⭐ *{league}* — تسجيل VIP مفتوح!",
+    "inviteNoneYet": "لم يسجّل أحد بعد — كن الأول!",
+    "inviteSignedUp": "✅ المسجّلون ({count}/{cap}):",
+    "inviteWaiting": "⏳ قائمة الانتظار:",
+    "inviteCta": "{spots, plural, one {بقي مكان واحد} other {بقيت # أماكن}} — انضم إلينا! سجّل هنا 👇",
+    "inviteCtaFull": "القائمة ممتلئة، لكن يمكنك الانضمام إلى قائمة الانتظار هنا 👇"
   },
   "errors": {
     "notSignedIn": "يجب تسجيل الدخول. حدّث الصفحة وحاول مرة أخرى.",
@@ -439,5 +451,15 @@
     "duplicateName": "هذا الاسم موجود بالفعل في القائمة.",
     "nameTooLong": "الأسماء محدودة بـ 60 حرفًا.",
     "signupFull": "قائمة التسجيل ممتلئة."
+  },
+  "colors": {
+    "red": "أحمر",
+    "yellow": "أصفر",
+    "blue": "أزرق",
+    "green": "أخضر",
+    "white": "أبيض",
+    "black": "أسود",
+    "orange": "برتقالي",
+    "pink": "وردي"
   }
 }

@@ -64,16 +64,17 @@ function makePlayer(name: string, rating: number, position: Position, stamina: S
   return { name, rating, position, stamina }
 }
 
-// 10-player squad — no ties, varied positions and stamina
+// 10-player squad — no ties, varied positions and stamina.
+// No 'GK' here: GK means a dedicated 5-rated keeper (Rule 6, tested below).
 const squad10: DraftPlayer[] = [
-  makePlayer('Alice',   9, 'GK',  'High'),
+  makePlayer('Alice',   9, 'DEF', 'High'),
   makePlayer('Bob',     8, 'DEF', 'Med'),
   makePlayer('Carol',   7, 'MID', 'Low'),
   makePlayer('Dave',    7, 'FWD', 'High'),
   makePlayer('Eve',     6, 'DEF', 'Med'),
   makePlayer('Frank',   5, 'MID', 'High'),
   makePlayer('Grace',   4, 'FWD', 'Low'),
-  makePlayer('Hank',    3, 'GK',  'Med'),
+  makePlayer('Hank',    3, 'DEF', 'Med'),
   makePlayer('Ivy',     2, 'DEF', 'High'),
   makePlayer('Jack',    1, 'MID', 'Low'),
 ]
@@ -83,14 +84,14 @@ const squad7: DraftPlayer[] = squad10.slice(0, 7)
 
 // 22-player squad — realistic football match
 const squad22: DraftPlayer[] = [
-  makePlayer('P1',  10, 'GK',  'High'), makePlayer('P2',  10, 'GK',  'Med'),
+  makePlayer('P1',  10, 'DEF', 'High'), makePlayer('P2',  10, 'DEF', 'Med'),
   makePlayer('P3',   9, 'DEF', 'High'), makePlayer('P4',   9, 'DEF', 'Low'),
   makePlayer('P5',   8, 'DEF', 'Med'),  makePlayer('P6',   8, 'DEF', 'High'),
   makePlayer('P7',   7, 'MID', 'Med'),  makePlayer('P8',   7, 'MID', 'High'),
   makePlayer('P9',   7, 'MID', 'Low'),  makePlayer('P10',  6, 'MID', 'Med'),
   makePlayer('P11',  6, 'FWD', 'Low'),  makePlayer('P12',  6, 'FWD', 'High'),
   makePlayer('P13',  5, 'FWD', 'Med'),  makePlayer('P14',  5, 'MID', 'Low'),
-  makePlayer('P15',  5, 'DEF', 'High'), makePlayer('P16',  4, 'GK',  'Low'),
+  makePlayer('P15',  5, 'DEF', 'High'), makePlayer('P16',  4, 'DEF', 'Low'),
   makePlayer('P17',  4, 'DEF', 'Med'),  makePlayer('P18',  4, 'MID', 'High'),
   makePlayer('P19',  3, 'FWD', 'Low'),  makePlayer('P20',  3, 'DEF', 'Med'),
   makePlayer('P21',  2, 'MID', 'High'), makePlayer('P22',  1, 'FWD', 'Low'),
@@ -375,6 +376,68 @@ test('Throws if players.length < numTeams', () => {
   let threw = false
   try { generateTeams(squad10.slice(0, 2), 5) } catch { threw = true }
   assert(threw, 'Expected an error when players < numTeams')
+})
+
+// ─── Rule 6: Dedicated goalkeepers ────────────────────────────────────────────
+
+console.log('\n[Rule 6] Dedicated goalkeepers')
+
+function gk(name: string): DraftPlayer {
+  return { name, rating: 5, position: 'GK', stamina: 'Med' }
+}
+function outfield(n: number, seed = 1): DraftPlayer[] {
+  const positions: Position[] = ['DEF', 'MID', 'FWD']
+  const staminas: Stamina[] = ['Low', 'Med', 'High']
+  return Array.from({ length: n }, (_, i) => ({
+    name: `P${i}`,
+    rating: ((i * 7 + seed) % 10) + 1,
+    position: positions[i % 3],
+    stamina: staminas[(i + seed) % 3],
+  }))
+}
+const keepersIn = (t: GeneratedTeam) => t.players.filter(p => p.isGhost || p.position === 'GK').length
+const realGksIn = (t: GeneratedTeam) => t.players.filter(p => !p.isGhost && p.position === 'GK').length
+
+test('One real GK per team when there are as many GKs as teams', () => {
+  for (let run = 0; run < 50; run++) {
+    const teams = generateTeams([gk('G1'), gk('G2'), gk('G3'), ...outfield(15, run)], 3)
+    for (const t of teams) assert(realGksIn(t) === 1, `team ${t.id} has ${realGksIn(t)} GKs`)
+  }
+})
+
+test('Fewer GKs than teams: no team gets two keepers', () => {
+  for (let run = 0; run < 50; run++) {
+    // 2 GKs + 13 outfield = 15 players → 3 teams of 5, no ghosts
+    const teams = generateTeams([gk('G1'), gk('G2'), ...outfield(13, run)], 3)
+    for (const t of teams) assert(keepersIn(t) <= 1, `team ${t.id} has ${keepersIn(t)} keepers`)
+  }
+})
+
+test('Ghost fillers go to teams without a real GK first', () => {
+  for (let run = 0; run < 50; run++) {
+    // 1 GK + 12 outfield = 13 → padded to 15 with 2 ghosts → every team gets exactly one keeper
+    const teams = generateTeams([gk('G1'), ...outfield(12, run)], 3)
+    for (const t of teams) assert(keepersIn(t) === 1, `team ${t.id} has ${keepersIn(t)} keepers`)
+  }
+})
+
+test('Teams stay equal size and every player is used once', () => {
+  const input = [gk('G1'), gk('G2'), ...outfield(17)]
+  const teams = generateTeams(input, 4)
+  const sizes = teams.map(t => t.players.length)
+  assert(sizes.every(n => n === sizes[0]), `uneven sizes ${sizes.join(',')}`)
+  const real = teams.flatMap(t => t.players).filter(p => !p.isGhost)
+  assert(real.length === input.length, `expected ${input.length} real players, got ${real.length}`)
+  assert(new Set(real).size === real.length, 'a player was placed twice')
+})
+
+test('Rating totals stay balanced with goalkeepers (spread ≤ 3)', () => {
+  for (let run = 0; run < 50; run++) {
+    const teams = generateTeams([gk('G1'), gk('G2'), ...outfield(20, run)], 2)
+    const totals = teams.map(t => t.totalRating)
+    const spread = Math.max(...totals) - Math.min(...totals)
+    assert(spread <= 3, `spread ${spread} (${totals.join(' vs ')})`)
+  }
 })
 
 // ─── Summary ──────────────────────────────────────────────────────────────────

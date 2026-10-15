@@ -28,6 +28,12 @@ export function EditPlayerModal({ player, onSave, onDelete, onClose }: Props) {
   const [rating,   setRating]   = useState(player.rating)
   const [position, setPosition] = useState<Position>(player.position as Position)
   const [stamina,  setStamina]  = useState<Stamina>(player.stamina as Stamina)
+
+  // Dedicated goalkeepers are always rated like a ghost GK (pinned in the DB too).
+  function choosePosition(next: Position) {
+    setPosition(next)
+    if (next === 'GK') { setRating(5); setStamina('Med') }
+  }
   const [isVip,        setIsVip]        = useState(player.is_vip ?? false)
   const [isVerified,   setIsVerified]   = useState(player.is_verified ?? false)
   const [saving,       setSaving]       = useState(false)
@@ -129,16 +135,17 @@ export function EditPlayerModal({ player, onSave, onDelete, onClose }: Props) {
                 value={rating}
                 onChange={e => setRating(Number(e.target.value))}
                 min={1} max={10}
+                disabled={position === 'GK'}
                 required
-                className="w-full rounded-xl bg-slate-700 px-3 py-3 text-center text-sm text-white outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full rounded-xl bg-slate-700 px-3 py-3 text-center text-sm text-white outline-none disabled:opacity-50 focus:ring-2 focus:ring-sky-500"
               />
             </div>
             <div>
               <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-400">{t('position')}</p>
               <select
                 value={position}
-                onChange={e => setPosition(e.target.value as Position)}
-                className="w-full rounded-xl bg-slate-700 px-3 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-sky-500"
+                onChange={e => choosePosition(e.target.value as Position)}
+                className="w-full rounded-xl bg-slate-700 px-3 py-3 text-sm text-white outline-none disabled:opacity-50 focus:ring-2 focus:ring-sky-500"
               >
                 {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
@@ -148,12 +155,16 @@ export function EditPlayerModal({ player, onSave, onDelete, onClose }: Props) {
               <select
                 value={stamina}
                 onChange={e => setStamina(e.target.value as Stamina)}
-                className="w-full rounded-xl bg-slate-700 px-3 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-sky-500"
+                disabled={position === 'GK'}
+                className="w-full rounded-xl bg-slate-700 px-3 py-3 text-sm text-white outline-none disabled:opacity-50 focus:ring-2 focus:ring-sky-500"
               >
                 {STAMINAS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>
+          {position === 'GK' && (
+            <p className="text-xs text-amber-400">🧤 {t('gkHint')}</p>
+          )}
 
           {/* VIP toggle */}
           <div className="flex items-center justify-between rounded-xl bg-slate-700/60 px-4 py-3">

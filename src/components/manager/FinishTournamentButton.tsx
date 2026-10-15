@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { findBibColor } from '@/lib/bib-colors'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
 import { PUBLIC_PLAYER_COLUMNS, withHiddenRatings } from '@/lib/players'
@@ -20,6 +21,7 @@ interface Props {
 export function FinishTournamentButton({ tournamentId, leagueId, onFinished }: Props) {
   const t       = useTranslations('dashboard')
   const tCommon = useTranslations('common')
+  const tColors = useTranslations('colors')
   const router  = useRouter()
 
   const [confirming,       setConfirming]       = useState(false)
@@ -131,7 +133,8 @@ export function FinishTournamentButton({ tournamentId, leagueId, onFinished }: P
     const topAssisterPlayer = topAssisterId ? resolvedPlayers.find(p => p.id === topAssisterId[0]) : null
 
     const details: string[] = []
-    if (champion) details.push(`🥇 *Champions:* ${champion.name}`)
+    const championBib = champion ? findBibColor(champion.color) : null
+    if (champion) details.push(`🥇 *Champions:* ${championBib ? `${championBib.emoji} ` : ''}${champion.name}${championBib ? ` (${tColors(championBib.key)})` : ''}`)
     if (topScorerPlayer && topScorerId) details.push(`⚽ *Top Scorer:* ${topScorerPlayer.full_name} (${topScorerId[1]} Goals)`)
     if (topAssisterPlayer && topAssisterId) details.push(`🎯 *Top Assister:* ${topAssisterPlayer.full_name} (${topAssisterId[1]} Assists)`)
 

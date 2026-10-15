@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { generateTeams } from '@/lib/team-generator'
+import { BIB_COLORS } from '@/lib/bib-colors'
 import type { DraftPlayer } from '@/lib/team-generator'
 import type { Tables } from '@/types/database'
 
@@ -22,16 +23,6 @@ interface Props {
 }
 
 // Football bib colours — first three match the three most common sets (Red, Yellow, Blue).
-const BIB_COLORS: { hex: string; label: string }[] = [
-  { hex: '#EF4444', label: 'Red'    },
-  { hex: '#EAB308', label: 'Yellow' },
-  { hex: '#3B82F6', label: 'Blue'   },
-  { hex: '#22C55E', label: 'Green'  },
-  { hex: '#F5F5F5', label: 'White'  },
-  { hex: '#3F3F46', label: 'Black'  },
-  { hex: '#F97316', label: 'Orange' },
-  { hex: '#EC4899', label: 'Pink'   },
-]
 
 const CUP_VALID_COUNTS = [4, 8, 16]
 
@@ -49,6 +40,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
   const t       = useTranslations('tournament')
   const tDraft  = useTranslations('draft')
   const tCommon = useTranslations('common')
+  const tColors = useTranslations('colors')
   const locale  = useLocale()
   const router  = useRouter()
 
@@ -781,7 +773,7 @@ export function StartTournamentButton({ leagueId, players, onCreated }: Props) {
                   className="rounded-lg bg-zinc-800 px-2 py-1.5 text-xs font-bold text-white outline-none focus:ring-2 focus:ring-emerald-500 [color-scheme:dark]"
                 >
                   {BIB_COLORS.map(c => (
-                    <option key={c.hex} value={c.hex}>{c.label}</option>
+                    <option key={c.hex} value={c.hex}>{c.emoji} {tColors(c.key)}</option>
                   ))}
                 </select>
               </div>

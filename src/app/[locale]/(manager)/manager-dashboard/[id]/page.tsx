@@ -123,6 +123,7 @@ export default async function ManagerDashboardPage({ params, searchParams }: Pro
       {/* ── Tabbed content — client component ── */}
       <DashboardTabs
         leagueId={leagueId}
+        leagueName={league.name}
         signupStatus={league.signup_status ?? 'closed'}
         signupDate={league.signup_date ?? null}
         signupCycle={league.signup_cycle ?? ''}

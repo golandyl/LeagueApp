@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
+import { findBibColor } from '@/lib/bib-colors'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database'
 
@@ -53,6 +54,7 @@ function groupByPos(roster: Player[]): Record<Position, Player[]> {
 
 export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp, readOnly = false, onTeamPlayersChange }: Props) {
   const t       = useTranslations('teams')
+  const tColors = useTranslations('colors')
   const tCommon = useTranslations('common')
   const supabase = createClient()
 
@@ -144,12 +146,14 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp,
   // ── WhatsApp share ─────────────────────────────────────────────────────────────
 
   function handleShareWhatsApp() {
-    const lines: string[] = [`🏆 ${tournament.name}`, '']
+    const lines: string[] = [`🏆 ${tournament.name}`, `👕 ${t('shareBibsNote')}`, '']
     for (const team of teams) {
       const roster = teamRosters.get(team.id) ?? []
-      lines.push(`${team.name}:`)
+      const bib = findBibColor(team.color)
+      // e.g. "🔴 *Team A* — Red" so everyone knows which bib to wear
+      lines.push(bib ? `${bib.emoji} *${team.name}* — ${tColors(bib.key)}` : `*${team.name}*`)
       for (const player of roster) {
-        lines.push(`• ${player.full_name}`)
+        lines.push(`• ${player.full_name}${player.position === 'GK' ? ' 🧤' : ''}`)
       }
       lines.push('')
     }

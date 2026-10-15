@@ -18,11 +18,13 @@ export interface SignupControlPanelProps {
   leagueId:     string
   signupStatus: string
   signupDate:   string | null
+  leagueName:   string
   maxCapacity:  number
 }
 
 export function SignupControlPanel({
   leagueId,
+  leagueName,
   signupStatus: initStatus,
   signupDate:   initDate,
   maxCapacity:  initCap,
@@ -151,10 +153,13 @@ export function SignupControlPanel({
     setSaving(false)
   }
 
+  function signupUrl() {
+    const urlLocale = (params?.locale as string | undefined) ?? locale
+    return `${window.location.origin}/${urlLocale}/manager-dashboard/${leagueId}?tab=signup`
+  }
+
   function copySignupLink() {
-    const urlLocale    = (params?.locale as string | undefined) ?? locale
-    const generatedUrl = `${window.location.origin}/${urlLocale}/manager-dashboard/${leagueId}?tab=signup`
-    navigator.clipboard.writeText(generatedUrl)
+    navigator.clipboard.writeText(signupUrl())
       .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2500) })
       .catch(() => {})
   }
@@ -242,6 +247,29 @@ export function SignupControlPanel({
     setClearing(false)
   }
 
+  // WhatsApp invite: who's in so far, the waitlist, and the signup link.
+  function shareSignupOnWhatsApp() {
+    const lines: string[] = [
+      formattedDate
+        ? t(isVipOnly ? 'inviteHeaderVip' : 'inviteHeader', { league: leagueName, date: formattedDate })
+        : t(isVipOnly ? 'inviteHeaderVipNoDate' : 'inviteHeaderNoDate', { league: leagueName }),
+      '',
+    ]
+    if (activeSignups.length === 0) {
+      lines.push(t('inviteNoneYet'))
+    } else {
+      lines.push(t('inviteSignedUp', { count: activeSignups.length, cap }))
+      activeSignups.forEach((s, i) => lines.push(`${i + 1}. ${s.player_name}`))
+    }
+    if (waitingSignups.length > 0) {
+      lines.push('', t('inviteWaiting'))
+      waitingSignups.forEach((s, i) => lines.push(`${activeSignups.length + i + 1}. ${s.player_name}`))
+    }
+    const spotsLeft = cap - activeSignups.length
+    lines.push('', spotsLeft > 0 ? t('inviteCta', { spots: spotsLeft }) : t('inviteCtaFull'), signupUrl())
+    window.open(`https://wa.me/?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener,noreferrer')
+  }
+
   // ── Derived ──────────────────────────────────────────────────────────────────
   const isOpen         = status === 'open' || status === 'vip_only'
   const isVipOnly      = status === 'vip_only'
@@ -290,7 +318,7 @@ export function SignupControlPanel({
                   type="date"
                   value={date}
                   onChange={e => setDate(e.target.value)}
-                  className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500 [color-scheme:dark]"
+                  className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white outline-none disabled:opacity-50 focus:ring-2 focus:ring-emerald-500 [color-scheme:dark]"
                 />
               </div>
               <div className="space-y-1.5">
@@ -303,7 +331,7 @@ export function SignupControlPanel({
                   max={100}
                   value={capacity}
                   onChange={e => setCapacity(e.target.value)}
-                  className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full rounded-lg bg-zinc-800 px-3 py-2.5 text-sm text-white outline-none disabled:opacity-50 focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
             </div>
@@ -372,6 +400,15 @@ export function SignupControlPanel({
                 {saving ? t('saving') : t('openRegularSignups')}
               </button>
             )}
+
+            {/* WhatsApp invite with the current list */}
+            <button
+              onClick={shareSignupOnWhatsApp}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] py-3 text-sm font-black text-white transition-all hover:brightness-110 active:scale-[0.98]"
+            >
+              <WhatsAppIcon />
+              {t('shareWhatsApp')}
+            </button>
 
             {/* Copy link + Close */}
             <div className="grid grid-cols-2 gap-2">
@@ -535,6 +572,12 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
   const [rating,   setRating]   = useState(5)
   const [position, setPosition] = useState<Position>('MID')
   const [stamina,  setStamina]  = useState<Stamina>('Med')
+
+  // Dedicated goalkeepers are always rated like a ghost GK (pinned in the DB too).
+  function choosePosition(next: Position) {
+    setPosition(next)
+    if (next === 'GK') { setRating(5); setStamina('Med') }
+  }
   const [isVip,    setIsVip]    = useState(false)
   const [isVerified, setIsVerified] = useState(false)
   const [saving,   setSaving]   = useState(false)
@@ -645,16 +688,17 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
                 value={rating}
                 onChange={e => setRating(Number(e.target.value))}
                 min={1} max={10}
+                disabled={position === 'GK'}
                 required
-                className="w-full rounded-xl bg-zinc-800 px-3 py-3 text-center text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full rounded-xl bg-zinc-800 px-3 py-3 text-center text-sm text-white outline-none disabled:opacity-50 focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             <div>
               <p className="mb-1 text-xs font-bold uppercase tracking-wide text-zinc-500">{t('position')}</p>
               <select
                 value={position}
-                onChange={e => setPosition(e.target.value as Position)}
-                className="w-full rounded-xl bg-zinc-800 px-3 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                onChange={e => choosePosition(e.target.value as Position)}
+                className="w-full rounded-xl bg-zinc-800 px-3 py-3 text-sm text-white outline-none disabled:opacity-50 focus:ring-2 focus:ring-emerald-500"
               >
                 {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
@@ -664,12 +708,16 @@ function ApproveAndCreateModal({ signup, leagueId, activeCount, cap, onClose }: 
               <select
                 value={stamina}
                 onChange={e => setStamina(e.target.value as Stamina)}
-                className="w-full rounded-xl bg-zinc-800 px-3 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                disabled={position === 'GK'}
+                className="w-full rounded-xl bg-zinc-800 px-3 py-3 text-sm text-white outline-none disabled:opacity-50 focus:ring-2 focus:ring-emerald-500"
               >
                 {STAMINAS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>
+          {position === 'GK' && (
+            <p className="text-xs text-amber-400">🧤 {t('gkHint')}</p>
+          )}
 
           {/* VIP toggle */}
           <div className="flex items-center justify-between rounded-xl bg-zinc-800 px-4 py-3">
@@ -811,6 +859,14 @@ function MiniSpinner() {
         fill="currentColor"
         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
       />
+    </svg>
+  )
+}
+
+function WhatsAppIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35M12.05 21.5h-.01a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.39 9.39 0 0 1-1.44-5.01c0-5.19 4.23-9.42 9.43-9.42a9.37 9.37 0 0 1 6.66 2.76 9.36 9.36 0 0 1 2.76 6.67c0 5.2-4.23 9.42-9.42 9.42m8.02-17.44A11.27 11.27 0 0 0 12.05.75C5.8.75.72 5.83.72 12.08c0 2 .52 3.95 1.52 5.66L.62 23.25l5.65-1.48a11.3 11.3 0 0 0 5.42 1.38h.01c6.25 0 11.33-5.08 11.33-11.33a11.26 11.26 0 0 0-3.32-8.02"/>
     </svg>
   )
 }

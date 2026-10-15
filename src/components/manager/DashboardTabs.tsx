@@ -27,6 +27,7 @@ type Team       = Tables<'teams'>
 
 export interface DashboardTabsProps {
   leagueId:     string
+  leagueName:   string
   signupStatus: string
   signupDate:   string | null
   signupCycle:  string
@@ -43,6 +44,7 @@ export interface DashboardTabsProps {
 
 export function DashboardTabs({
   leagueId,
+  leagueName,
   signupStatus,
   signupDate,
   signupCycle,
@@ -269,6 +271,7 @@ export function DashboardTabs({
           {isManager ? (
             <SignupControlPanel
               leagueId={leagueId}
+              leagueName={leagueName}
               signupStatus={signupStatus}
               signupDate={signupDate}
               maxCapacity={maxCapacity}

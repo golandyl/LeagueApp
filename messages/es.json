@@ -125,7 +125,8 @@
     "swapPlayer": "Intercambiar jugador",
     "swapWith": "Intercambiar con",
     "swapHint": "Desplázate abajo para elegir con quién intercambiar",
-    "noSwapOptions": "No hay jugadores disponibles para intercambiar."
+    "noSwapOptions": "No hay jugadores disponibles para intercambiar.",
+    "shareBibsNote": "¡Ven con el color de tu equipo!"
   },
   "players": {
     "addPlayer": "+ Añadir jugador",
@@ -148,7 +149,8 @@
     "duplicateAddAnyway": "Agregar de todos modos",
     "verifiedToggle": "Verificado (seguro firmado)",
     "markVerified": "Marcar como verificado",
-    "unmarkVerified": "Quitar verificación"
+    "unmarkVerified": "Quitar verificación",
+    "gkHint": "Portero fijo — solo juega en la portería. Cuenta como valoración 5 / resistencia media al equilibrar equipos."
   },
   "tournament": {
     "startNew": "Iniciar nuevo día de torneo",
@@ -419,7 +421,17 @@
     "createAndAdd": "Crear y agregar a la lista",
     "requestedAs": "Solicitado como",
     "declineRequest": "Rechazar",
-    "verifyToApprove": "Marca al jugador como verificado (seguro firmado) para aprobarlo."
+    "verifyToApprove": "Marca al jugador como verificado (seguro firmado) para aprobarlo.",
+    "shareWhatsApp": "Compartir por WhatsApp",
+    "inviteHeader": "⚽ *{league}* — ¡inscripción abierta para el {date}!",
+    "inviteHeaderNoDate": "⚽ *{league}* — ¡inscripción abierta!",
+    "inviteHeaderVip": "⭐ *{league}* — ¡inscripción VIP abierta para el {date}!",
+    "inviteHeaderVipNoDate": "⭐ *{league}* — ¡inscripción VIP abierta!",
+    "inviteNoneYet": "Aún no se ha inscrito nadie — ¡sé el primero!",
+    "inviteSignedUp": "✅ Inscritos ({count}/{cap}):",
+    "inviteWaiting": "⏳ Lista de espera:",
+    "inviteCta": "{spots, plural, one {Queda # plaza} other {Quedan # plazas}} — ¡únete! Inscríbete aquí 👇",
+    "inviteCtaFull": "La lista está completa, pero puedes apuntarte a la lista de espera aquí 👇"
   },
   "errors": {
     "notSignedIn": "Debes iniciar sesión. Actualiza la página e inténtalo de nuevo.",
@@ -439,5 +451,15 @@
     "duplicateName": "Ese nombre ya está en la lista.",
     "nameTooLong": "Los nombres tienen un máximo de 60 caracteres.",
     "signupFull": "La lista de inscripción está completa."
+  },
+  "colors": {
+    "red": "Rojo",
+    "yellow": "Amarillo",
+    "blue": "Azul",
+    "green": "Verde",
+    "white": "Blanco",
+    "black": "Negro",
+    "orange": "Naranja",
+    "pink": "Rosa"
   }
 }

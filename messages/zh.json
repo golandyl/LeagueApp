@@ -125,7 +125,8 @@
     "swapPlayer": "交换球员",
     "swapWith": "与以下球员交换",
     "swapHint": "向下滚动选择要交换的球员",
-    "noSwapOptions": "没有可交换的球员。"
+    "noSwapOptions": "没有可交换的球员。",
+    "shareBibsNote": "请穿上你所在队伍的颜色！"
   },
   "players": {
     "addPlayer": "+ 添加球员",
@@ -148,7 +149,8 @@
     "duplicateAddAnyway": "仍然添加",
     "verifiedToggle": "已认证（已签保险）",
     "markVerified": "标记为已认证",
-    "unmarkVerified": "取消认证"
+    "unmarkVerified": "取消认证",
+    "gkHint": "专职门将——只守门。平衡分队时按评分5 / 中等体能计算。"
   },
   "tournament": {
     "startNew": "开始新的赛事日",
@@ -419,7 +421,17 @@
     "createAndAdd": "创建并添加到列表",
     "requestedAs": "请求名称",
     "declineRequest": "拒绝",
-    "verifyToApprove": "需先将球员标记为已认证（已签保险）才能批准。"
+    "verifyToApprove": "需先将球员标记为已认证（已签保险）才能批准。",
+    "shareWhatsApp": "分享到WhatsApp",
+    "inviteHeader": "⚽ *{league}* — {date}的报名已开放！",
+    "inviteHeaderNoDate": "⚽ *{league}* — 报名已开放！",
+    "inviteHeaderVip": "⭐ *{league}* — {date}的VIP报名已开放！",
+    "inviteHeaderVipNoDate": "⭐ *{league}* — VIP报名已开放！",
+    "inviteNoneYet": "还没有人报名——快来当第一个！",
+    "inviteSignedUp": "✅ 已报名（{count}/{cap}）：",
+    "inviteWaiting": "⏳ 候补名单：",
+    "inviteCta": "还剩 {spots} 个名额——快来加入！点此报名 👇",
+    "inviteCtaFull": "名单已满，但可以在这里加入候补 👇"
   },
   "errors": {
     "notSignedIn": "请先登录，刷新页面后重试。",
@@ -439,5 +451,15 @@
     "duplicateName": "该名字已在名单中。",
     "nameTooLong": "名字不能超过60个字符。",
     "signupFull": "报名名单已满。"
+  },
+  "colors": {
+    "red": "红色",
+    "yellow": "黄色",
+    "blue": "蓝色",
+    "green": "绿色",
+    "white": "白色",
+    "black": "黑色",
+    "orange": "橙色",
+    "pink": "粉色"
   }
 }

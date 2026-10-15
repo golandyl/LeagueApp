@@ -125,7 +125,8 @@
     "swapPlayer": "החלפת שחקן",
     "swapWith": "החלף עם",
     "swapHint": "גלול למטה כדי לבחור עם מי להחליף",
-    "noSwapOptions": "אין שחקנים זמינים להחלפה."
+    "noSwapOptions": "אין שחקנים זמינים להחלפה.",
+    "shareBibsNote": "הגיעו עם הצבע של הקבוצה שלכם!"
   },
   "players": {
     "addPlayer": "+ הוסף שחקן",
@@ -148,7 +149,8 @@
     "duplicateAddAnyway": "הוסף בכל זאת",
     "verifiedToggle": "מאומת (חתם על ביטוח)",
     "markVerified": "סמן כמאומת",
-    "unmarkVerified": "הסר אימות"
+    "unmarkVerified": "הסר אימות",
+    "gkHint": "שוער קבוע — משחק רק בשער. נספר כדירוג 5 / סיבולת בינונית באיזון הקבוצות."
   },
   "tournament": {
     "startNew": "התחל יום טורניר חדש",
@@ -419,7 +421,17 @@
     "createAndAdd": "צור והוסף לרשימה",
     "requestedAs": "ביקש בשם",
     "declineRequest": "דחה",
-    "verifyToApprove": "סמנו את השחקן כמאומת (חתם על ביטוח) כדי לאשר."
+    "verifyToApprove": "סמנו את השחקן כמאומת (חתם על ביטוח) כדי לאשר.",
+    "shareWhatsApp": "שיתוף בוואטסאפ",
+    "inviteHeader": "⚽ *{league}* — ההרשמה ל{date} פתוחה!",
+    "inviteHeaderNoDate": "⚽ *{league}* — ההרשמה פתוחה!",
+    "inviteHeaderVip": "⭐ *{league}* — הרשמת VIP ל{date} פתוחה!",
+    "inviteHeaderVipNoDate": "⭐ *{league}* — הרשמת VIP פתוחה!",
+    "inviteNoneYet": "עוד אף אחד לא נרשם — תהיו הראשונים!",
+    "inviteSignedUp": "✅ נרשמו ({count}/{cap}):",
+    "inviteWaiting": "⏳ רשימת המתנה:",
+    "inviteCta": "{spots, plural, one {נשאר מקום אחד} other {נשארו # מקומות}} — בואו להצטרף! להרשמה 👇",
+    "inviteCtaFull": "הרשימה מלאה, אבל אפשר להיכנס לרשימת ההמתנה 👇"
   },
   "errors": {
     "notSignedIn": "יש להתחבר. רעננו את הדף ונסו שוב.",
@@ -439,5 +451,15 @@
     "duplicateName": "השם הזה כבר ברשימה.",
     "nameTooLong": "שמות מוגבלים ל-60 תווים.",
     "signupFull": "רשימת ההרשמה מלאה."
+  },
+  "colors": {
+    "red": "אדום",
+    "yellow": "צהוב",
+    "blue": "כחול",
+    "green": "ירוק",
+    "white": "לבן",
+    "black": "שחור",
+    "orange": "כתום",
+    "pink": "ורוד"
   }
 }

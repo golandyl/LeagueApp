@@ -125,7 +125,8 @@
     "swapPlayer": "Swap Player",
     "swapWith": "Swap with",
     "swapHint": "Scroll down to pick who to swap with",
-    "noSwapOptions": "No other players available to swap."
+    "noSwapOptions": "No other players available to swap.",
+    "shareBibsNote": "Wear your team colour!"
   },
   "players": {
     "addPlayer": "+ Add Player",
@@ -148,7 +149,8 @@
     "duplicateAddAnyway": "Add Anyway",
     "verifiedToggle": "Verified (insurance signed)",
     "markVerified": "Mark as verified",
-    "unmarkVerified": "Remove verified"
+    "unmarkVerified": "Remove verified",
+    "gkHint": "Dedicated goalkeeper — plays only in goal. Counted as rating 5 / Med stamina for team balancing."
   },
   "tournament": {
     "startNew": "Start New Tournament Day",
@@ -392,7 +394,17 @@
     "createAndAdd": "Create & Add to List",
     "requestedAs": "Requested as",
     "declineRequest": "Decline",
-    "verifyToApprove": "Mark the player as verified (insurance signed) to approve."
+    "verifyToApprove": "Mark the player as verified (insurance signed) to approve.",
+    "shareWhatsApp": "Share on WhatsApp",
+    "inviteHeader": "⚽ *{league}* — signup is open for {date}!",
+    "inviteHeaderNoDate": "⚽ *{league}* — signup is open!",
+    "inviteHeaderVip": "⭐ *{league}* — VIP signup is open for {date}!",
+    "inviteHeaderVipNoDate": "⭐ *{league}* — VIP signup is open!",
+    "inviteNoneYet": "Nobody has signed up yet — be the first!",
+    "inviteSignedUp": "✅ Signed up ({count}/{cap}):",
+    "inviteWaiting": "⏳ Waiting list:",
+    "inviteCta": "{spots, plural, one {Only # spot left} other {# spots left}} — come join us! Sign up here 👇",
+    "inviteCtaFull": "The list is full, but join the waiting list here 👇"
   },
   "standings": {
     "noTournaments": "No tournaments yet.",
@@ -439,5 +451,15 @@
     "duplicateName": "That name is already on the list.",
     "nameTooLong": "Names are limited to 60 characters.",
     "signupFull": "The signup list is full."
+  },
+  "colors": {
+    "red": "Red",
+    "yellow": "Yellow",
+    "blue": "Blue",
+    "green": "Green",
+    "white": "White",
+    "black": "Black",
+    "orange": "Orange",
+    "pink": "Pink"
   }
 }
