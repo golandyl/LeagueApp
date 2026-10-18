@@ -20,6 +20,7 @@ export function LeagueSettingsModal({ league }: Props) {
 
   const [open, setOpen] = useState(false)
 
+  const [name,         setName]         = useState(league.name)
   const [matchMin,     setMatchMin]     = useState(league.match_length_minutes)
   const [otMin,        setOtMin]        = useState(league.overtime_length_minutes)
   const [overtimeType, setOvertimeType] = useState<'GOLDEN_GOAL' | 'CLASSIC'>(
@@ -51,6 +52,7 @@ export function LeagueSettingsModal({ league }: Props) {
     const { error } = await supabase
       .from('leagues')
       .update({
+        name:                    name.trim(),
         match_length_minutes:    matchMin,
         overtime_length_minutes: otMin,
         overtime_type:           overtimeType,
@@ -124,6 +126,17 @@ export function LeagueSettingsModal({ league }: Props) {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
+
+              <Field label={tCreate('leagueName')}>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  maxLength={60}
+                  required
+                  className={inputCls}
+                />
+              </Field>
 
               <div className="grid grid-cols-2 gap-3">
                 <Field label={tCreate('matchLength')}>

@@ -9,6 +9,7 @@ import type { Tables } from '@/types/database'
 type Team       = Tables<'teams'>
 type Player     = Tables<'players'>
 type Tournament = Tables<'tournaments'>
+type Match      = Tables<'matches'>
 type Position   = 'GK' | 'DEF' | 'MID' | 'FWD'
 type ViewMode   = 'pitch' | 'stats'
 
@@ -18,6 +19,7 @@ interface Props {
   tournament:           Tournament
   teams:                Team[]
   players:              Player[]
+  matches?:             Match[]
   teamPlayers:          TeamPlayerRow[]
   readOnly?:            boolean
   onTeamPlayersChange?: (updated: TeamPlayerRow[]) => void
@@ -52,7 +54,7 @@ function groupByPos(roster: Player[]): Record<Position, Player[]> {
 
 // ── Root panel ─────────────────────────────────────────────────────────────────
 
-export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp, readOnly = false, onTeamPlayersChange }: Props) {
+export function TeamsPanel({ tournament, teams, players, matches = [], teamPlayers: initialTp, readOnly = false, onTeamPlayersChange }: Props) {
   const t       = useTranslations('teams')
   const tColors = useTranslations('colors')
   const tCommon = useTranslations('common')
@@ -163,6 +165,21 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp,
       }
       lines.push('')
     }
+
+    // First game still to be played (earliest created), e.g. "🔴 Team A vs 🔵 Team B"
+    const firstMatch = matches
+      .filter(m => m.status !== 'completed' && m.status !== 'cancelled')
+      .sort((a, b) => a.created_at.localeCompare(b.created_at))[0]
+    if (firstMatch) {
+      const label = (teamId: string) => {
+        const team = teams.find(tm => tm.id === teamId)
+        if (!team) return '?'
+        const bib = findBibColor(team.color)
+        return bib ? `${bib.emoji} ${team.name}` : team.name
+      }
+      lines.push(t('shareFirstGame', { home: label(firstMatch.home_team_id), away: label(firstMatch.away_team_id) }))
+    }
+
     const text = lines.join('\n').trim()
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
   }

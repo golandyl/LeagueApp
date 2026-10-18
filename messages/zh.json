@@ -126,7 +126,8 @@
     "swapWith": "与以下球员交换",
     "swapHint": "向下滚动选择要交换的球员",
     "noSwapOptions": "没有可交换的球员。",
-    "shareBibsNote": "请穿上你所在队伍的颜色！"
+    "shareBibsNote": "请穿上你所在队伍的颜色！",
+    "shareFirstGame": "⚽ *首场比赛：*{home} 对 {away}"
   },
   "players": {
     "addPlayer": "+ 添加球员",

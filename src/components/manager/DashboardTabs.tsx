@@ -232,6 +232,7 @@ export function DashboardTabs({
             tournament={activeTournament}
             teams={teams}
             players={players}
+            matches={liveMatches}
             teamPlayers={localTeamPlayers}
             onTeamPlayersChange={setLocalTeamPlayers}
             readOnly={!isManager}

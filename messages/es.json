@@ -126,7 +126,8 @@
     "swapWith": "Intercambiar con",
     "swapHint": "Desplázate abajo para elegir con quién intercambiar",
     "noSwapOptions": "No hay jugadores disponibles para intercambiar.",
-    "shareBibsNote": "¡Ven con el color de tu equipo!"
+    "shareBibsNote": "¡Ven con el color de tu equipo!",
+    "shareFirstGame": "⚽ *Primer partido:* {home} vs {away}"
   },
   "players": {
     "addPlayer": "+ Añadir jugador",

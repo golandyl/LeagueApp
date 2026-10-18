@@ -126,7 +126,8 @@
     "swapWith": "Swap with",
     "swapHint": "Scroll down to pick who to swap with",
     "noSwapOptions": "No other players available to swap.",
-    "shareBibsNote": "Wear your team colour!"
+    "shareBibsNote": "Wear your team colour!",
+    "shareFirstGame": "⚽ *First game:* {home} vs {away}"
   },
   "players": {
     "addPlayer": "+ Add Player",

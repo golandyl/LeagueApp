@@ -126,7 +126,8 @@
     "swapWith": "החלף עם",
     "swapHint": "גלול למטה כדי לבחור עם מי להחליף",
     "noSwapOptions": "אין שחקנים זמינים להחלפה.",
-    "shareBibsNote": "הגיעו עם הצבע של הקבוצה שלכם!"
+    "shareBibsNote": "הגיעו עם הצבע של הקבוצה שלכם!",
+    "shareFirstGame": "⚽ *משחק ראשון:* {home} נגד {away}"
   },
   "players": {
     "addPlayer": "+ הוסף שחקן",
