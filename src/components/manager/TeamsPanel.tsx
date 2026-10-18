@@ -76,6 +76,9 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp,
       if (!player) continue   // ghost — not in non-ghost player list
       rosters.get(tp.team_id)?.push(player)
     }
+    // team_players are saved strongest-first by the generator — sort by name
+    // so the on-screen order doesn't reveal the ranking.
+    for (const roster of rosters.values()) roster.sort((a, b) => a.full_name.localeCompare(b.full_name))
     return rosters
   }, [localTp, playerById, teams])
 
@@ -152,7 +155,10 @@ export function TeamsPanel({ tournament, teams, players, teamPlayers: initialTp,
       const bib = findBibColor(team.color)
       // e.g. "🔴 *Team A* — Red" so everyone knows which bib to wear
       lines.push(bib ? `${bib.emoji} *${team.name}* — ${tColors(bib.key)}` : `*${team.name}*`)
-      for (const player of roster) {
+      // Shuffled so the list doesn't reveal the rating order; keeper last.
+      const outfield = shuffle(roster.filter(p => p.position !== 'GK'))
+      const keepers  = roster.filter(p => p.position === 'GK')
+      for (const player of [...outfield, ...keepers]) {
         lines.push(`• ${player.full_name}${player.position === 'GK' ? ' 🧤' : ''}`)
       }
       lines.push('')
@@ -640,6 +646,17 @@ function ListIcon() {
       <circle cx="2.5" cy="12" r="1" fill="currentColor" stroke="none" />
     </svg>
   )
+}
+
+// ── Shuffle (Fisher–Yates) ─────────────────────────────────────────────────────
+
+function shuffle<T>(items: T[]): T[] {
+  const a = items.slice()
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
 }
 
 // ── WhatsApp icon ──────────────────────────────────────────────────────────────
