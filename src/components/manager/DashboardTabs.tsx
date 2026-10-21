@@ -16,6 +16,7 @@ import { AccessCodeCard }          from '@/components/manager/AccessCodeCard'
 import { SignupControlPanel }      from './SignupControlPanel'
 import { TournamentSignup }        from './TournamentSignup'
 import { InsuranceFormCard }       from './InsuranceFormCard'
+import { SignupAutomationCard }    from './SignupAutomationCard'
 import type { Tables } from '@/types/database'
 import type { TabId } from '@/types/dashboard'
 
@@ -270,13 +271,16 @@ export function DashboardTabs({
         >
           <InsuranceFormCard />
           {isManager ? (
-            <SignupControlPanel
-              leagueId={leagueId}
-              leagueName={leagueName}
-              signupStatus={signupStatus}
-              signupDate={signupDate}
-              maxCapacity={maxCapacity}
-            />
+            <>
+              <SignupControlPanel
+                leagueId={leagueId}
+                leagueName={leagueName}
+                signupStatus={signupStatus}
+                signupDate={signupDate}
+                maxCapacity={maxCapacity}
+              />
+              <SignupAutomationCard leagueId={leagueId} />
+            </>
           ) : (
             <TournamentSignup
               leagueId={leagueId}

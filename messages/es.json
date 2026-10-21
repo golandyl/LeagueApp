@@ -462,5 +462,23 @@
     "black": "Negro",
     "orange": "Naranja",
     "pink": "Rosa"
+  },
+  "automation": {
+    "title": "Inscripción automática",
+    "enable": "Inscripción semanal automática",
+    "autoResetNote": "Siempre activo: el día después de la jornada a las {time} la lista se vacía y la inscripción se cierra, aunque lo olvides.",
+    "matchday": "Día de partido",
+    "vipOpens": "Abre la inscripción VIP",
+    "regularOpens": "Abre la inscripción normal",
+    "sameDay": "El día del partido",
+    "daysBefore": "{count, plural, one {# día antes} other {# días antes}}",
+    "vipOrderError": "La inscripción VIP debe abrir antes que la normal.",
+    "nextRound": "Próxima ronda",
+    "previewVip": "VIP abre {when}",
+    "previewOpen": "Normal abre {when}",
+    "previewMatch": "Partido {when}",
+    "previewReset": "La lista se vacía {when}",
+    "save": "Guardar horario",
+    "saved": "Guardado"
   }
 }

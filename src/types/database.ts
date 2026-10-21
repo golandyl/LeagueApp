@@ -467,6 +467,59 @@ export type Database = {
           },
         ]
       }
+      signup_schedules: {
+        Row: {
+          league_id:        string
+          enabled:          boolean
+          match_weekday:    number
+          vip_enabled:      boolean
+          vip_days_before:  number
+          vip_open_time:    string
+          open_days_before: number
+          open_time:        string
+          timezone:         string
+          last_vip_round:   string | null
+          last_open_round:  string | null
+          updated_at:       string
+        }
+        Insert: {
+          league_id:        string
+          enabled?:          boolean
+          match_weekday?:    number
+          vip_enabled?:      boolean
+          vip_days_before?:  number
+          vip_open_time?:    string
+          open_days_before?: number
+          open_time?:        string
+          timezone?:         string
+          last_vip_round?:   string | null
+          last_open_round?:  string | null
+          updated_at?:       string
+        }
+        Update: {
+          league_id?:        string
+          enabled?:          boolean
+          match_weekday?:    number
+          vip_enabled?:      boolean
+          vip_days_before?:  number
+          vip_open_time?:    string
+          open_days_before?: number
+          open_time?:        string
+          timezone?:         string
+          last_vip_round?:   string | null
+          last_open_round?:  string | null
+          updated_at?:       string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signup_schedules_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: true
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_access_codes: {
         Row: {
           tournament_id: string

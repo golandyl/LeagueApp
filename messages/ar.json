@@ -462,5 +462,23 @@
     "black": "أسود",
     "orange": "برتقالي",
     "pink": "وردي"
+  },
+  "automation": {
+    "title": "تسجيل تلقائي",
+    "enable": "تسجيل أسبوعي تلقائي",
+    "autoResetNote": "يعمل دائمًا: في اليوم التالي ليوم المباراة الساعة {time} تُمسح القائمة ويُغلق التسجيل — حتى لو نسيت.",
+    "matchday": "يوم المباراة",
+    "vipOpens": "فتح تسجيل VIP",
+    "regularOpens": "فتح التسجيل العادي",
+    "sameDay": "في يوم المباراة",
+    "daysBefore": "{count, plural, one {قبل يوم} two {قبل يومين} few {قبل # أيام} other {قبل # يومًا}}",
+    "vipOrderError": "يجب أن يُفتح تسجيل VIP قبل التسجيل العادي.",
+    "nextRound": "الجولة القادمة",
+    "previewVip": "يُفتح VIP في {when}",
+    "previewOpen": "يُفتح التسجيل العادي في {when}",
+    "previewMatch": "يوم المباراة: {when}",
+    "previewReset": "تُمسح القائمة في {when}",
+    "save": "حفظ الجدول",
+    "saved": "تم الحفظ"
   }
 }

@@ -462,5 +462,23 @@
     "black": "Black",
     "orange": "Orange",
     "pink": "Pink"
+  },
+  "automation": {
+    "title": "Automatic signup",
+    "enable": "Automatic weekly signup",
+    "autoResetNote": "Always on: the day after the matchday at {time}, the list is cleared and signup closes — even if you forget.",
+    "matchday": "Matchday",
+    "vipOpens": "VIP signup opens",
+    "regularOpens": "Regular signup opens",
+    "sameDay": "On the matchday",
+    "daysBefore": "{count, plural, one {# day before} other {# days before}}",
+    "vipOrderError": "VIP signup has to open before regular signup.",
+    "nextRound": "Next round",
+    "previewVip": "VIP opens {when}",
+    "previewOpen": "Regular opens {when}",
+    "previewMatch": "Matchday {when}",
+    "previewReset": "List clears {when}",
+    "save": "Save schedule",
+    "saved": "Saved"
   }
 }

@@ -462,5 +462,23 @@
     "black": "שחור",
     "orange": "כתום",
     "pink": "ורוד"
+  },
+  "automation": {
+    "title": "הרשמה אוטומטית",
+    "enable": "הרשמה שבועית אוטומטית",
+    "autoResetNote": "פועל תמיד: ביום שאחרי יום המשחק בשעה {time} הרשימה מתנקה וההרשמה נסגרת — גם אם שכחת.",
+    "matchday": "יום משחק",
+    "vipOpens": "הרשמת VIP נפתחת",
+    "regularOpens": "הרשמה רגילה נפתחת",
+    "sameDay": "ביום המשחק",
+    "daysBefore": "{count, plural, one {יום לפני} two {יומיים לפני} other {# ימים לפני}}",
+    "vipOrderError": "הרשמת ה-VIP צריכה להיפתח לפני ההרשמה הרגילה.",
+    "nextRound": "הסבב הבא",
+    "previewVip": "VIP נפתח ב{when}",
+    "previewOpen": "הרשמה רגילה נפתחת ב{when}",
+    "previewMatch": "יום משחק: {when}",
+    "previewReset": "הרשימה מתנקה ב{when}",
+    "save": "שמירת התזמון",
+    "saved": "נשמר"
   }
 }
